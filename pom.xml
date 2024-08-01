@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.hjow.samples</groupId>
+  <artifactId>com.hjow.samples</artifactId>
+  <version>0.0.1</version>
+  <name>SampleJavaCodes</name>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <repositories>
+      <repository>
+          <id>mvn2s</id>
+          <url>https://repo1.maven.org/maven2/</url>
+          <releases>
+              <enabled>true</enabled>
+          </releases>
+          <snapshots>
+              <enabled>true</enabled>
+          </snapshots>
+      </repository>
+      <repository>
+    	<id>egovframe</id>
+    	<url>https://maven.egovframe.go.kr/maven/</url>
+    	<releases>
+    		<enabled>true</enabled>
+    	</releases>
+    	<snapshots>
+    		<enabled>false</enabled>
+    	</snapshots>
+      </repository>
+      
+      <repository>
+    	<id>java.net2</id>
+    	<name>Repository hosting the jee6 artifacts</name>
+    	<url>http://download.java.net/maven/2</url>
+      </repository>
+  </repositories>
+  <dependencies>
+	  <dependency>
+		  <groupId>javax.mail</groupId>
+		  <artifactId>javax.mail-api</artifactId>
+		  <version>1.4.7</version>
+	  </dependency>
+	  <dependency>
+		  <groupId>javax.mail</groupId>
+		  <artifactId>mail</artifactId>
+		  <version>1.4.7</version>
+	  </dependency>
+  </dependencies>
+</project>
