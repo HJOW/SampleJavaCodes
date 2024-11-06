@@ -10,6 +10,10 @@
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
+  <properties>
+      <spring.maven.artifact.version>5.3.27</spring.maven.artifact.version>
+      <org.egovframe.rte.version>4.2.0</org.egovframe.rte.version>
+  </properties>
   <repositories>
       <repository>
           <id>mvn2s</id>
@@ -39,6 +43,7 @@
       </repository>
   </repositories>
   <dependencies>
+      <!-- javamail 패키지 의존성 START -->
 	  <dependency>
 		  <groupId>javax.mail</groupId>
 		  <artifactId>javax.mail-api</artifactId>
@@ -49,5 +54,91 @@
 		  <artifactId>mail</artifactId>
 		  <version>1.4.7</version>
 	  </dependency>
+	  <!-- javamail 패키지 의존성 END -->
+	  <!-- simplecryptor 패키지 의존성 START -->
+	  <dependency>
+          <groupId>commons-codec</groupId>
+          <artifactId>commons-codec</artifactId>
+          <version>1.14</version>
+      </dependency>
+      <dependency>
+          <groupId>org.egovframe.rte</groupId>
+          <artifactId>org.egovframe.rte.fdl.cmmn</artifactId>
+          <version>${org.egovframe.rte.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.egovframe.rte</groupId>
+          <artifactId>org.egovframe.rte.fdl.idgnr</artifactId>
+          <version>${org.egovframe.rte.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.egovframe.rte</groupId>
+          <artifactId>org.egovframe.rte.fdl.property</artifactId>
+          <version>${org.egovframe.rte.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.egovframe.rte</groupId>
+          <artifactId>org.egovframe.rte.fdl.string</artifactId>
+          <version>${org.egovframe.rte.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.egovframe.rte</groupId>
+          <artifactId>org.egovframe.rte.fdl.security</artifactId>
+          <version>${org.egovframe.rte.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>org.egovframe.rte</groupId>
+          <artifactId>org.egovframe.rte.fdl.crypto</artifactId>
+          <version>${org.egovframe.rte.version}</version>
+      </dependency>
+      <!-- simplecryptor 패키지 의존성 END -->
   </dependencies>
+  <build>
+    <defaultGoal>package</defaultGoal>
+    <sourceDirectory>src</sourceDirectory>
+    <finalName>SimpleCryptor</finalName>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.4.2</version>
+          <configuration>
+              <archive>
+                  <manifest>
+                      <mainClass>com.hjow.propcryptor.SimpleCryptor</mainClass>
+                      <addClasspath>true</addClasspath>
+                      <classpathPrefix>lib/</classpathPrefix>
+                  </manifest>
+              </archive>
+          </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.8.1</version>
+          <executions>
+              <execution>
+                  <id>copy-dependencies</id>
+                  <phase>package</phase>
+                  <goals>
+                      <goal>copy-dependencies</goal>
+                  </goals>
+                  <configuration>
+                      <includeScope>runtime</includeScope>
+                      <outputDirectory>${project.build.directory}/lib/</outputDirectory>
+                  </configuration>
+              </execution>
+          </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
