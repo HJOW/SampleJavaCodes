@@ -1,4 +1,4 @@
-package com.hjow.img2base64;
+package org.duckdns.hjow.samples.img2base64;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

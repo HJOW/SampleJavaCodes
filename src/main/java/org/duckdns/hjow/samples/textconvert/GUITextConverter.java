@@ -1,4 +1,4 @@
-package com.hjow.textconvert;
+package org.duckdns.hjow.samples.textconvert;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

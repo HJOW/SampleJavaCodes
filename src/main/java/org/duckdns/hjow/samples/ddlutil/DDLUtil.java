@@ -1,4 +1,4 @@
-package com.hjow.ddlutil;
+package org.duckdns.hjow.samples.ddlutil;
 
 import java.io.Serializable;
 import java.util.ArrayList;

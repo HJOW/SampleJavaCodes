@@ -1,4 +1,4 @@
-package com.hjow.textconvert;
+package org.duckdns.hjow.samples.textconvert;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;

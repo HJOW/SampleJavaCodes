@@ -1,4 +1,4 @@
-package com.hjow.listmanager;
+package org.duckdns.hjow.samples.listmanager;
 
 import java.io.BufferedWriter;
 import java.io.File;

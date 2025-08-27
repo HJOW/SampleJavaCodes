@@ -1,4 +1,4 @@
-package com.hjow.javamail;
+package org.duckdns.hjow.samples.javamail;
 
 import java.util.Properties;
 

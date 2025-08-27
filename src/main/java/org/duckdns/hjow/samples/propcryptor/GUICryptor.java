@@ -1,4 +1,4 @@
-package com.hjow.propcryptor;
+package org.duckdns.hjow.samples.propcryptor;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
