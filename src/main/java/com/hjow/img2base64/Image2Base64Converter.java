@@ -1,0 +1,66 @@
+package com.hjow.img2base64;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.StringTokenizer;
+
+import javax.xml.bind.DatatypeConverter;
+
+/** 이미지 (jpg, png) 파일을 입력받아 BASE64 문자열 출력 */
+public class Image2Base64Converter {
+    /** 이미지 (jpg, png) 파일을 입력받아 BASE64 문자열 출력, 확장자를 따로 입력해 주어야 함 (jpg, png만 허용) */
+    public String convert(File file, String ext) {
+        if(file == null) throw new RuntimeException("There is no file !");
+        if(! file.exists()) throw new RuntimeException("There is no file at " + file.getAbsolutePath());
+        if(file.isDirectory()) throw new RuntimeException("Please input image file !");
+        
+        FileInputStream fileIn = null;
+        ByteArrayOutputStream collector = new ByteArrayOutputStream();
+        StringBuilder res = new StringBuilder("");
+        byte[] buffer1 = new byte[2048];
+        try {
+            fileIn = new FileInputStream(file);
+            int r;
+            
+            while(true) {
+                r = fileIn.read(buffer1, 0, buffer1.length);
+                if(r < 0) break;
+                
+                collector.write(buffer1, 0, r);
+            }
+            
+            fileIn.close(); fileIn = null;
+            res = res.append( DatatypeConverter.printBase64Binary(collector.toByteArray()) );
+            collector = null;
+        } catch(Exception ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        } finally {
+            if(fileIn != null) { try { fileIn.close(); } catch(Exception ignores) {} }
+        }
+        
+        return res.toString().trim();
+    }
+    
+    /** 이미지 (jpg, png) 파일을 입력받아 BASE64 문자열 출력, 파일 이름으로 확장자를 판단 */
+    public String convert(File file) {
+        if(file == null) throw new RuntimeException("There is no file !");
+        if(! file.exists()) throw new RuntimeException("There is no file at " + file.getAbsolutePath());
+        if(file.isDirectory()) throw new RuntimeException("Please input image file !");
+        
+        String name = file.getName().toLowerCase();
+        String lasts = "";
+        boolean firsts = true;
+        
+        StringTokenizer dotTokenizer = new StringTokenizer(name, ".");
+        while(dotTokenizer.hasMoreTokens()) {
+            if(firsts) { firsts = false; continue; }
+            lasts = dotTokenizer.nextToken();
+        }
+        
+        if(lasts.equals("jpg")) return convert(file, "jpg");
+        if(lasts.equals("png")) return convert(file, "png");
+        
+        throw new IllegalArgumentException("Unknown image ext");
+    }
+}
