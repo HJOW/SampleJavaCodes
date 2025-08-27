@@ -1,6 +1,8 @@
 package org.duckdns.hjow.samples.img2base64;
 
 import java.awt.BorderLayout;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -15,14 +17,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -47,12 +56,16 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements R
     protected JFrame frame;
     protected JTextField tfPath;
     protected JTextArea taRes, taLog;
+    protected JCheckBox chkPrefix;
     protected JFileChooser fileChooser;
     protected JButton btnFile, btnRun;
     protected JProgressBar prog;
     protected JSplitPane splits;
+    protected JMenuItem mnFileRun;
     
+    /** 객체 생성 및 UI 세팅 */
     public GUIImage2Base64Converter() {
+        // LookAndFeel 설정
         try {
             LookAndFeelInfo[] looAndFeels = UIManager.getInstalledLookAndFeels();
             for(LookAndFeelInfo lookAndFeelOne : looAndFeels) {
@@ -62,14 +75,18 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements R
             }
         } catch(Exception ex) { ex.printStackTrace(); }
         
+        // JFrame 설정
         frame = new JFrame();
         frame.setSize(600, 400);
         frame.setTitle("Image 2 Base64 Converter");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setIconImage(iconToImage(UIManager.getIcon("OptionPane.informationIcon")));
         frame.setLayout(new BorderLayout());
         
+        // 기본 날짜 포맷 (로그 출력 시 사용)
         formatter16 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         
+        // UI 요소 구성
         JPanel pnMain, pnTop, pnCenter, pnDown, pnCtrl;
         
         pnMain = new JPanel();
@@ -100,6 +117,10 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements R
         
         JToolBar toolbar = new JToolBar();
         pnCenter.add(toolbar, BorderLayout.NORTH);
+        
+        chkPrefix = new JCheckBox("접두어 포함");
+        chkPrefix.setSelected(true);
+        toolbar.add(chkPrefix);
         
         pnTop.add(pnCtrl, BorderLayout.EAST);
         
@@ -151,9 +172,11 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements R
         });
         
         btnRun = new JButton("실행");
-        pnCtrl.add(btnRun, BorderLayout.CENTER);
+        btnRun.setIcon(UIManager.getIcon("FileChooser.detailsViewIcon"));
+        // pnCtrl.add(btnRun, BorderLayout.CENTER);
+        toolbar.add(btnRun);
         
-        btnRun.addActionListener(new ActionListener() {
+        ActionListener listenerRun = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {   
@@ -163,7 +186,9 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements R
                     }
                 });
             }
-        });
+        };
+        
+        btnRun.addActionListener(listenerRun);
         
         taLog = new JTextArea();
         taLog.setEditable(false);
@@ -174,6 +199,45 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements R
         prog.setValue(0);
         pnDown.add(prog, BorderLayout.NORTH);
         
+        // 메뉴 구성
+        JMenuBar menuBar = new JMenuBar();
+        frame.setJMenuBar(menuBar);
+        
+        JMenu menu = new JMenu("파일");
+        menuBar.add(menu);
+        
+        mnFileRun = new JMenuItem("실행");
+        menu.add(mnFileRun);
+        mnFileRun.addActionListener(listenerRun);
+        
+        menu.addSeparator();
+        
+        JMenuItem mnItem = new JMenuItem("종료");
+        menu.add(mnItem);
+        
+        mnItem.addActionListener(new ActionListener() {   
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.setVisible(false);
+                System.exit(0);
+            }
+        });
+        
+        menu = new JMenu("기능");
+        menuBar.add(menu);
+        
+        mnItem = new JMenuItem("로그 및 결과 비우기");
+        menu.add(mnItem);
+        
+        mnItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                taLog.setText("");
+                taRes.setText("");
+            }
+        });
+        
+        // DnD 구성
         DropTarget dndTargetTf = new DropTarget(frame, new DropTargetListener() {
             @Override
             public void dropActionChanged(DropTargetDragEvent dtde) { }            
@@ -225,6 +289,7 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements R
         });
     }
     
+    /** DnD 발생 시 호출되는 메소드 */
     @SuppressWarnings("unchecked")
     protected String getFromDnd(DropTargetDropEvent dtde) {
         try {
@@ -247,6 +312,7 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements R
         }
     }
     
+    /** frame 창을 호출 */
     public void open() {
         frame.setVisible(true);
         taLog.setText("이미지 파일을 선택하신 후 실행해 주세요.");
@@ -254,6 +320,7 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements R
         splits.setDividerLocation(0.7);
     }
     
+    /** 작업 시작 메소드 */
     public void processStart() {
         taRes.setText("...");
         prog.setIndeterminate(true);
@@ -262,19 +329,36 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements R
         btnRun.setEnabled(false);
         btnFile.setEnabled(false);
         
-        new Thread(this).start();
+        new Thread(this).start(); // 별도 쓰레드에서 run 메소드 수행
     }
     
+    /** 로그 출력 */
     public void log(String msg) {
+        System.out.println(msg);
         taLog.setText(taLog.getText() + "\n" + formatter16.format(new Date(System.currentTimeMillis())) + " " + msg);
         taLog.setCaretPosition(taLog.getDocument().getLength() - 1);
     }
     
+    /** 작업 시작 시, 별도 쓰레드에서 이 메소드가 호출됨 */
     @Override
     public void run() {
         try {
+            boolean usingPrefix = chkPrefix.isSelected();
+            chkPrefix.setEnabled(false);
+            
             String path = tfPath.getText();
-            String res  = convert(new File(path));
+            File   file = new File(path);
+            
+            String ext  = getExt(file);
+            String res  = convert(file);
+            
+            if(usingPrefix) {
+                String prefix = "data:image/";
+                if(ext.equalsIgnoreCase("jpg")) prefix += "jpeg";
+                else prefix += ext;
+                
+                res = prefix + ";base64, " + res;
+            }
             
             taRes.setText(res);
         } catch(Exception ex) {
@@ -284,8 +368,22 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements R
             tfPath.setEditable(true);
             btnRun.setEnabled(true);
             btnFile.setEnabled(true);
+            chkPrefix.setEnabled(true);
             prog.setIndeterminate(false);
             log("작업이 종료되었습니다.");
         }
+    }
+    
+    /** javax.swing.Icon 객체를 java.awt.Image 로 변환 */
+    public static Image iconToImage(Icon icon) {
+        if(icon instanceof ImageIcon) return ((ImageIcon) icon).getImage();
+        
+        BufferedImage buffImage = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(),BufferedImage.TYPE_INT_ARGB);
+        Graphics g = buffImage.createGraphics();
+        
+        icon.paintIcon(null, g, 0, 0);
+        g.dispose();
+        
+        return buffImage;
     }
 }

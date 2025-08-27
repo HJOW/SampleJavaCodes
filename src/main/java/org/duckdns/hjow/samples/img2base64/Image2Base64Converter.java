@@ -48,6 +48,16 @@ public class Image2Base64Converter {
         if(! file.exists()) throw new RuntimeException("There is no file at " + file.getAbsolutePath());
         if(file.isDirectory()) throw new RuntimeException("Please input image file !");
         
+        String lasts = getExt(file);
+        
+        if(lasts.equals("jpg")) return convert(file, "jpg");
+        if(lasts.equals("png")) return convert(file, "png");
+        
+        throw new IllegalArgumentException("Unknown image ext");
+    }
+    
+    /** 해당 파일의 확장자를 반환 */
+    public static String getExt(File file) {
         String name = file.getName().toLowerCase();
         String lasts = "";
         boolean firsts = true;
@@ -58,9 +68,6 @@ public class Image2Base64Converter {
             lasts = dotTokenizer.nextToken();
         }
         
-        if(lasts.equals("jpg")) return convert(file, "jpg");
-        if(lasts.equals("png")) return convert(file, "png");
-        
-        throw new IllegalArgumentException("Unknown image ext");
+        return lasts.trim();
     }
 }
