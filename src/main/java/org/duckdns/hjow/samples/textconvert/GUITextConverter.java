@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -173,6 +174,11 @@ public class GUITextConverter implements Program {
     public String getName() {
         return "textconv";
     }
+    
+    @Override
+    public Icon getIcon() {
+        return null;
+    }
 
     @Override
     public JDialog getDialog() {
@@ -184,4 +190,7 @@ public class GUITextConverter implements Program {
         if(dialog != null) dialog.setVisible(false);
         dialog = null;
     }
+    
+    @Override
+    public boolean isHidden() {return true;}
 }

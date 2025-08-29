@@ -2,6 +2,7 @@ package org.duckdns.hjow.samples.base;
 
 import java.awt.Window;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
@@ -9,6 +10,8 @@ import java.util.Vector;
 import org.duckdns.hjow.samples.cryptor.GCypher;
 import org.duckdns.hjow.samples.img2base64.GUIImage2Base64Converter;
 import org.duckdns.hjow.samples.interfaces.LineListener;
+import org.duckdns.hjow.samples.scripts.ScriptBase;
+import org.duckdns.hjow.samples.textconvert.GUITextConverter;
 import org.duckdns.hjow.samples.util.ResourceUtil;
 
 public class SampleJavaCodes {
@@ -23,6 +26,8 @@ public class SampleJavaCodes {
     }
     
     protected List<Program> programs = new Vector<Program>();
+    protected ScriptBase scriptBase = new ScriptBase();
+    
     public SampleJavaCodes() {
         
     }
@@ -33,7 +38,7 @@ public class SampleJavaCodes {
         
         addProgram(superInstance, new GUIImage2Base64Converter(superInstance));
         addProgram(superInstance, new GCypher(superInstance));
-        // addProgram(new GUITextConverter(superInstance));
+        addProgram(superInstance, new GUITextConverter(superInstance));
         
         ResourceUtil.loadResource("/program.txt", '#', new LineListener() {   
             @SuppressWarnings("unchecked")
@@ -64,9 +69,27 @@ public class SampleJavaCodes {
         } catch(NoSuchMethodException ex) { log("Failed to load program " + prgmClass); log("    Error : " + ex.getMessage()); } catch(Exception ex) { ex.printStackTrace(); log("Failed to load program " + prgmClass); log("    Error : " + ex.getMessage()); }
     }
     
+    public Program getProgram(String name) {
+        for(Program pg : programs) {
+            if(name.equals(pg.getName())) return pg;
+        }
+        return null;
+    }
+    
+    public List<String> getProgramNames() {
+        List<String> names = new ArrayList<String>();
+        for(Program pg : programs) { names.add(pg.getName()); }
+        return names;
+    }
+    
     public void init(SampleJavaCodes superInstance) { }
-    public void applySampleList(SampleJavaCodes superInstance) { }
+    public void applySampleList(SampleJavaCodes superInstance) {}
     public void run(Properties args) { }
+    
+    public void exit() {
+        disposeAllPrograms();
+        System.exit(0);
+    }
     
     public Window getWindow() { return null; }
     public void log(String msg) { System.out.println(msg); }

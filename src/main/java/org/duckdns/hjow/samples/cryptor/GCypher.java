@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import java.util.Properties;
 import java.util.Vector;
 
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -262,4 +263,11 @@ public class GCypher implements Program {
     public JDialog getDialog() {
         return dialog;
     }
+    @Override
+    public Icon getIcon() {
+        return null;
+    }
+    
+    @Override
+    public boolean isHidden() {return false;}
 }

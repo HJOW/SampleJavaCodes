@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.Vector;
 
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -293,4 +294,12 @@ public class GUICryptor implements Program {
         dialog.setVisible(false);
         dialog = null;
     }
+    
+    @Override
+    public Icon getIcon() {
+        return null;
+    }
+    
+    @Override
+    public boolean isHidden() {return true;}
 }

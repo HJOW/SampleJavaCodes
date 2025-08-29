@@ -3,7 +3,6 @@ package org.duckdns.hjow.samples.img2base64;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Frame;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -20,7 +19,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -148,19 +146,6 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements P
         }
     }
     
-    /** javax.swing.Icon 객체를 java.awt.Image 로 변환 */
-    public static Image iconToImage(Icon icon) {
-        if(icon instanceof ImageIcon) return ((ImageIcon) icon).getImage();
-        
-        BufferedImage buffImage = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(),BufferedImage.TYPE_INT_ARGB);
-        Graphics g = buffImage.createGraphics();
-        
-        icon.paintIcon(null, g, 0, 0);
-        g.dispose();
-        
-        return buffImage;
-    }
-
     @Override
     public void init(SampleJavaCodes superInstance) {
         Window superDialog = superInstance.getWindow();
@@ -172,7 +157,7 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements P
         
         dialog.setSize(600, 400);
         dialog.setTitle("Image 2 Base64 Converter");
-        dialog.setIconImage(iconToImage(UIManager.getIcon("OptionPane.informationIcon")));
+        dialog.setIconImage(UIUtil.iconToImage(getIcon()));
         dialog.setLayout(new BorderLayout());
         
         UIUtil.center(dialog);
@@ -408,6 +393,16 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements P
     public String getName() {
         return "img2base64";
     }
+    
+    @Override
+    public Icon getIcon() {
+        Icon icon = UIManager.getIcon("OptionPane.informationIcon");
+        Image img = UIUtil.iconToImage(icon);
+        img = img.getScaledInstance(12, 12, Image.SCALE_SMOOTH);
+        ImageIcon newIcon = new ImageIcon(img);
+        
+        return newIcon;
+    }
 
     @Override
     public JDialog getDialog() {
@@ -428,4 +423,7 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements P
         dialog.setVisible(true);
         onAfterOpened(superInstance);
     }
+    
+    @Override
+    public boolean isHidden() {return false;}
 }

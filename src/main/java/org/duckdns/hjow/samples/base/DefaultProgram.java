@@ -35,4 +35,7 @@ public abstract class DefaultProgram implements Program {
     
     @Override
     public void dispose() {}
+    
+    @Override
+    public boolean isHidden() {return false;}
 }
