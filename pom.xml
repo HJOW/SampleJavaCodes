@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.hjow.samples</groupId>
-  <artifactId>com.hjow.samples</artifactId>
+  <groupId>org.duckdns.hjow.samples</groupId>
+  <artifactId>samples</artifactId>
   <version>0.0.1</version>
   <name>SampleJavaCodes</name>
   <licenses>
@@ -77,6 +77,12 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <version>2.18.3</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.duckdns.hjow</groupId>
+            <artifactId>hjow-commons</artifactId>
+            <version>0.0.1</version>
         </dependency>
       <dependency>
           <groupId>org.egovframe.rte</groupId>

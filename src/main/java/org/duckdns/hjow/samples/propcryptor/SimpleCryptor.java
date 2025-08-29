@@ -7,8 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.swing.JOptionPane;
-
 import org.apache.commons.codec.binary.Base64;
 import org.egovframe.rte.fdl.cryptography.EgovCryptoService;
 import org.egovframe.rte.fdl.cryptography.EgovPasswordEncoder;
@@ -114,14 +112,5 @@ public class SimpleCryptor {
             enc.setHashedPassword(algInfo.getKeyHash());
             service.setPasswordEncoder(enc);
         }
-    }
-
-    public static void main(String[] args) {
-        try {
-            new GUICryptor().open();
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error : " + e.getMessage());
-        } 
     }
 }
