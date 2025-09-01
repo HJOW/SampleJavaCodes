@@ -26,6 +26,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import org.duckdns.hjow.samples.scripts.ScriptBase;
 import org.duckdns.hjow.samples.scripts.ScriptObject;
 import org.duckdns.hjow.samples.uicomponent.JLogArea;
+import org.duckdns.hjow.samples.util.UIUtil;
 
 public class GUISampleJavaCodes extends SampleJavaCodes {
     protected JFrame frame;
@@ -58,6 +59,7 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
             @Override
             public void windowClosing(WindowEvent e) { exit(); }
         });
+        frame.setIconImage(UIUtil.iconToImage(getDefaultIcon()));
         
         JPanel pnMain = new JPanel();
         pnMain.setLayout(new BorderLayout());
@@ -164,6 +166,9 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
     protected void refreshMenuSamplesIn(SampleJavaCodes instances) {
         menuSamples.removeAll();
         JMenuItem mn;
+        
+        Icon defaultIcon = getDefaultIcon();
+        
         for(final Program p : programs) {
             if(p.isHidden()) continue;
             
@@ -171,6 +176,7 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
             
             Icon icon = p.getIcon();
             if(icon != null) mn.setIcon(icon);
+            else if(defaultIcon != null) mn.setIcon(defaultIcon);
             
             mn.addActionListener(new ActionListener() {   
                 @Override
@@ -185,13 +191,18 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
     protected void refreshToolbarSamplesIn(SampleJavaCodes instances) {
         toolbarSamples.removeAll();
         JButton btn;
+        
+        Icon defaultIcon = getDefaultIcon();
+        
         for(final Program p : programs) {
             if(p.isHidden()) continue;
             
             Icon icon = p.getIcon();
+            if(icon == null && defaultIcon != null) icon = defaultIcon;
             
             if(icon == null) btn = new JButton(p.getTitle());
             else             btn = new JButton(icon);
+            btn.setToolTipText(p.getTitle());
             
             btn.addActionListener(new ActionListener() {   
                 @Override
@@ -228,5 +239,9 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
                 }
             }
         }).start();
+    }
+    
+    public static Icon getDefaultIcon() {
+        return UIManager.getIcon("FileView.fileIcon");
     }
 }

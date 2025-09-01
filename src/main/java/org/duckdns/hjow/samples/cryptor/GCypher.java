@@ -27,6 +27,7 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import org.duckdns.hjow.samples.base.GUISampleJavaCodes;
 import org.duckdns.hjow.samples.base.Program;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
 import org.duckdns.hjow.samples.cryptor.modules.CypherModule;
@@ -82,6 +83,7 @@ public class GCypher implements Program {
         		exit();
         	}
 		});
+        dialog.setIconImage(UIUtil.iconToImage(GUISampleJavaCodes.getDefaultIcon()));
         UIUtil.center(dialog);
         
         dialog.setLayout(new BorderLayout());

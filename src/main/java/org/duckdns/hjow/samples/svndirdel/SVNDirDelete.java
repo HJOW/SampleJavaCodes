@@ -20,10 +20,13 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
+import org.duckdns.hjow.samples.base.GUISampleJavaCodes;
 import org.duckdns.hjow.samples.base.Program;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
 import org.duckdns.hjow.samples.uicomponent.JLogArea;
+import org.duckdns.hjow.samples.util.UIUtil;
 
 public class SVNDirDelete implements Program {
     private static final long serialVersionUID = -792627049639601026L;
@@ -213,6 +216,7 @@ public class SVNDirDelete implements Program {
         dialog.setSize(700, 400);
         dialog.setLayout(new BorderLayout());
         dialog.setTitle("SVN Directory Delete");
+        dialog.setIconImage(UIUtil.iconToImage(GUISampleJavaCodes.getDefaultIcon()));
         
         JPanel pnMain, pnCenter, pnNorth, pnSouth, pn;
         
@@ -264,7 +268,8 @@ public class SVNDirDelete implements Program {
             }
         });
         
-        btnRun = new JButton("▶");
+        btnRun = new JButton("실행");
+        btnRun.setIcon(UIManager.getIcon("FileChooser.detailsViewIcon"));
         toolbar.add(btnRun);
         
         btnRun.addActionListener(new ActionListener() {
@@ -284,7 +289,7 @@ public class SVNDirDelete implements Program {
             }
         });
         
-        btnStop = new JButton("■");
+        btnStop = new JButton("■ 정지");
         btnStop.addActionListener(new ActionListener() {
             
             @Override
