@@ -11,6 +11,7 @@ import org.duckdns.hjow.samples.cryptor.GCypher;
 import org.duckdns.hjow.samples.img2base64.GUIImage2Base64Converter;
 import org.duckdns.hjow.samples.interfaces.LineListener;
 import org.duckdns.hjow.samples.scripts.ScriptBase;
+import org.duckdns.hjow.samples.svndirdel.SVNDirDelete;
 import org.duckdns.hjow.samples.textconvert.GUITextConverter;
 import org.duckdns.hjow.samples.util.ResourceUtil;
 
@@ -39,6 +40,7 @@ public class SampleJavaCodes {
         addProgram(superInstance, new GUIImage2Base64Converter(superInstance));
         addProgram(superInstance, new GCypher(superInstance));
         addProgram(superInstance, new GUITextConverter(superInstance));
+        addProgram(superInstance, new SVNDirDelete(superInstance));
         
         ResourceUtil.loadResource("/program.txt", '#', new LineListener() {   
             @SuppressWarnings("unchecked")

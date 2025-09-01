@@ -21,7 +21,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -47,6 +46,7 @@ import javax.swing.filechooser.FileFilter;
 
 import org.duckdns.hjow.samples.base.Program;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
+import org.duckdns.hjow.samples.uicomponent.JLogArea;
 import org.duckdns.hjow.samples.util.UIUtil;
 
 /** GUI 기반 Image2Base64 툴 */
@@ -56,7 +56,8 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements P
 
     protected JDialog dialog;
     protected JTextField tfPath;
-    protected JTextArea taRes, taLog;
+    protected JTextArea taRes;
+    protected JLogArea taLog;
     protected JCheckBox chkPrefix;
     protected JFileChooser fileChooser;
     protected JButton btnFile, btnRun;
@@ -107,8 +108,7 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements P
     /** 로그 출력 */
     public void log(String msg) {
         System.out.println(msg);
-        taLog.setText(taLog.getText() + "\n" + formatter16.format(new Date(System.currentTimeMillis())) + " " + msg);
-        taLog.setCaretPosition(taLog.getDocument().getLength() - 1);
+        if(taLog != null) taLog.log(msg);
     }
     
     /** 작업 시작 시, 별도 쓰레드에서 이 메소드가 호출됨 */
@@ -150,7 +150,7 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements P
     public void init(SampleJavaCodes superInstance) {
         Window superDialog = superInstance.getWindow();
         
-        // JFrame 설정
+        // JDialog 설정
         if(     superDialog instanceof Frame ) dialog = new JDialog((Frame) superDialog);
         else if(superDialog instanceof Dialog) dialog = new JDialog((Dialog)superDialog);
         else dialog = new JDialog();
@@ -269,9 +269,8 @@ public class GUIImage2Base64Converter extends Image2Base64Converter implements P
         
         btnRun.addActionListener(listenerRun);
         
-        taLog = new JTextArea();
-        taLog.setEditable(false);
-        splits.setBottomComponent(new JScrollPane(taLog));
+        taLog = new JLogArea();
+        splits.setBottomComponent(taLog);
         
         prog = new JProgressBar();
         prog.setMaximum(100);

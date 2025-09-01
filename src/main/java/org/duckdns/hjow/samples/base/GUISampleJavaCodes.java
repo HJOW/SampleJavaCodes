@@ -17,8 +17,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
@@ -27,12 +25,13 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.duckdns.hjow.samples.scripts.ScriptBase;
 import org.duckdns.hjow.samples.scripts.ScriptObject;
+import org.duckdns.hjow.samples.uicomponent.JLogArea;
 
 public class GUISampleJavaCodes extends SampleJavaCodes {
     protected JFrame frame;
     protected JMenu menuSamples;
     protected JToolBar toolbarSamples;
-    protected JTextArea taLog;
+    protected JLogArea taLog;
     protected JTextField tfScript;
     protected JButton btnScript;
     
@@ -94,10 +93,9 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
         tfScript.addActionListener(listenerRunScript);
         btnScript.addActionListener(listenerRunScript);
         
-        taLog = new JTextArea();
-        taLog.setEditable(false);
+        taLog = new JLogArea();
         taLog.setLineWrap(true);
-        pnCenter.add(new JScrollPane(taLog), BorderLayout.CENTER);
+        pnCenter.add(taLog, BorderLayout.CENTER);
         
         toolbarSamples = new JToolBar();
         pnUp.add(toolbarSamples, BorderLayout.CENTER);
@@ -146,8 +144,7 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
         super.log(msg);
         
         if(taLog != null) {
-            taLog.setText(taLog.getText() + "\n" + msg);
-            taLog.setCaretPosition(taLog.getDocument().getLength() - 1);
+            taLog.log(msg);
         }
     }
     
