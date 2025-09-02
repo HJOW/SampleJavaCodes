@@ -26,11 +26,11 @@ import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
-import org.duckdns.hjow.samples.base.Program;
+import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
 
 @Deprecated
-public class GUICryptor implements Program {
+public class GUICryptor implements GUIProgram {
     private static final long serialVersionUID = 9127870350945283621L;
 
     protected SimpleCryptor cryptor;

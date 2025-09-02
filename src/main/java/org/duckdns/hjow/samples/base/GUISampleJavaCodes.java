@@ -125,7 +125,7 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
         menuBar.add(menuSamples);
         
         List<ScriptObject> objList = new ArrayList<ScriptObject>();
-        for(Program p : programs) { objList.add(p); }
+        for(GUIProgram p : programs) { objList.add(p); }
         ScriptBase.init(instances, objList);
     }
     
@@ -169,7 +169,7 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
         
         Icon defaultIcon = getDefaultIcon();
         
-        for(final Program p : programs) {
+        for(final GUIProgram p : programs) {
             if(p.isHidden()) continue;
             
             mn = new JMenuItem(p.getTitle());
@@ -194,7 +194,7 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
         
         Icon defaultIcon = getDefaultIcon();
         
-        for(final Program p : programs) {
+        for(final GUIProgram p : programs) {
             if(p.isHidden()) continue;
             
             Icon icon = p.getIcon();

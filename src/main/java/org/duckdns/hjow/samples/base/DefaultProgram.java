@@ -1,6 +1,6 @@
 package org.duckdns.hjow.samples.base;
 
-public abstract class DefaultProgram implements Program {
+public abstract class DefaultProgram implements GUIProgram {
     private static final long serialVersionUID = -8751781027069806392L;
     
     protected SampleJavaCodes superInstance;

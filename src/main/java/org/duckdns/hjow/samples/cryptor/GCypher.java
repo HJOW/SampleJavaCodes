@@ -28,7 +28,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import org.duckdns.hjow.samples.base.GUISampleJavaCodes;
-import org.duckdns.hjow.samples.base.Program;
+import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
 import org.duckdns.hjow.samples.cryptor.modules.CypherModule;
 import org.duckdns.hjow.samples.cryptor.modules.ModuleLoader;
@@ -42,7 +42,7 @@ import org.duckdns.hjow.samples.util.UIUtil;
  * @author HJOW
  *
  */
-public class GCypher implements Program {
+public class GCypher implements GUIProgram {
     private static final long serialVersionUID = 1987839294285455468L;
     protected JDialog           dialog;
     protected JSplitPane        splitPane;

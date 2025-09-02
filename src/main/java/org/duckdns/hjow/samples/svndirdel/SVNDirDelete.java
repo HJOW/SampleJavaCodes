@@ -23,12 +23,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.duckdns.hjow.samples.base.GUISampleJavaCodes;
-import org.duckdns.hjow.samples.base.Program;
+import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
 import org.duckdns.hjow.samples.uicomponent.JLogArea;
 import org.duckdns.hjow.samples.util.UIUtil;
 
-public class SVNDirDelete implements Program {
+public class SVNDirDelete implements GUIProgram {
     private static final long serialVersionUID = -792627049639601026L;
     protected JDialog dialog;
     protected JFileChooser fileChooser;

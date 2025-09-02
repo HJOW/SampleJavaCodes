@@ -23,11 +23,11 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
-import org.duckdns.hjow.samples.base.Program;
+import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
 import org.duckdns.hjow.samples.util.UIUtil;
 
-public class GUITextConverter implements Program {
+public class GUITextConverter implements GUIProgram {
     private static final long serialVersionUID = -3245930991246791318L;
 
     protected JDialog dialog;

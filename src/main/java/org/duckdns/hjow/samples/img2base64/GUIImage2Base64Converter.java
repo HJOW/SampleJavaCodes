@@ -44,13 +44,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
-import org.duckdns.hjow.samples.base.Program;
+import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
 import org.duckdns.hjow.samples.uicomponent.JLogArea;
 import org.duckdns.hjow.samples.util.UIUtil;
 
 /** GUI 기반 Image2Base64 툴 */
-public class GUIImage2Base64Converter extends Image2Base64Converter implements Program, Runnable {
+public class GUIImage2Base64Converter extends Image2Base64Converter implements GUIProgram, Runnable {
     private static final long serialVersionUID = 5119253138076253761L;
     protected SimpleDateFormat formatter16;
 

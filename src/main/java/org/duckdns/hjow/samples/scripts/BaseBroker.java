@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.duckdns.hjow.samples.base.Program;
+import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
 
 public class BaseBroker implements ScriptObject {
@@ -65,12 +65,12 @@ public class BaseBroker implements ScriptObject {
         throw new RuntimeException("This object does not support 'clone' !");
     }
     
-    public Program getProgram(Object name) {
+    public GUIProgram getProgram(Object name) {
         return superInstance.getProgram(name.toString());
     }
     
     public void open(Object name) {
-        Program progrm = superInstance.getProgram(name.toString());
+        GUIProgram progrm = superInstance.getProgram(name.toString());
         if(progrm == null) throw new NullPointerException("There is no program named '" + name + "'.");
         progrm.open(superInstance);
     }
