@@ -26,7 +26,9 @@ public class ConsoleStream implements Closeable, Disposeable {
 
     @Override
     public void dispose() {
-        try { inp.close(); } catch(Exception ex) { ex.printStackTrace(); }; inp = null;
+        if(inp != null) {
+            try { inp.close(); } catch(Exception ex) { ex.printStackTrace(); }; inp = null;
+        }
     }
     
     public String ask() {

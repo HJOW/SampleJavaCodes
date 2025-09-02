@@ -44,7 +44,7 @@ public class SampleJavaCodes {
             }
         }
         
-        boolean gui = false;
+        boolean gui = true;
         if(prop.getProperty("GUI") != null) gui = Boolean.parseBoolean(prop.getProperty("GUI"));
         
         if(gui) obj = new GUISampleJavaCodes();
@@ -143,8 +143,10 @@ public class SampleJavaCodes {
             }
         }
         
-        terminal.dispose();   terminal   = null;
-        mainStream.dispose(); mainStream = null;
+        if(mainStream != null) mainStream.println("END");
+        
+        if(terminal   != null) terminal.dispose();   terminal   = null;
+        if(mainStream != null) mainStream.dispose(); mainStream = null;
         exit();
     }
     
@@ -170,7 +172,6 @@ public class SampleJavaCodes {
         }
         
         terminal.dispose();
-        mainStream.dispose();
     }
     
     public void exit() {
