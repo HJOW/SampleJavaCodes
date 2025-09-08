@@ -1,6 +1,7 @@
 package org.duckdns.hjow.samples.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
@@ -102,5 +103,18 @@ public class ResourceUtil {
         }
         
         return res.toString();
+    }
+    
+    /** 홈 디렉토리 반환 */
+    public static File getHomeDir(String programNameMain, String programNameSub) {
+        if(programNameMain == null) throw new NullPointerException("programNameMain cannot be null !");
+        if(programNameSub  == null) throw new NullPointerException("programNameSub cannot be null !");
+        programNameMain = programNameMain.replace(".", "").trim();
+        programNameSub  = programNameSub.replace(".", "").trim();
+        if(programNameMain.equals("")) throw new NullPointerException("programNameMain cannot be a empty string !");
+        if(programNameSub.equals(""))  throw new NullPointerException("programNameSub cannot be a empty string !");
+        File f = new File(System.getProperty("user.home") + File.separator + "." + programNameMain + File.separator + programNameSub);
+        if(! f.exists()) f.mkdirs();
+        return f;
     }
 }
