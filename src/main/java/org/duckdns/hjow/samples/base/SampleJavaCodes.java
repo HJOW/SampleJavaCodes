@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
+import org.duckdns.hjow.samples.colonyman.ColonyMan;
 import org.duckdns.hjow.samples.console.ConsoleStream;
 import org.duckdns.hjow.samples.console.ConsoleTerminal;
 import org.duckdns.hjow.samples.cryptor.GCypher;
@@ -71,6 +72,7 @@ public class SampleJavaCodes {
         addProgram(superInstance, new GCypher(superInstance));
         addProgram(superInstance, new GUITextConverter(superInstance));
         addProgram(superInstance, new SVNDirDelete(superInstance));
+        addProgram(superInstance, new ColonyMan(superInstance));
         
         ResourceUtil.loadResource("/program.txt", '#', new LineListener() {   
             @SuppressWarnings("unchecked")

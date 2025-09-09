@@ -14,10 +14,10 @@ public class Citizen implements ColonyElements {
     protected int stamina =  0;
     protected int happy   = 50;
     
-    protected int strength    = (int) (Math.random() * 4) + 5;
-    protected int agility     = (int) (Math.random() * 4) + 5;
-    protected int carisma     = (int) (Math.random() * 4) + 5;
-    protected int intelligent = (int) (Math.random() * 4) + 5;
+    protected int strength    = (int) (Math.random() * 5) + 4;
+    protected int agility     = (int) (Math.random() * 5) + 4;
+    protected int carisma     = (int) (Math.random() * 5) + 4;
+    protected int intelligent = (int) (Math.random() * 5) + 4;
     
     protected long money           = 100L;
     protected long experience      =   0L;
@@ -25,6 +25,15 @@ public class Citizen implements ColonyElements {
     protected long workingFacility = -1L;
     protected long workingCity     = -1L;
     protected long livingHome      = -1L;
+    
+    public Citizen() {
+        
+    }
+    
+    public Citizen(JsonObject json) {
+        super();
+        fromJson(json);
+    }
 
     @Override
     public long getKey() {
@@ -41,22 +50,58 @@ public class Citizen implements ColonyElements {
     }
 
     @Override
-    public void oneSecond(int cycle, City city, Colony colony) {
+    public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
         if(hp < 0) hp = 0;
         if(hp <= 0) return;
         
-        if(cycle % 10 == 0) {
+        boolean harm = false;
+        int std;
+        
+        std = 10;
+        if(cycle % std == 0) {
             if(livingHome < 0L) { // 집이 없으면
                 happy--;
+                hp--;
+                harm = true;
             }
         }
-        if(cycle % 100 == 0) {
+        
+        std = 100;
+        if(cycle % std == 0) {
             hunger--;
         }
         if(hunger < 0) {
             hunger = 0;
             hp--;
+            if(efficiency100 < 50) hp--;
+            harm = true;
         }
+        
+        std = 10000 / ( (101 - efficiency100) < 1 ? 1 : (101 - efficiency100) );
+        if(cycle % std == 0) {
+            happy--;
+            if(happy <    0) happy =   0;
+            if(happy >  100) happy = 100;
+        }
+        
+        if(! harm) {
+            hp++;
+            int mx = getMaxHp();
+            if(hp >= mx) hp = mx;
+        }
+    }
+    
+    public void addHp(int amount) {
+        hp += amount;
+        int mx = getMaxHp();
+        if(hp >  mx) hp = mx;
+        if(hp <   0) hp = 0;
+    }
+    
+    public void addHappy(int amount) {
+        happy += amount;
+        if(happy <    0) happy =   0;
+        if(happy >  100) happy = 100;
     }
 
     @Override
@@ -164,6 +209,10 @@ public class Citizen implements ColonyElements {
         this.experience = experience;
     }
     
+    public int getMaxHp() {
+        return 100 + (getStrength() / 5) + (getAgility() / 10);
+    }
+    
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
@@ -187,5 +236,25 @@ public class Citizen implements ColonyElements {
         json.put("livingHome"        , new Long(getLivingHome()));
         
         return json;
+    }
+    
+    public void fromJson(JsonObject json) {
+        if(! "Citizen".equals(json.get("type"))) throw new RuntimeException("This object is not Citizen type.");
+        setName(json.get("name").toString());
+        key = Long.parseLong(json.get("key").toString());
+        setHp(Integer.parseInt(json.get("hp").toString()));
+        setMoney(Long.parseLong(json.get("money").toString()));
+        
+        setHunger(     Integer.parseInt(json.get("hunger"     ).toString()));
+        setStamina(    Integer.parseInt(json.get("stamina"    ).toString()));
+        setHappy(      Integer.parseInt(json.get("happy"      ).toString()));
+        setStrength(   Integer.parseInt(json.get("strength"   ).toString()));
+        setAgility(    Integer.parseInt(json.get("agility"    ).toString()));
+        setCarisma(    Integer.parseInt(json.get("carisma"    ).toString()));
+        setIntelligent(Integer.parseInt(json.get("intelligent").toString()));
+        setExperience(     Long.parseLong(json.get("experience"     ).toString()));
+        setWorkingFacility(Long.parseLong(json.get("workingFacility").toString()));
+        setWorkingCity(    Long.parseLong(json.get("workingCity"    ).toString()));
+        setLivingHome(     Long.parseLong(json.get("livingHome"     ).toString()));
     }
 }

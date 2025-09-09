@@ -1,6 +1,7 @@
 package org.duckdns.hjow.samples.base;
 
 import java.awt.BorderLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -12,13 +13,17 @@ import java.util.Properties;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -31,7 +36,9 @@ import org.duckdns.hjow.samples.util.UIUtil;
 public class GUISampleJavaCodes extends SampleJavaCodes {
     protected JFrame frame;
     protected JMenu menuSamples;
-    protected JToolBar toolbarSamples;
+    protected JToolBar toobarUp;
+    protected JPanel desktop;
+    protected JSplitPane splits;
     protected JLogArea taLog;
     protected JTextField tfScript;
     protected JButton btnScript;
@@ -75,7 +82,9 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
         JToolBar toolbarScripts = new JToolBar();
         pnMain.add(toolbarScripts, BorderLayout.SOUTH);
         
-        tfScript = new JTextField(20);
+        toolbarScripts.add(new JLabel("Script"));
+        
+        tfScript = new JTextField(30);
         toolbarScripts.add(tfScript);
         
         btnScript = new JButton(">>");
@@ -95,12 +104,19 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
         tfScript.addActionListener(listenerRunScript);
         btnScript.addActionListener(listenerRunScript);
         
+        splits = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        pnCenter.add(splits, BorderLayout.CENTER);
+        
         taLog = new JLogArea();
         taLog.setLineWrap(true);
-        pnCenter.add(taLog, BorderLayout.CENTER);
+        splits.setBottomComponent(new JScrollPane(taLog));
         
-        toolbarSamples = new JToolBar();
-        pnUp.add(toolbarSamples, BorderLayout.CENTER);
+        desktop = new JPanel();
+        desktop.setLayout(null);
+        splits.setTopComponent(desktop);
+        
+        toobarUp = new JToolBar();
+        pnUp.add(toobarUp, BorderLayout.CENTER);
         
         JMenuBar menuBar = new JMenuBar();
         frame.setJMenuBar(menuBar);
@@ -138,6 +154,7 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
     @Override
     public void run(Properties args) {
         frame.setVisible(true);
+        splits.setDividerLocation(0.5);
         tfScript.requestFocus();
     }
     
@@ -158,7 +175,7 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
             @Override
             public void run() {
                 refreshMenuSamplesIn(instances);
-                refreshToolbarSamplesIn(instances);
+                refreshDesktopIcons(instances);
             }
         });
     }
@@ -188,20 +205,25 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
         }
     }
     
-    protected void refreshToolbarSamplesIn(SampleJavaCodes instances) {
-        toolbarSamples.removeAll();
+    protected void refreshDesktopIcons(SampleJavaCodes instances) {
+        desktop.removeAll();
         JButton btn;
         
         Icon defaultIcon = getDefaultIcon();
+        int x, y, w, h;
+        x = 10;
+        y = 10;
+        w = 80;
+        h = 80;
         
         for(final GUIProgram p : programs) {
             if(p.isHidden()) continue;
             
             Icon icon = p.getIcon();
             if(icon == null && defaultIcon != null) icon = defaultIcon;
+            if(icon == null) continue;
             
-            if(icon == null) btn = new JButton(p.getTitle());
-            else             btn = new JButton(icon);
+            btn = new JButton(p.getTitle(), icon);
             btn.setToolTipText(p.getTitle());
             
             btn.addActionListener(new ActionListener() {   
@@ -210,7 +232,14 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
                     p.open(instances);
                 }
             });
-            toolbarSamples.add(btn);
+            btn.setVerticalTextPosition(SwingConstants.BOTTOM);
+            btn.setHorizontalTextPosition(SwingConstants.CENTER);
+            
+            btn.setBounds(new Rectangle(x, y, w, h));
+            desktop.add(btn);
+            
+            x += w + 10;
+            if(x >= desktop.getWidth()) { x = 10; y += h + 10; }
         }
     }
     
