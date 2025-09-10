@@ -9,13 +9,15 @@ import java.util.Vector;
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.commons.util.FileUtil;
+import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 
 public class Colony implements ColonyElements {
     private static final long serialVersionUID = -3144963237818493111L;
     protected transient volatile long key = new Random().nextLong();
     
-    protected List<City> cities = new Vector<City>();
-    protected String name = "정착지_" + new Random().nextInt();
+    protected List<City>  cities  = new Vector<City>();
+    protected List<Enemy> enemies = new Vector<Enemy>();
+    protected String name = "정착지_" + Math.abs(new Random().nextInt());
     protected int  hp    = getMaxHp();
     protected long money = 1000000L;
     protected long tech  = 0L;
@@ -52,15 +54,25 @@ public class Colony implements ColonyElements {
         this.cities = cities;
     }
 
+    public List<Enemy> getEnemies() {
+        return enemies;
+    }
+
+    public void setEnemies(List<Enemy> enemies) {
+        this.enemies = enemies;
+    }
+
     @Override
     public long getKey() {
         return key;
     }
     
+    @Override
     public void addHp(int amount) {
         hp += amount;
-        int mx = 1000000;
+        int mx = getMaxHp();
         if(hp >= mx) hp = mx;
+        if(hp <   0) hp = 0;
     }
 
     public int getHp() {
@@ -182,6 +194,9 @@ public class Colony implements ColonyElements {
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) { // parameters are null
         for(City c : cities) {
             c.oneSecond(cycle, c, this, 100);
+        }
+        for(Enemy e : enemies) {
+            e.oneSecond(cycle, city, colony, efficiency100);
         }
         time = time.add(BigInteger.ONE);
     }

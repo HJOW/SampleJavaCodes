@@ -31,6 +31,14 @@ public abstract class DefaultFacility implements Facility {
     }
     
     @Override
+    public void addHp(int amount) {
+        hp += amount;
+        int mx = getMaxHp();
+        if(hp >= mx) hp = mx;
+        if(hp <   0) hp = 0;
+    }
+    
+    @Override
     public int getMaxHp() {
         return 1000;
     }
@@ -78,6 +86,20 @@ public abstract class DefaultFacility implements Facility {
     public int increasingCityMaxHP() {
         return 0;
     }
+    
+    @Override
+    public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
+        if(cycle % (60 * 60) == 0) {
+            processSalary(city, colony);
+        }
+    }
+    
+    protected void processSalary(City city, Colony colony) {
+        for(Citizen c : getWorkingCitizens(city, colony)) {
+            c.setMoney(c.getMoney() + 100);
+        }
+    }
+    
     @Override
     public void fromJson(JsonObject json) {
         setName(json.get("name").toString());

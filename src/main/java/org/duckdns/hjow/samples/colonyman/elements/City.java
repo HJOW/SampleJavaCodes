@@ -10,6 +10,7 @@ import java.util.Vector;
 
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityManager;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
@@ -18,9 +19,10 @@ public class City implements ColonyElements {
     private static final long serialVersionUID = -8442328554683565064L;
     protected transient volatile long key = new Random().nextLong();
     
-    protected String name = "도시_" + new Random().nextInt();
+    protected String name = "도시_" + Math.abs(new Random().nextInt());
     protected List<Facility> facility = new Vector<Facility>();
     protected List<Citizen>  citizens = new Vector<Citizen>();
+    protected List<Enemy>    enemies  = new Vector<Enemy>();
     protected int hp = getMaxHp();
     
     public City() {
@@ -57,10 +59,20 @@ public class City implements ColonyElements {
         this.citizens = citizens;
     }
     
+    public List<Enemy> getEnemies() {
+        return enemies;
+    }
+
+    public void setEnemies(List<Enemy> enemies) {
+        this.enemies = enemies;
+    }
+
+    @Override
     public void addHp(int amount) {
         hp += amount;
         int mx = getMaxHp();
         if(hp >= mx) hp = mx;
+        if(hp <   0) hp = 0;
     }
 
     public int getHp() {
@@ -123,6 +135,11 @@ public class City implements ColonyElements {
         // Allocates
         allocateHome(colony);
         allocateWorkers(colony);
+        
+        // Process Enemies
+        for(Enemy e : enemies) {
+            e.oneSecond(cycle, city, colony, efficiency100);
+        }
     }
     
     /** Calculate total power generating */

@@ -12,6 +12,7 @@ public class Restaurant extends DefaultFacility {
     
     protected String name = "식당_" + new Random().nextInt();
     protected int comportGrade = 0;
+    protected int capacity = 30;
 
     @Override
     public String getName() {
@@ -27,10 +28,33 @@ public class Restaurant extends DefaultFacility {
     public int getMaxHp() {
         return 1000;
     }
+    
+    @Override
+    public int getCapacity() {
+        return capacity;
+    }
+    
+    public void setCapacity(int c) {
+        capacity = c;
+    }
 
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
+        super.oneSecond(cycle, city, colony, efficiency100);
         
+        int servicingCount = 0;
+        for(Citizen c : city.getCitizens()) {
+            if(c.getHunger() >= 100) continue;
+            
+            servicingCount++;
+            c.setHunger(c.getHunger() + 50);
+            
+            if(getComportGrade() >= 2) {
+                c.setHappy(c.getHappy() + (getComportGrade() / 2));
+            }
+            
+            if(servicingCount >= getCapacity()) break;
+        }
     }
 
     @Override
@@ -90,6 +114,7 @@ public class Restaurant extends DefaultFacility {
         key = Long.parseLong(json.get("key").toString());
         setHp(Integer.parseInt(json.get("hp").toString()));
         setComportGrade(Integer.parseInt(json.get("comportGrade").toString()));
+        setCapacity(Integer.parseInt(json.get("capacity").toString()));
     }
 
     @Override
@@ -100,6 +125,7 @@ public class Restaurant extends DefaultFacility {
         json.put("key", new Long(getKey()));
         json.put("hp", new Long(getHp()));
         json.put("comportGrade", new Integer(getComportGrade()));
+        json.put("capacity", new Integer(getCapacity()));
         
         return json;
     }

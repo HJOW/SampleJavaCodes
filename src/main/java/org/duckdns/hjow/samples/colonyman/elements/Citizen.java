@@ -7,11 +7,11 @@ import org.duckdns.hjow.commons.json.JsonObject;
 public class Citizen implements ColonyElements {
     private static final long serialVersionUID = -6856576686789163067L;
     protected transient volatile long key = new Random().nextLong();
-    protected String name = "시민_" + new Random().nextInt();
+    protected String name = "시민_" + Math.abs(new Random().nextInt());
     
     protected int hp = 100;
-    protected int hunger  =  0;
-    protected int stamina =  0;
+    protected int hunger  = 50;
+    protected int stamina = 50;
     protected int happy   = 50;
     
     protected int strength    = (int) (Math.random() * 5) + 4;
@@ -91,6 +91,7 @@ public class Citizen implements ColonyElements {
         }
     }
     
+    @Override
     public void addHp(int amount) {
         hp += amount;
         int mx = getMaxHp();
@@ -147,10 +148,18 @@ public class Citizen implements ColonyElements {
 
     public void setHunger(int hunger) {
         this.hunger = hunger;
+        if(this.hunger <   0) this.hunger =   0;
+        if(this.hunger > 100) this.hunger = 100;
     }
 
     public void setStamina(int stamina) {
         this.stamina = stamina;
+        if(this.stamina < 0) this.stamina = 0;
+        if(this.stamina > getMaxStemina()) this.stamina = getMaxStemina();
+    }
+    
+    public int getMaxStemina() {
+        return 50 + (getAgility() / 2);
     }
 
     public void setStrength(int strength) {
@@ -175,6 +184,7 @@ public class Citizen implements ColonyElements {
 
     public void setMoney(long money) {
         this.money = money;
+        if(this.money < 0) this.money = 0L;
     }
 
     public void setWorkingFacility(long workingFacility) {
@@ -191,6 +201,8 @@ public class Citizen implements ColonyElements {
 
     public void setHappy(int happy) {
         this.happy = happy;
+        if(this.happy <   0) this.happy =   0;
+        if(this.happy > 100) this.happy = 100;
     }
 
     public long getLivingHome() {

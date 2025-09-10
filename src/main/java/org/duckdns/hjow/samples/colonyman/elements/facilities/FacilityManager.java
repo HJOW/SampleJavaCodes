@@ -12,6 +12,8 @@ public class FacilityManager {
     static {
         register(Residence.class);
         register(PowerStation.class);
+        register(Restaurant.class);
+        register(Arcade.class);
     }
     
     public static Facility fromJson(JsonObject json) {

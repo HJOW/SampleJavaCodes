@@ -10,6 +10,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Colony;
 public class PowerStation extends DefaultFacility {
     private static final long serialVersionUID = 4079646708867981024L;
     protected String name = "발전소_" + new Random().nextInt();
+    protected int capacity = 100;
     
     @Override
     public String getType() {
@@ -25,13 +26,16 @@ public class PowerStation extends DefaultFacility {
     }
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
-        // Do nothing on PowerStation (implemented on City)
+        super.oneSecond(cycle, city, colony, efficiency100);
+        
+        // Do nothing on PowerStation (implemented on City class)
     }
     @Override
     public void fromJson(JsonObject json) {
         setName(json.get("name").toString());
         key = Long.parseLong(json.get("key").toString());
         setHp(Integer.parseInt(json.get("hp").toString()));
+        setCapacity(Integer.parseInt(json.get("capacity").toString()));
     }
 
     @Override
@@ -41,6 +45,7 @@ public class PowerStation extends DefaultFacility {
         json.put("name", getName());
         json.put("key", new Long(getKey()));
         json.put("hp", new Long(getHp()));
+        json.put("capacity", new Integer(getCapacity()));
         
         return json;
     }
@@ -57,7 +62,14 @@ public class PowerStation extends DefaultFacility {
         return 0;
     }
     public int getPowerGenerate() {
-        return 100;
+        return getCapacity();
+    }
+    @Override
+    public int getCapacity() {
+        return capacity;
+    }
+    public void setCapacity(int c) {
+        this.capacity = c;
     }
     @Override
     public int getComportGrade() {

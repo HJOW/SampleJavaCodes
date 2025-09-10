@@ -10,6 +10,7 @@ public interface ColonyElements extends Serializable {
     public int getHp();
     public int getMaxHp();
     public void setHp(int hp);
+    public void addHp(int amount);
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100);
     public void fromJson(JsonObject json);
     public JsonObject toJson();
