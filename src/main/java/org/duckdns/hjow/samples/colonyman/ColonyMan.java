@@ -92,7 +92,9 @@ public class ColonyMan implements GUIProgram {
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                // LoadingModal loading = LoadingModal.open(getDialog());
                 disposeContents();
+                // loading.end();
             }
         });
         
@@ -437,5 +439,40 @@ public class ColonyMan implements GUIProgram {
     
     public static int generateNaturalNumber() {
         return Math.abs(new Random().nextInt());
+    }
+}
+
+class LoadingModal extends JDialog {
+    private static final long serialVersionUID = -1936442322739111389L;
+    volatile boolean closingSwitch = false;
+
+    public LoadingModal(JDialog superDialog) {
+        super(superDialog, true);
+        setSize(200, 150);
+        setLayout(new BorderLayout());
+        
+        JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL);
+        prog.setIndeterminate(true);
+        add(prog, BorderLayout.CENTER);
+        
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(! closingSwitch) {
+                    try { Thread.sleep(100L); } catch(InterruptedException ex) { break; }
+                }
+                setVisible(false);
+            }
+        }).start();
+    }
+    
+    public void end() {
+        closingSwitch = true;
+    }
+    
+    public static LoadingModal open(JDialog superDialog) {
+        LoadingModal instances = new LoadingModal(superDialog);
+        instances.setVisible(true);
+        return instances;
     }
 }
