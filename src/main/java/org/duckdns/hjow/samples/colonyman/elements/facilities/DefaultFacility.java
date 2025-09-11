@@ -2,9 +2,9 @@ package org.duckdns.hjow.samples.colonyman.elements.facilities;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.samples.colonyman.ColonyMan;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
@@ -12,7 +12,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Facility;
 
 public abstract class DefaultFacility implements Facility {
     private static final long serialVersionUID = 8012568139388326869L;
-    protected transient volatile long key = new Random().nextLong();
+    protected transient volatile long key = ColonyMan.generateKey();
     protected int hp = getMaxHp();
     
     @Override

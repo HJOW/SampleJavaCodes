@@ -14,6 +14,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
@@ -425,5 +426,16 @@ public class ColonyMan implements GUIProgram {
         }
         if(colPn == null) return null;
         return colPn.getCityPanel(city);
+    }
+    
+    public static long generateKey() {
+        Random rd = new Random();
+        long key = rd.nextLong();
+        while(key == 0L) key = rd.nextLong();
+        return key;
+    }
+    
+    public static int generateNaturalNumber() {
+        return Math.abs(new Random().nextInt());
     }
 }

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 import java.util.Vector;
 
 import org.duckdns.hjow.commons.json.JsonArray;
@@ -20,9 +19,9 @@ import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
 
 public class City implements ColonyElements {
     private static final long serialVersionUID = -8442328554683565064L;
-    protected transient volatile long key = new Random().nextLong();
+    protected transient volatile long key = ColonyMan.generateKey();
     
-    protected String name = "도시_" + Math.abs(new Random().nextInt());
+    protected String name = "도시_" + ColonyMan.generateNaturalNumber();
     protected List<Facility> facility = new Vector<Facility>();
     protected List<Citizen>  citizens = new Vector<Citizen>();
     protected List<Enemy>    enemies  = new Vector<Enemy>();

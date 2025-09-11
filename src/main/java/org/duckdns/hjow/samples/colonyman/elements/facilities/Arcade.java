@@ -1,15 +1,14 @@
 package org.duckdns.hjow.samples.colonyman.elements.facilities;
 
-import java.util.Random;
-
 import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.samples.colonyman.ColonyMan;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 
 public class Arcade extends DefaultFacility {
     private static final long serialVersionUID = 6472512678804457223L;
-    protected String name = "아케이드_" + new Random().nextInt();
+    protected String name = "아케이드_" + ColonyMan.generateNaturalNumber();
     protected int comportGrade = 0;
     protected int capacity = 100;
 

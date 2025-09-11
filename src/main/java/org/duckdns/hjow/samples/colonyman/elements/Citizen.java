@@ -1,13 +1,12 @@
 package org.duckdns.hjow.samples.colonyman.elements;
 
-import java.util.Random;
-
 import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.samples.colonyman.ColonyMan;
 
 public class Citizen implements ColonyElements {
     private static final long serialVersionUID = -6856576686789163067L;
-    protected transient volatile long key = new Random().nextLong();
-    protected String name = "시민_" + Math.abs(new Random().nextInt());
+    protected transient volatile long key = ColonyMan.generateKey();
+    protected String name = "시민_" + ColonyMan.generateNaturalNumber();
     
     protected int hp = 100;
     protected int hunger  = 50;

@@ -1,6 +1,7 @@
 package org.duckdns.hjow.samples.colonyman.elements;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.List;
@@ -138,4 +139,13 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         this.colony = colony;
     }
 
+    @Override
+    public Component getComponent() {
+        return this;
+    }
+
+    @Override
+    public String getTargetName() {
+        return colony.getName();
+    }
 }

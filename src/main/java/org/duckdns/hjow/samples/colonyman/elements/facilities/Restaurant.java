@@ -1,8 +1,7 @@
 package org.duckdns.hjow.samples.colonyman.elements.facilities;
 
-import java.util.Random;
-
 import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.samples.colonyman.ColonyMan;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
@@ -10,7 +9,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Colony;
 public class Restaurant extends DefaultFacility {
     private static final long serialVersionUID = -7371044845340026748L;
     
-    protected String name = "식당_" + new Random().nextInt();
+    protected String name = "식당_" + ColonyMan.generateNaturalNumber();
     protected int comportGrade = 0;
     protected int capacity = 30;
 

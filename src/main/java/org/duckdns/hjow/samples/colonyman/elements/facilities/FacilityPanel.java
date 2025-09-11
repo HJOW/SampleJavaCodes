@@ -1,6 +1,7 @@
 package org.duckdns.hjow.samples.colonyman.elements.facilities;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 
 import javax.swing.JLabel;
@@ -21,7 +22,9 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     protected transient JPanel pnUp, pnCenter, pnDown;
     protected transient JLabel lb;
     protected transient JTextArea ta;
+    
     protected long facilityKey = 0L;
+    protected String targetName;
     
     public FacilityPanel() {
         super();
@@ -35,6 +38,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     public void init(Facility f) {
         dispose();
         setFacilityKey(f.getKey());
+        setTargetName(f.getName());
         
         removeAll();
         setLayout(new BorderLayout());
@@ -71,8 +75,16 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         this.facilityKey = facilityKey;
     }
     
+    public String getTargetName() {
+        return targetName;
+    }
+
+    public void setTargetName(String targetName) {
+        this.targetName = targetName;
+    }
+
     public Facility getFacility(City city) {
-        if(getFacilityKey() < 0L) return null;
+        if(getFacilityKey() == 0L) return null;
         for(Facility f : city.getFacility()) {
             if(f.getKey() == getFacilityKey()) return f;
         }
@@ -81,6 +93,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
 
     public void refresh(Facility fac, City city, Colony colony, ColonyMan superInstance) {
         lb.setText(fac.getName());
+        setTargetName(fac.getName());
         
         StringBuilder res = new StringBuilder("");
         res = res.append("\n").append("Type : ").append(fac.getType());
@@ -89,7 +102,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
             res = res.append(" (").append("Home").append(")");
             
             Home home = (Home) fac;
-            res = res.append("\n").append("Capacity : ").append(home.getCitizens(city, colony)).append(" / ").append(home.getCapacity());
+            res = res.append("\n").append("Capacity : ").append(home.getCitizens(city, colony).size()).append(" / ").append(home.getCapacity());
             res = res.append("\n").append("Comport : ").append(fac.getComportGrade());
             res = res.append("\n").append("Living...");
             for(Citizen c : home.getCitizens(city, colony)) {
@@ -124,5 +137,10 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     public void dispose() {
         facilityKey = 0L;
         removeAll();
+    }
+
+    @Override
+    public Component getComponent() {
+        return this;
     }
 }

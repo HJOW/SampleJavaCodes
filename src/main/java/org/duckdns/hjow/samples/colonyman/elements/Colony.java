@@ -3,21 +3,21 @@ package org.duckdns.hjow.samples.colonyman.elements;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Random;
 import java.util.Vector;
 
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.commons.util.FileUtil;
+import org.duckdns.hjow.samples.colonyman.ColonyMan;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 
 public class Colony implements ColonyElements {
     private static final long serialVersionUID = -3144963237818493111L;
-    protected transient volatile long key = new Random().nextLong();
+    protected transient volatile long key = ColonyMan.generateKey();
     
     protected List<City>  cities  = new Vector<City>();
     protected List<Enemy> enemies = new Vector<Enemy>();
-    protected String name = "정착지_" + Math.abs(new Random().nextInt());
+    protected String name = "정착지_" + ColonyMan.generateNaturalNumber();
     protected int  hp    = getMaxHp();
     protected long money = 1000000L;
     protected long tech  = 0L;

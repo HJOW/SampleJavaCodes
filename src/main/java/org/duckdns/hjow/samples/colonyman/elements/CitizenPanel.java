@@ -1,6 +1,7 @@
 package org.duckdns.hjow.samples.colonyman.elements;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 
 import javax.swing.JPanel;
@@ -13,6 +14,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyMan;
 public class CitizenPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = 8988684923024941632L;
     protected long citizenKey = 0L;
+    protected String targetName;
     
     protected transient JTextField tfName;
     protected transient JTextArea  ta;
@@ -29,17 +31,18 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
     public void init(Citizen c) {
         dispose();
         setCitizenKey(c.getKey());
+        setTargetName(c.getName());
         
         setLayout(new BorderLayout());
         
         JPanel pnNorth, pnCenter;
         pnNorth  = new JPanel();
         pnCenter = new JPanel();
-        add(pnNorth , BorderLayout.NORTH);
-        add(pnCenter, BorderLayout.CENTER);
-        
         pnNorth.setLayout(new FlowLayout(FlowLayout.LEFT));
         pnCenter.setLayout(new BorderLayout());
+        
+        add(pnNorth , BorderLayout.NORTH);
+        add(pnCenter, BorderLayout.CENTER);
         
         tfName = new JTextField(20);
         tfName.setEditable(false);
@@ -51,7 +54,7 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
     }
     
     public Citizen getCitizen(City city) {
-        if(getCitizenKey() < 0L) return null;
+        if(getCitizenKey() == 0L) return null;
         for(Citizen c : city.getCitizens()) {
             if(c.getKey() == getCitizenKey()) return c;
         }
@@ -66,7 +69,8 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
     @Override
     public void refresh(int cycle, City city, Colony colony, ColonyMan superInstance) {
         Citizen c = getCitizen(city);
-        if(c == null) { dispose(); return; }
+        if(c == null) { tfName.setName(""); ta.setText(""); return; }
+        setTargetName(c.getName());
         
         tfName.setText(c.getName());
         ta.setText(getCitizenStatusText().trim());
@@ -89,5 +93,19 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
 
     public void setCitizenKey(long citizenKey) {
         this.citizenKey = citizenKey;
+    }
+
+    public void setTargetName(String targetName) {
+        this.targetName = targetName;
+    }
+
+    @Override
+    public String getTargetName() {
+        return targetName;
+    }
+
+    @Override
+    public Component getComponent() {
+        return this;
     }
 }

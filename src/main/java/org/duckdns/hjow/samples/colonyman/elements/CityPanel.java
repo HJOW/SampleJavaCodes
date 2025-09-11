@@ -2,8 +2,13 @@ package org.duckdns.hjow.samples.colonyman.elements;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.Vector;
 
@@ -24,7 +29,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = 3475480727850203183L;
     protected City city;
     protected JTextArea ta;
-    protected JTextField tfName;
+    protected JTextField tfName, tfSearchCitizen, tfSearchFacility;
     protected JPanel pnGrid, pnCitizens, pnFacilities;
     protected JSplitPane splits;
     protected List<FacilityPanel> facilityPns = new Vector<FacilityPanel>();
@@ -81,10 +86,45 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         JTabbedPane tab = new JTabbedPane();
         pnGrid.add(tab, BorderLayout.CENTER);
         
+        JPanel pnFacRoot, pnCitiRoot;
+        pnFacRoot  = new JPanel();
+        pnCitiRoot = new JPanel();
+        
+        pnFacRoot.setLayout(new BorderLayout());
+        pnCitiRoot.setLayout(new BorderLayout());
+        
+        tfSearchCitizen  = new JTextField();
+        tfSearchFacility = new JTextField();
+        
+        pnFacRoot.add(tfSearchFacility, BorderLayout.NORTH);
+        pnCitiRoot.add(tfSearchCitizen, BorderLayout.NORTH);
+        
         pnFacilities = new JPanel();
         pnCitizens   = new JPanel();
-        tab.add("시설", new JScrollPane(pnFacilities));
-        tab.add("시민", new JScrollPane(pnCitizens));
+        
+        pnFacRoot.add(new JScrollPane(pnFacilities), BorderLayout.CENTER);
+        pnCitiRoot.add(new JScrollPane(pnCitizens), BorderLayout.CENTER);
+        
+        tab.add("시설", pnFacRoot);
+        tab.add("시민", pnCitiRoot);
+        
+        KeyAdapter eventSearch = new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                processSearch();
+            }
+        };
+        ActionListener eventEnter = new ActionListener() {  
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                processSearch();
+            }
+        };
+        
+        tfSearchCitizen.addKeyListener(eventSearch);
+        tfSearchFacility.addKeyListener(eventSearch);
+        tfSearchCitizen.addActionListener(eventEnter);
+        tfSearchFacility.addActionListener(eventEnter);
         
         refresh(0, city, colony, superInstance);
     }
@@ -99,6 +139,15 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
     
     @Override
     public void refresh(int cycle, City city, Colony colony, ColonyMan superInstance) {
+        if(city == null) { city = getCity(); }
+        if(city == null) {
+            tfName.setText("");
+            ta.setText("");
+            pnFacilities.removeAll();
+            pnCitizens.removeAll();
+            return;
+        }
+        
         tfName.setText(city.getName());
         
         List<Facility> facList = city.getFacility();
@@ -157,10 +206,14 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         citizenPns.clear();
         
         List<Citizen> citizens = city.getCitizens();
-        pnCitizens.setLayout(new GridLayout(citizens.size(), 1));
         for(Citizen c : citizens) {
+            if(c.getHp() <= 0) continue;
             CitizenPanel p = new CitizenPanel(c);
             citizenPns.add(p);
+        }
+        citizens = null;
+        pnCitizens.setLayout(new GridLayout(citizenPns.size(), 1));
+        for(CitizenPanel p : citizenPns) {
             pnCitizens.add(p);
             p.refresh(cycle, city, colony, superInstance);
         }
@@ -178,6 +231,9 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             if(p.getFacility(city).getHp() <= 0) p.setEditable(false);
             else p.setEditable(editable); 
         }
+        
+        tfSearchCitizen.setEditable(editable);
+        tfSearchFacility.setEditable(editable);
     }
     
     @Override
@@ -189,5 +245,39 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         citizenPns.clear();
         
         removeAll();
+    }
+    
+    protected void processSearch() {
+        String keyword = tfSearchFacility.getText();
+        for(FacilityPanel p : facilityPns) { processSearch(keyword, p); }
+        keyword = tfSearchCitizen.getText();
+        for(CitizenPanel  p : citizenPns ) { processSearch(keyword, p); }
+    }
+    
+    protected void processSearch(String keyword, ColonyElementPanel component) {
+        if(component.getComponent() == null) return;
+        if(keyword == null || keyword.equals("")) {
+            component.getComponent().setVisible(true);
+            return;
+        }
+        
+        String name = component.getTargetName();
+        if(name == null) { component.getComponent().setVisible(false); return; }
+        if(name.indexOf(keyword) >= 0) {
+            component.getComponent().setVisible(true);
+        } else {
+            component.getComponent().setVisible(false);
+        }
+    }
+
+    @Override
+    public String getTargetName() {
+        if(city == null) return null;
+        return city.getName();
+    }
+
+    @Override
+    public Component getComponent() {
+        return this;
     }
 }
