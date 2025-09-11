@@ -12,17 +12,30 @@ import org.duckdns.hjow.samples.colonyman.ColonyMan;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyElementPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Facility;
 
-public class FacilityPanel extends JPanel {
+public class FacilityPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = -6078767714905474678L;
     
-    protected JPanel pnUp, pnCenter, pnDown;
-    protected JLabel lb;
-    protected JTextArea ta;
+    protected transient JPanel pnUp, pnCenter, pnDown;
+    protected transient JLabel lb;
+    protected transient JTextArea ta;
+    protected long facilityKey;
+    
     public FacilityPanel() {
         super();
+    }
+    
+    public FacilityPanel(Facility f) {
+        this();
+        init(f);   
+    }
+    
+    public void init(Facility f) {
+        setFacilityKey(f.getKey());
         
+        removeAll();
         setLayout(new BorderLayout());
         
         pnUp     = new JPanel();
@@ -49,6 +62,14 @@ public class FacilityPanel extends JPanel {
         pnCenter.add(new JScrollPane(ta), BorderLayout.CENTER);
     }
     
+    public long getFacilityKey() {
+        return facilityKey;
+    }
+
+    public void setFacilityKey(long facilityKey) {
+        this.facilityKey = facilityKey;
+    }
+
     public void refresh(Facility fac, City city, Colony colony, ColonyMan superInstance) {
         lb.setText(fac.getName());
         
@@ -74,5 +95,23 @@ public class FacilityPanel extends JPanel {
         }
         
         ta.setText(res.toString().trim());
+        
+        if(fac.getHp() <= 0) setEditable(false);
     }
+    
+    @Override
+    public void refresh(int cycle, City city, Colony colony, ColonyMan superInstance) {
+        Facility fac = null;
+        for(Facility f : city.getFacility()) {
+            if(getFacilityKey() == f.getKey()) { fac = f; break;}  
+        }
+        if(fac == null) { setEditable(false); return; }
+        refresh(fac, city, colony, superInstance);
+    }
+
+    @Override
+    public void setEditable(boolean editable) {
+        
+    }
+
 }

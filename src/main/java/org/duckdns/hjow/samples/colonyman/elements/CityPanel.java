@@ -10,6 +10,8 @@ import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
@@ -18,12 +20,13 @@ import org.duckdns.hjow.samples.colonyman.ColonyMan;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityPanel;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.SupportGUIFacility;
 
-public class CityPanel extends JPanel {
+public class CityPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = 3475480727850203183L;
     protected City city;
     protected JTextArea ta;
     protected JTextField tfName;
-    protected JPanel pnGrid, pnFacilities;
+    protected JPanel pnGrid, pnCitizens, pnFacilities;
+    protected JSplitPane splits;
     protected List<FacilityPanel> facilityPns = new Vector<FacilityPanel>();
     
     public CityPanel() {
@@ -63,18 +66,26 @@ public class CityPanel extends JPanel {
         tfName.setEditable(false);
         pnTopInfos.add(tfName);
         
+        splits = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        pnCenter.add(splits, BorderLayout.CENTER);
+        
         pnGrid = new JPanel();
-        pnGrid.setLayout(new GridLayout(2, 1));
-        pnCenter.add(pnGrid, BorderLayout.CENTER);
+        pnGrid.setLayout(new BorderLayout());
+        splits.setRightComponent(pnGrid);
         
         ta = new JTextArea();
         ta.setEditable(false);
-        pnGrid.add(new JScrollPane(ta));
+        splits.setLeftComponent(new JScrollPane(ta));
+        
+        JTabbedPane tab = new JTabbedPane();
+        pnGrid.add(tab, BorderLayout.CENTER);
         
         pnFacilities = new JPanel();
-        pnGrid.add(pnFacilities);
+        pnCitizens   = new JPanel();
+        tab.add("시설", new JScrollPane(pnFacilities));
+        tab.add("시민", new JScrollPane(pnCitizens));
         
-        refresh(0, colony, superInstance);
+        refresh(0, city, colony, superInstance);
     }
 
     public City getCity() {
@@ -85,12 +96,26 @@ public class CityPanel extends JPanel {
         this.city = city;
     }
     
-    public void refresh(int cycle, Colony colony, ColonyMan superInstance) {
+    @Override
+    public void refresh(int cycle, City city, Colony colony, ColonyMan superInstance) {
         tfName.setText(city.getName());
         
         List<Facility> facList = city.getFacility();
-        int idx;
+        int idx = 0;
         int sizes = facList.size();
+        
+        // Remove destroyed facilities panel
+        for(Facility f : facList) {
+            if(f.getHp() <= 0) {
+                idx = 0;
+                while(idx < facilityPns.size()) {
+                    if(f.getKey() == facilityPns.get(idx).getFacilityKey()) { facilityPns.remove(idx); continue; }
+                    idx++;
+                }
+            }
+        }
+        
+        idx = 0;
         if(sizes != facilityPns.size()) {
             facilityPns.clear();
             pnFacilities.removeAll();
@@ -102,7 +127,7 @@ public class CityPanel extends JPanel {
                     SupportGUIFacility sFac = (SupportGUIFacility) facList.get(idx);
                     pn = sFac.createPanel();
                 } else {
-                    pn = new FacilityPanel();
+                    pn = new FacilityPanel(facList.get(idx));
                 }
                 pnFacilities.add(pn);
                 facilityPns.add(pn);
@@ -116,12 +141,24 @@ public class CityPanel extends JPanel {
             if(fac instanceof SupportGUIFacility) {
                 if(! ((SupportGUIFacility) fac).checkPanelAccept(pn) ) {
                     facilityPns.clear();
-                    refresh(cycle, colony, superInstance);
+                    refresh(cycle, city, colony, superInstance);
                     return;
                 }
             }
             
             pn.refresh(fac, city, colony, superInstance);
         }
+        
+        ta.setText(city.getStatusString(superInstance));
+        
+        splits.setDividerLocation(0.5);
+        
+        if(city.getHp() <= 0) {
+            setEditable(false);
+        }
+    }
+    
+    public void setEditable(boolean editable) {
+        
     }
 }

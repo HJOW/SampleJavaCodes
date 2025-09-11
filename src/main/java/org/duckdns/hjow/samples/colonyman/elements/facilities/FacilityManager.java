@@ -17,7 +17,8 @@ public class FacilityManager {
     }
     
     public static Facility fromJson(JsonObject json) {
-        if(! "Facility".equals(json.get("type"))) throw new RuntimeException("This object is not a Facility type.");
+        String type = String.valueOf(json.get("type"));
+        if(type.equals("City") || type.equals("Colony")) throw new RuntimeException("This object is not a Facility type.");
         
         Facility fac = null;
         Class<?> classes = null;

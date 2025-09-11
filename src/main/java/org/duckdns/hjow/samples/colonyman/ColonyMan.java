@@ -88,7 +88,7 @@ public class ColonyMan implements GUIProgram {
         else if(superDialog instanceof Dialog) dialog = new JDialog((Dialog)superDialog);
         else dialog = new JDialog();
         
-        dialog.setSize(600, 400);
+        dialog.setSize(800, 600);
         dialog.setTitle("Colony");
         dialog.setIconImage(UIUtil.iconToImage(getIcon()));
         dialog.setLayout(new BorderLayout());
@@ -140,17 +140,29 @@ public class ColonyMan implements GUIProgram {
         
         JPanel pnArena = new JPanel();
         JPanel pnCtrl  = new JPanel();
+        JPanel pnCols  = new JPanel();
         pnArena.setLayout( new BorderLayout());
         pnCtrl.setLayout( new BorderLayout());
+        pnCols.setLayout( new BorderLayout());
         pnCenter.add(pnArena, BorderLayout.CENTER);
         
         pnColonies = new JPanel();
         cbxColony  = new JComboBox<Colony>();
         
-        pnArena.add(pnColonies, BorderLayout.CENTER);
+        pnArena.add(pnCols, BorderLayout.CENTER);
         pnArena.add(pnCtrl , BorderLayout.NORTH);
         
+        pnCols.add(pnColonies, BorderLayout.CENTER);
         pnCtrl.add(cbxColony, BorderLayout.CENTER);
+        
+        JPanel pnColTop, pnColBottom;
+        pnColTop = new JPanel();
+        pnColBottom = new JPanel();
+        pnColTop.setLayout(new BorderLayout());
+        pnColBottom.setLayout(new FlowLayout(FlowLayout.LEFT));
+        
+        pnCols.add(pnColTop   , BorderLayout.NORTH);
+        pnCols.add(pnColBottom, BorderLayout.SOUTH);
         
         cbxColony.addItemListener(new ItemListener() {
             @Override
@@ -179,6 +191,7 @@ public class ColonyMan implements GUIProgram {
         pnColonyBasics.add(pnTopLeft  , BorderLayout.WEST);
         pnColonyBasics.add(pnTopCenter, BorderLayout.CENTER);
         pnColonyBasics.add(pnTopRight , BorderLayout.EAST);
+        pnColTop.add(pnColonyBasics, BorderLayout.CENTER);
         
         lbColonyName = new JLabel();
         pnTopLeft.add(lbColonyName);
@@ -403,37 +416,39 @@ public class ColonyMan implements GUIProgram {
         Colony col = getColony();
         if(cycle == 0 || cycle % 100 == 0) {
             pnColonies.removeAll();
-            
-            JPanel[] pns = new JPanel[colonies.size() + 3];
-            pnColonies.setLayout(new GridLayout(pns.length, 1));
-            
-            JPanel pnBottom = new JPanel();
-            pnBottom.setLayout(new FlowLayout(FlowLayout.LEFT));
-            
-            pns[0] = pnColonyBasics;
-            pns[pns.length - 1] = pnBottom;
-            
-            pnColonies.add(pnColonyBasics);
+            pnCities.clear();
             
             List<City> cities = col.getCities();
-            pnCities.clear();
+            
+            JPanel[] pns = new JPanel[cities.size() + 1];
+            pnColonies.setLayout(new GridLayout(pns.length, 1));
             
             for(int idx=0; idx<cities.size(); idx++) {
                 CityPanel c = new CityPanel(cities.get(idx), col, this);
-                pns[idx + 1] = c;
+                pns[idx] = c;
                 pnCities.add(c);
                 pnColonies.add(c);
             }
             
-            pnColonies.add(new JPanel());
-            pnColonies.add(pnBottom);
+            JPanel pnEmpty = new JPanel();
+            pns[pns.length - 1] = pnEmpty;
+            pnColonies.add(pnEmpty);
         }
         
         lbColonyName.setText(col.getName());
         tfColonyTime.setText(col.getDateString());
         
         for(CityPanel c : pnCities) {
-            c.refresh(cycle, col, this);
+            c.refresh(cycle, c.getCity(), col, this);
         }
+    }
+    
+    public CityPanel getCityPanel(City city) {
+        for(CityPanel c : pnCities) {
+            if(c.getCity().getKey() == city.getKey()) {
+                return c;
+            }
+        }
+        return null;
     }
 }

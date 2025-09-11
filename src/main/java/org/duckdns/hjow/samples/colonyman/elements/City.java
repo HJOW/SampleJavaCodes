@@ -1,6 +1,8 @@
 package org.duckdns.hjow.samples.colonyman.elements;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,6 +12,7 @@ import java.util.Vector;
 
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.samples.colonyman.ColonyMan;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityManager;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
@@ -93,6 +96,12 @@ public class City implements ColonyElements {
     }
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) { // city should be a self
+        // Apply Born and move Chance
+        processBornChance(cycle, colony, efficiency100);
+        processMoveInChance(cycle, colony, efficiency100);
+        processMoveOutChance(cycle, colony, efficiency100);
+        
+        // Calculate power generation
         long power = getPowerAvail(colony);
         
         // Apply Facilities
@@ -274,6 +283,114 @@ public class City implements ColonyElements {
         }
     }
     
+    public int getCitizenCount() {
+        return citizens.size();
+    }
+    
+    public long getHomeCapacity() {
+        long res = 0L;
+        for(Facility f : getFacility()) {
+            if(f instanceof Home) {
+                res += f.getCapacity();
+            }
+        }
+        return res;
+    }
+    
+    public void newCitizen() {
+        Citizen c = new Citizen();
+        getCitizens().add(c);
+    }
+    
+    /** 출산률 계산 */
+    public double getBornChanceRate(Colony col, int efficiency100) {
+        double res = efficiency100 / 100.0;
+        if(res > 50.0) res = 50.0;
+        return res;
+    }
+    
+    /** 출산률 적용 */
+    public void processBornChance(int cycle, Colony col, int efficiency100) {
+        if(cycle % 600 == 0) {
+            if(getHomeCapacity() > getCitizenCount()) {
+                if(Math.random() < ( getBornChanceRate(col, efficiency100))) {
+                    newCitizen();
+                }
+            }
+        }
+    }
+    
+    /** 이주율 계산 (이주해 들어올 확률만 계산) */
+    public double getMoveChangeRate(Colony col, int efficiency100) {
+        // 거주지가 부족하면 이주 0
+        if(getHomeCapacity() <= getCitizenCount()) return 0.0;
+        
+        // 행복도 체크
+        boolean happinessAccepts = false;
+        double rate = getAverageHappiness();
+        if(getCitizenCount() <= 0) {
+            happinessAccepts = true;
+            rate = 10.0; // 시민이 아예 없으면 10 적용
+        } else {
+            if(rate >= 50.0) happinessAccepts = true;
+            rate = rate - 50.0;
+        }
+        
+        if(! happinessAccepts) return 0.0;
+        if(rate <= 0.0) return 0.0;
+        
+        // 효율 적용
+        rate = rate * (efficiency100 / 100.0);
+        
+        // 백분율 to 0~1
+        return rate / 100.0;
+    }
+    
+    /** 평균행복도 계산 (참고 - 시민의 행복도는 최소 0, 최초값은 50) */
+    public double getAverageHappiness() {
+        BigDecimal happiness = new BigDecimal("0");
+        if(getCitizenCount() >= 1) {
+            for(Citizen c : getCitizens()) {
+                happiness = happiness.add(new BigDecimal(String.valueOf(c.getHappy())));
+            }
+            happiness = happiness.divide(new BigDecimal(String.valueOf(getCitizenCount())), 5, BigDecimal.ROUND_DOWN);
+            return happiness.doubleValue();
+        }
+        return 0.0;
+    }
+    
+    /** 이주율 (입주) 적용 */
+    public void processMoveInChance(int cycle, Colony col, int efficiency100) {
+        double moveRate = getMoveChangeRate(col, efficiency100);
+        if(cycle % 600 == 0) {
+            if(Math.random() < moveRate) {
+                newCitizen();
+            }
+        }
+    }
+    
+    /** 이주율 (탈출) 적용 */
+    public void processMoveOutChance(int cycle, Colony col, int efficiency100) {
+        if(cycle % 60 == 0) {
+            if(getCitizenCount() >= 1) {
+                int idx = 0;
+                List<Citizen> citizens = getCitizens();
+                while(idx < citizens.size()) {
+                    int happy = citizens.get(idx).getHappy();
+                    if(happy < 10) {
+                        double rates = (happy / 100.0);
+                        if(Math.random() < rates) {
+                            citizens.remove(idx);
+                            continue;
+                        }
+                    }
+                    
+                    idx++;
+                }
+            }
+        }
+    }
+    
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
@@ -292,6 +409,7 @@ public class City implements ColonyElements {
         return json;
     }
     
+    @Override
     public void fromJson(JsonObject json) {
         if(! "City".equals(json.get("type"))) throw new RuntimeException("This object is not City type.");
         setName(json.get("name").toString());
@@ -330,5 +448,18 @@ public class City implements ColonyElements {
                 }
             }
         }
+    }
+    
+    public String getStatusString(ColonyMan superInstance) {
+        StringBuilder desc = new StringBuilder("");
+        
+        DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
+        DecimalFormat formatterRate = new DecimalFormat("##0.00");
+        
+        desc = desc.append("\n").append("HP : ").append(formatterInt.format(getHp())).append(" / ").append(formatterInt.format(getMaxHp()));
+        desc = desc.append("\n").append("인구 : ").append(formatterInt.format(getCitizenCount()));
+        desc = desc.append("\n").append("평균 행복도 : ").append(formatterRate.format(getAverageHappiness()));
+        
+        return desc.toString().trim();
     }
 }
