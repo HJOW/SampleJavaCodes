@@ -26,10 +26,19 @@ public class CityPanel extends JPanel {
     protected JPanel pnGrid, pnFacilities;
     protected List<FacilityPanel> facilityPns = new Vector<FacilityPanel>();
     
+    public CityPanel() {
+        
+    }
+    
     public CityPanel(City city, Colony colony, ColonyMan superInstance) {
         super();
-        this.city = city;
+        init(city, colony, superInstance);
+    }
+    
+    protected void init(City city, Colony colony, ColonyMan superInstance) {
+        if(this.city != null) removeAll();
         
+        this.city = city;
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED, getForeground(), Color.GRAY));
         

@@ -404,7 +404,7 @@ public class ColonyMan implements GUIProgram {
         if(cycle == 0 || cycle % 100 == 0) {
             pnColonies.removeAll();
             
-            JPanel[] pns = new JPanel[colonies.size() + 2];
+            JPanel[] pns = new JPanel[colonies.size() + 3];
             pnColonies.setLayout(new GridLayout(pns.length, 1));
             
             JPanel pnBottom = new JPanel();
@@ -425,6 +425,7 @@ public class ColonyMan implements GUIProgram {
                 pnColonies.add(c);
             }
             
+            pnColonies.add(new JPanel());
             pnColonies.add(pnBottom);
         }
         
