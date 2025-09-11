@@ -21,7 +21,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     protected transient JPanel pnUp, pnCenter, pnDown;
     protected transient JLabel lb;
     protected transient JTextArea ta;
-    protected long facilityKey;
+    protected long facilityKey = 0L;
     
     public FacilityPanel() {
         super();
@@ -33,6 +33,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     }
     
     public void init(Facility f) {
+        dispose();
         setFacilityKey(f.getKey());
         
         removeAll();
@@ -69,6 +70,14 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     public void setFacilityKey(long facilityKey) {
         this.facilityKey = facilityKey;
     }
+    
+    public Facility getFacility(City city) {
+        if(getFacilityKey() < 0L) return null;
+        for(Facility f : city.getFacility()) {
+            if(f.getKey() == getFacilityKey()) return f;
+        }
+        return null;
+    }
 
     public void refresh(Facility fac, City city, Colony colony, ColonyMan superInstance) {
         lb.setText(fac.getName());
@@ -101,10 +110,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     
     @Override
     public void refresh(int cycle, City city, Colony colony, ColonyMan superInstance) {
-        Facility fac = null;
-        for(Facility f : city.getFacility()) {
-            if(getFacilityKey() == f.getKey()) { fac = f; break;}  
-        }
+        Facility fac = getFacility(city);
         if(fac == null) { setEditable(false); return; }
         refresh(fac, city, colony, superInstance);
     }
@@ -114,4 +120,9 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         
     }
 
+    @Override
+    public void dispose() {
+        facilityKey = 0L;
+        removeAll();
+    }
 }

@@ -28,6 +28,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
     protected JPanel pnGrid, pnCitizens, pnFacilities;
     protected JSplitPane splits;
     protected List<FacilityPanel> facilityPns = new Vector<FacilityPanel>();
+    protected List<CitizenPanel>  citizenPns  = new Vector<CitizenPanel>();
     
     public CityPanel() {
         
@@ -38,8 +39,8 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         init(city, colony, superInstance);
     }
     
-    protected void init(City city, Colony colony, ColonyMan superInstance) {
-        if(this.city != null) removeAll();
+    public void init(City city, Colony colony, ColonyMan superInstance) {
+        if(this.city != null) dispose();
         
         this.city = city;
         this.setLayout(new BorderLayout());
@@ -109,7 +110,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             if(f.getHp() <= 0) {
                 idx = 0;
                 while(idx < facilityPns.size()) {
-                    if(f.getKey() == facilityPns.get(idx).getFacilityKey()) { facilityPns.remove(idx); continue; }
+                    if(f.getKey() == facilityPns.get(idx).getFacilityKey()) { facilityPns.get(idx).dispose(); facilityPns.remove(idx); continue; }
                     idx++;
                 }
             }
@@ -117,6 +118,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         
         idx = 0;
         if(sizes != facilityPns.size()) {
+            for(FacilityPanel p : facilityPns) { p.dispose(); }
             facilityPns.clear();
             pnFacilities.removeAll();
             pnFacilities.setLayout(new GridLayout(sizes, 1));
@@ -149,8 +151,21 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             pn.refresh(fac, city, colony, superInstance);
         }
         
-        ta.setText(city.getStatusString(superInstance));
+        facList = null;
+        pnCitizens.removeAll();
+        for(CitizenPanel p : citizenPns) { p.dispose(); }
+        citizenPns.clear();
         
+        List<Citizen> citizens = city.getCitizens();
+        pnCitizens.setLayout(new GridLayout(citizens.size(), 1));
+        for(Citizen c : citizens) {
+            CitizenPanel p = new CitizenPanel(c);
+            citizenPns.add(p);
+            pnCitizens.add(p);
+            p.refresh(cycle, city, colony, superInstance);
+        }
+        
+        ta.setText(city.getStatusString(superInstance));
         splits.setDividerLocation(0.5);
         
         if(city.getHp() <= 0) {
@@ -159,6 +174,20 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
     }
     
     public void setEditable(boolean editable) {
+        for(FacilityPanel p : facilityPns) {
+            if(p.getFacility(city).getHp() <= 0) p.setEditable(false);
+            else p.setEditable(editable); 
+        }
+    }
+    
+    @Override
+    public void dispose() {
+        city = null;
+        for(FacilityPanel p : facilityPns) { p.dispose(); }
+        facilityPns.clear();
+        for(CitizenPanel p : citizenPns) { p.dispose(); }
+        citizenPns.clear();
         
+        removeAll();
     }
 }

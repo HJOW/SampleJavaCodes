@@ -2,9 +2,7 @@ package org.duckdns.hjow.samples.colonyman;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;
-import java.awt.FlowLayout;
 import java.awt.Frame;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -24,11 +22,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -40,6 +36,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.CityPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Facility;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Residence;
@@ -59,11 +56,10 @@ public class ColonyMan implements GUIProgram {
     protected transient volatile int selectedColony = -1;
     protected transient volatile int cycle = 0;
     
+    protected transient JPanel pnCols;
+    protected transient ColonyPanel cpNow;
     protected transient JComboBox<Colony> cbxColony;
-    protected transient List<CityPanel> pnCities = new Vector<CityPanel>();
-    protected transient JPanel pnColonies, pnColonyBasics;
-    protected transient JLabel lbColonyName;
-    protected transient JTextField tfColonyTime;
+    protected transient List<ColonyPanel> pnColonies = new Vector<ColonyPanel>();
     
     protected transient JProgressBar progThreadStatus;
     
@@ -138,31 +134,22 @@ public class ColonyMan implements GUIProgram {
         progThreadStatus = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
         toolbarNorth.add(progThreadStatus);
         
+        pnCols  = new JPanel();
         JPanel pnArena = new JPanel();
         JPanel pnCtrl  = new JPanel();
-        JPanel pnCols  = new JPanel();
+        
         pnArena.setLayout( new BorderLayout());
         pnCtrl.setLayout( new BorderLayout());
         pnCols.setLayout( new BorderLayout());
         pnCenter.add(pnArena, BorderLayout.CENTER);
         
-        pnColonies = new JPanel();
         cbxColony  = new JComboBox<Colony>();
         
         pnArena.add(pnCols, BorderLayout.CENTER);
         pnArena.add(pnCtrl , BorderLayout.NORTH);
         
-        pnCols.add(pnColonies, BorderLayout.CENTER);
+        // pnCols.add(pnColonies, BorderLayout.CENTER);
         pnCtrl.add(cbxColony, BorderLayout.CENTER);
-        
-        JPanel pnColTop, pnColBottom;
-        pnColTop = new JPanel();
-        pnColBottom = new JPanel();
-        pnColTop.setLayout(new BorderLayout());
-        pnColBottom.setLayout(new FlowLayout(FlowLayout.LEFT));
-        
-        pnCols.add(pnColTop   , BorderLayout.NORTH);
-        pnCols.add(pnColBottom, BorderLayout.SOUTH);
         
         cbxColony.addItemListener(new ItemListener() {
             @Override
@@ -176,29 +163,7 @@ public class ColonyMan implements GUIProgram {
                 });
             }
         });
-        
-        pnColonyBasics = new JPanel();
-        pnColonyBasics.setLayout(new BorderLayout());
-        
-        JPanel pnTopLeft, pnTopCenter, pnTopRight;
-        pnTopLeft   = new JPanel();
-        pnTopCenter = new JPanel();
-        pnTopRight  = new JPanel();
-        pnTopLeft.setLayout(new FlowLayout(FlowLayout.LEFT));
-        pnTopCenter.setLayout(new BorderLayout());
-        pnTopRight.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        
-        pnColonyBasics.add(pnTopLeft  , BorderLayout.WEST);
-        pnColonyBasics.add(pnTopCenter, BorderLayout.CENTER);
-        pnColonyBasics.add(pnTopRight , BorderLayout.EAST);
-        pnColTop.add(pnColonyBasics, BorderLayout.CENTER);
-        
-        lbColonyName = new JLabel();
-        pnTopLeft.add(lbColonyName);
-        
-        tfColonyTime = new JTextField(15);
-        tfColonyTime.setEditable(false);
-        pnTopRight.add(tfColonyTime);
+        refreshColonyContent();
     }
 
     @Override
@@ -355,6 +320,14 @@ public class ColonyMan implements GUIProgram {
     @Override
     public void dispose() {
         disposeContents();
+        
+        cpNow = null;
+        for(ColonyPanel p : pnColonies) {
+            p.dispose();
+        }
+        pnColonies.clear();
+        colonies.clear();
+        
         if(dialog != null) dialog.setVisible(false);
         dialog = null;
     }
@@ -414,41 +387,43 @@ public class ColonyMan implements GUIProgram {
     
     public synchronized void refreshArenaPanel(int cycle) {
         Colony col = getColony();
-        if(cycle == 0 || cycle % 100 == 0) {
-            pnColonies.removeAll();
-            pnCities.clear();
-            
-            List<City> cities = col.getCities();
-            
-            JPanel[] pns = new JPanel[cities.size() + 1];
-            pnColonies.setLayout(new GridLayout(pns.length, 1));
-            
-            for(int idx=0; idx<cities.size(); idx++) {
-                CityPanel c = new CityPanel(cities.get(idx), col, this);
-                pns[idx] = c;
-                pnCities.add(c);
-                pnColonies.add(c);
-            }
-            
-            JPanel pnEmpty = new JPanel();
-            pns[pns.length - 1] = pnEmpty;
-            pnColonies.add(pnEmpty);
+        if(col == null) {
+            pnCols.removeAll();
+            return;
         }
         
-        lbColonyName.setText(col.getName());
-        tfColonyTime.setText(col.getDateString());
+        ColonyPanel colPn = null;
+        for(ColonyPanel cp : pnColonies) {
+            if(cp.getColony().getKey() == col.getKey()) {
+                colPn = cp; break;
+            }
+        }
         
-        for(CityPanel c : pnCities) {
-            c.refresh(cycle, c.getCity(), col, this);
+        if(colPn == null) {
+            colPn = new ColonyPanel(col, this);
+            pnColonies.add(colPn);
+        }
+        
+        if(cpNow == null || cpNow != colPn) {
+            pnCols.removeAll();
+            cpNow = colPn;
+            if(cpNow != null) pnCols.add(colPn, BorderLayout.CENTER);
+        }
+        
+        if(cycle == 0 || cycle % 100 == 0) {
+            colPn.refresh(cycle, null, col, this);
         }
     }
     
     public CityPanel getCityPanel(City city) {
-        for(CityPanel c : pnCities) {
-            if(c.getCity().getKey() == city.getKey()) {
-                return c;
+        Colony col = getColony();
+        ColonyPanel colPn = null;
+        for(ColonyPanel cp : pnColonies) {
+            if(cp.getColony().getKey() == col.getKey()) {
+                colPn = cp; break;
             }
         }
-        return null;
+        if(colPn == null) return null;
+        return colPn.getCityPanel(city);
     }
 }
