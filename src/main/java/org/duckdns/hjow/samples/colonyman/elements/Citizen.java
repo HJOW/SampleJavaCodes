@@ -71,9 +71,18 @@ public class Citizen implements ColonyElements {
         }
         if(hunger < 0) {
             hunger = 0;
-            hp--;
-            if(efficiency100 < 50) hp--;
-            harm = true;
+        }
+        
+        if(hunger <= 0) {
+            std = 5;
+            if(cycle % std == 0) {
+                hp--;
+                if(efficiency100 < 50) hp--;
+                harm = true;
+            }
+        } else if(hunger >= 50) {
+            std = 50;
+            if(cycle % std == 0 && hp < getMaxHp()) hp++;
         }
         
         std = 10000 / ( (101 - efficiency100) < 1 ? 1 : (101 - efficiency100) );

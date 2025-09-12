@@ -60,6 +60,7 @@ public class GUISampleJavaCodes extends SampleJavaCodes {
         
         frame = new JFrame();
         frame.setSize(600, 400);
+        UIUtil.center(frame);
         frame.setTitle("Sample Java Codes");
         frame.setLayout(new BorderLayout());
         frame.addWindowListener(new WindowAdapter() {

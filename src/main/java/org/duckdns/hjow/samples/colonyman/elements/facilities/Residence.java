@@ -32,7 +32,7 @@ public class Residence extends DefaultFacility implements Home {
 
     @Override
     public String getStatusDescription(City city, Colony colony) {
-        return ""; // TODO
+        return "";
     }
     
     @Override

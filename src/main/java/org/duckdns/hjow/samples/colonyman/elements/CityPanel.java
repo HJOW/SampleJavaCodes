@@ -14,6 +14,7 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -28,6 +29,7 @@ import org.duckdns.hjow.samples.colonyman.elements.facilities.SupportGUIFacility
 public class CityPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = 3475480727850203183L;
     protected City city;
+    protected JProgressBar progHp;
     protected JTextArea ta;
     protected JTextField tfName, tfSearchCitizen, tfSearchFacility;
     protected JPanel pnGrid, pnCitizens, pnFacilities;
@@ -68,9 +70,16 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         pnTopInfos.setLayout(new FlowLayout(FlowLayout.LEFT));
         pnTop.add(pnTopInfos, BorderLayout.CENTER);
         
-        tfName = new JTextField(12);
+        JPanel pnHp = new JPanel();
+        pnHp.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        pnTop.add(pnHp, BorderLayout.EAST);
+        
+        tfName = new JTextField(15);
         tfName.setEditable(false);
         pnTopInfos.add(tfName);
+        
+        progHp = new JProgressBar(JProgressBar.HORIZONTAL);
+        pnHp.add(progHp);
         
         splits = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         pnCenter.add(splits, BorderLayout.CENTER);
@@ -149,6 +158,9 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         }
         
         tfName.setText(city.getName());
+        
+        progHp.setMaximum(city.getMaxHp());
+        progHp.setValue(city.getHp());
         
         List<Facility> facList = city.getFacility();
         int idx = 0;

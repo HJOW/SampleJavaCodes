@@ -1,7 +1,9 @@
 package org.duckdns.hjow.samples.colonyman;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Dialog;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Image;
 import java.awt.Window;
@@ -48,10 +50,13 @@ import org.duckdns.hjow.samples.util.UIUtil;
 public class ColonyMan implements GUIProgram {
     private static final long serialVersionUID = -5740844908011980260L;
     protected transient SampleJavaCodes superInstance;
-    protected transient JDialog dialog;
     protected transient Thread thread;
     protected transient volatile boolean threadSwitch, threadPaused, threadShutdown, reserveSaving;
-    protected transient JButton btnThrPlay;
+    
+    protected transient JDialog dialog;
+    protected transient JPanel pnMain;
+    protected transient CardLayout cardMain;
+    protected transient JButton btnSaveAs, btnLoadAs, btnThrPlay;
     
     protected transient Vector<Colony> colonies = new Vector<Colony>();
     protected transient volatile int selectedColony = -1;
@@ -86,39 +91,86 @@ public class ColonyMan implements GUIProgram {
         else dialog = new JDialog();
         
         dialog.setSize(800, 600);
-        dialog.setTitle("Colony");
+        UIUtil.center(dialog);
+        dialog.setTitle("Colonization");
         dialog.setIconImage(UIUtil.iconToImage(getIcon()));
         dialog.setLayout(new BorderLayout());
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                // LoadingModal loading = LoadingModal.open(getDialog());
-                disposeContents();
-                // loading.end();
+                setEditable(false);
+                
+                final Vector<String> flagShutdowns = new Vector<String>();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() { 
+                        dispose(false);
+                        flagShutdowns.add("1");
+                    }
+                }).start();
+                int numInfLoopPrev = 0;
+                while(true) {
+                    if(flagShutdowns.size() >= 1) break;
+                    try { Thread.sleep(100L); } catch(InterruptedException ex) { break; }
+                    numInfLoopPrev++;
+                    if(numInfLoopPrev >= 100) break;
+                }
             }
         });
         
-        JPanel pnMain, pnSouth, pnCenter, pnNorth;
-        pnMain   = new JPanel();
+        JPanel pnMainCard1, pnMainCard2;
+        pnMain      = new JPanel();
+        pnMainCard1 = new JPanel();
+        pnMainCard2 = new JPanel();
+        
+        dialog.add(pnMain, BorderLayout.CENTER);
+        
+        cardMain = new CardLayout();
+        pnMain.setLayout(cardMain);
+        
+        pnMain.add(pnMainCard1, "C1");
+        pnMain.add(pnMainCard2, "C2");
+        
+        pnMainCard1.setLayout(new BorderLayout());
+        pnMainCard2.setLayout(new BorderLayout());
+        
+        JPanel pnHide = new JPanel();
+        pnMainCard2.add(pnHide, BorderLayout.CENTER);
+        pnMainCard2.add(new JPanel(), BorderLayout.NORTH);
+        pnMainCard2.add(new JPanel(), BorderLayout.SOUTH);
+        
+        pnHide.setLayout(new FlowLayout(FlowLayout.CENTER));
+        
+        JProgressBar progHide = new JProgressBar();
+        progHide.setIndeterminate(true);
+        pnHide.add(progHide);
+        
+        JPanel pnSouth, pnCenter, pnNorth;
         pnSouth  = new JPanel();
         pnCenter = new JPanel();
         pnNorth  = new JPanel();
         
-        dialog.add(pnMain, BorderLayout.CENTER);
-        
-        pnMain.setLayout(  new BorderLayout());
         pnSouth.setLayout( new BorderLayout());
         pnCenter.setLayout(new BorderLayout());
         pnNorth.setLayout( new BorderLayout());
         
-        pnMain.add(pnSouth , BorderLayout.SOUTH);
-        pnMain.add(pnCenter, BorderLayout.CENTER);
-        pnMain.add(pnNorth , BorderLayout.NORTH);
+        pnMainCard1.add(pnSouth , BorderLayout.SOUTH);
+        pnMainCard1.add(pnCenter, BorderLayout.CENTER);
+        pnMainCard1.add(pnNorth , BorderLayout.NORTH);
         
         JToolBar toolbarNorth = new JToolBar();
         pnNorth.add(toolbarNorth, BorderLayout.NORTH);
         
-        btnThrPlay = new JButton("▶");
+        btnSaveAs = new JButton(UIManager.getIcon("FileView.floppyDriveIcon"));
+        toolbarNorth.add(btnSaveAs);
+        
+        btnLoadAs = new JButton(UIManager.getIcon("FileView.directoryIcon"));
+        toolbarNorth.add(btnLoadAs);
+        
+        cbxColony  = new JComboBox<Colony>();
+        toolbarNorth.add(cbxColony);
+        
+        btnThrPlay = new JButton("시뮬레이션 시작");
         toolbarNorth.add(btnThrPlay);
         
         btnThrPlay.addActionListener(new ActionListener() {
@@ -126,10 +178,16 @@ public class ColonyMan implements GUIProgram {
             public void actionPerformed(ActionEvent e) {
                 threadPaused = (! threadPaused);
                 if(threadPaused) {
-                    btnThrPlay.setText("▶");
+                    btnThrPlay.setText("시뮬레이션 시작");
+                    btnSaveAs.setEnabled(true);
+                    btnLoadAs.setEnabled(true);
+                    cbxColony.setEnabled(true);
                 } else {
                     reserveSaving = true;
-                    btnThrPlay.setText("||");
+                    btnThrPlay.setText("시뮬레이션 정지");
+                    btnSaveAs.setEnabled(false);
+                    btnLoadAs.setEnabled(false);
+                    cbxColony.setEnabled(false);
                 }
             }
         });
@@ -146,13 +204,8 @@ public class ColonyMan implements GUIProgram {
         pnCols.setLayout( new BorderLayout());
         pnCenter.add(pnArena, BorderLayout.CENTER);
         
-        cbxColony  = new JComboBox<Colony>();
-        
         pnArena.add(pnCols, BorderLayout.CENTER);
         pnArena.add(pnCtrl , BorderLayout.NORTH);
-        
-        // pnCols.add(pnColonies, BorderLayout.CENTER);
-        pnCtrl.add(cbxColony, BorderLayout.CENTER);
         
         cbxColony.addItemListener(new ItemListener() {
             @Override
@@ -167,6 +220,7 @@ public class ColonyMan implements GUIProgram {
             }
         });
         refreshColonyContent();
+        cardMain.show(pnMain, "C2");
     }
 
     @Override
@@ -201,9 +255,10 @@ public class ColonyMan implements GUIProgram {
         threadPaused   = true;
         threadShutdown = false;
         reserveSaving  = false;
-        btnThrPlay.setText("▶");
+        btnThrPlay.setText("시뮬레이션 시작");
         btnThrPlay.setEnabled(true);
         thread.start();
+        setEditable(true);
     }
     
     public void loadColonies() {
@@ -322,6 +377,11 @@ public class ColonyMan implements GUIProgram {
 
     @Override
     public void dispose() {
+        dispose(true);
+    }
+    
+    public void dispose(boolean closeDialog) {
+        setEditable(false);
         disposeContents();
         
         cpNow = null;
@@ -331,7 +391,12 @@ public class ColonyMan implements GUIProgram {
         pnColonies.clear();
         colonies.clear();
         
-        if(dialog != null) dialog.setVisible(false);
+        cardMain = null;
+        
+        if(pnMain != null) pnMain.removeAll();
+        pnMain = null;
+        
+        if(dialog != null && closeDialog) dialog.setVisible(false);
         dialog = null;
     }
     
@@ -339,6 +404,17 @@ public class ColonyMan implements GUIProgram {
         threadSwitch = false;
         waitThreadShutdown();
         saveColonies();
+    }
+    
+    public void setEditable(boolean editable) {
+        // TODO
+        if(editable) {
+            if(cardMain != null) cardMain.show(pnMain, "C1");
+            
+        } else {
+            if(cardMain != null) cardMain.show(pnMain, "C2");
+            
+        }
     }
 
     @Override
@@ -439,40 +515,5 @@ public class ColonyMan implements GUIProgram {
     
     public static int generateNaturalNumber() {
         return Math.abs(new Random().nextInt());
-    }
-}
-
-class LoadingModal extends JDialog {
-    private static final long serialVersionUID = -1936442322739111389L;
-    volatile boolean closingSwitch = false;
-
-    public LoadingModal(JDialog superDialog) {
-        super(superDialog, true);
-        setSize(200, 150);
-        setLayout(new BorderLayout());
-        
-        JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL);
-        prog.setIndeterminate(true);
-        add(prog, BorderLayout.CENTER);
-        
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(! closingSwitch) {
-                    try { Thread.sleep(100L); } catch(InterruptedException ex) { break; }
-                }
-                setVisible(false);
-            }
-        }).start();
-    }
-    
-    public void end() {
-        closingSwitch = true;
-    }
-    
-    public static LoadingModal open(JDialog superDialog) {
-        LoadingModal instances = new LoadingModal(superDialog);
-        instances.setVisible(true);
-        return instances;
     }
 }

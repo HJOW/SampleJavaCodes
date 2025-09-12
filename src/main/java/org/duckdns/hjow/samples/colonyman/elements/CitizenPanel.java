@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -16,6 +17,7 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
     protected long citizenKey = 0L;
     protected String targetName;
     
+    protected transient JProgressBar progHp;
     protected transient JTextField tfName;
     protected transient JTextArea  ta;
     
@@ -38,15 +40,28 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
         JPanel pnNorth, pnCenter;
         pnNorth  = new JPanel();
         pnCenter = new JPanel();
-        pnNorth.setLayout(new FlowLayout(FlowLayout.LEFT));
+        pnNorth.setLayout(new BorderLayout());
         pnCenter.setLayout(new BorderLayout());
         
         add(pnNorth , BorderLayout.NORTH);
         add(pnCenter, BorderLayout.CENTER);
         
+        JPanel pnName, pnHp;
+        
+        pnName = new JPanel();
+        pnName.setLayout(new FlowLayout(FlowLayout.LEFT));
+        pnNorth.add(pnName, BorderLayout.CENTER);
+        
+        pnHp = new JPanel();
+        pnHp.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        pnNorth.add(pnHp, BorderLayout.EAST);
+        
         tfName = new JTextField(20);
         tfName.setEditable(false);
-        pnNorth.add(tfName);
+        pnName.add(tfName);
+        
+        progHp = new JProgressBar(JProgressBar.HORIZONTAL);
+        pnHp.add(progHp);
         
         ta = new JTextArea();
         ta.setEditable(false);
@@ -71,6 +86,9 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
         Citizen c = getCitizen(city);
         if(c == null) { tfName.setName(""); ta.setText(""); return; }
         setTargetName(c.getName());
+        
+        progHp.setMaximum(c.getMaxHp());
+        progHp.setValue(c.getHp());
         
         tfName.setText(c.getName());
         ta.setText(getCitizenStatusText().trim());

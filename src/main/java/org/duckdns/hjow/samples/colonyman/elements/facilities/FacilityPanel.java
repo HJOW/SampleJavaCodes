@@ -3,9 +3,11 @@ package org.duckdns.hjow.samples.colonyman.elements.facilities;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -19,6 +21,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Facility;
 public class FacilityPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = -6078767714905474678L;
     
+    protected transient JProgressBar progHp;
     protected transient JPanel pnUp, pnCenter, pnDown;
     protected transient JLabel lb;
     protected transient JTextArea ta;
@@ -62,6 +65,13 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         lb = new JLabel();
         pnLb.add(lb);
         
+        JPanel pnHp = new JPanel();
+        pnHp.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        pnUp.add(pnHp, BorderLayout.EAST);
+        
+        progHp = new JProgressBar(JProgressBar.HORIZONTAL);
+        pnHp.add(progHp);
+        
         ta = new JTextArea();
         ta.setEditable(false);
         pnCenter.add(new JScrollPane(ta), BorderLayout.CENTER);
@@ -92,28 +102,44 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     }
 
     public void refresh(Facility fac, City city, Colony colony, ColonyMan superInstance) {
+        if(fac == null) {
+            lb.setText("");
+            ta.setText("");
+            return;
+        }
+        
+        progHp.setMaximum(fac.getMaxHp());
+        progHp.setValue(fac.getHp());
+        
         lb.setText(fac.getName());
         setTargetName(fac.getName());
         
         StringBuilder res = new StringBuilder("");
         res = res.append("\n").append("Type : ").append(fac.getType());
+        if(fac instanceof Home) res = res.append(" (").append("Home").append(")");
+        
         res = res.append("\n").append("HP : ").append(fac.getHp()).append(" / ").append(fac.getMaxHp());
+        
+        String desc = fac.getStatusDescription(city, colony);
+        if(desc != null) res = res.append("\n").append(desc);
+        
         if(fac instanceof Home) {
-            res = res.append(" (").append("Home").append(")");
-            
             Home home = (Home) fac;
-            res = res.append("\n").append("Capacity : ").append(home.getCitizens(city, colony).size()).append(" / ").append(home.getCapacity());
-            res = res.append("\n").append("Comport : ").append(fac.getComportGrade());
-            res = res.append("\n").append("Living...");
+            res = res.append("\n").append("거주인원 : ").append(home.getCitizens(city, colony).size()).append(" / ").append(home.getCapacity());
+            res = res.append("\n").append("편안함 : ").append(fac.getComportGrade());
+            res = res.append("\n").append("거주자...");
             for(Citizen c : home.getCitizens(city, colony)) {
                 res = res.append("\n    ").append(c.getName());
             }
         }
         
-        res = res.append("\n").append("Working...");
-        
-        for(Citizen c : fac.getWorkingCitizens(city, colony)) {
-            res = res.append("\n    ").append(c.getName());
+        List<Citizen> workers = fac.getWorkingCitizens(city, colony);
+        if(! workers.isEmpty()) {
+            res = res.append("\n").append("재직자...");
+            
+            for(Citizen c : workers) {
+                res = res.append("\n    ").append(c.getName());
+            }
         }
         
         ta.setText(res.toString().trim());

@@ -9,6 +9,8 @@ import java.util.Vector;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.duckdns.hjow.samples.colonyman.ColonyMan;
@@ -19,6 +21,8 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
     
     protected transient List<CityPanel> pnCities = new Vector<CityPanel>();
     protected transient JPanel pnColonies, pnColonyBasics;
+    protected transient JTabbedPane tabCities;
+    protected transient JProgressBar progHp;
     protected transient JLabel lbColonyName;
     protected transient JTextField tfColonyTime;
     
@@ -37,6 +41,8 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         
         setLayout(new BorderLayout());
         
+        // tabCities = new JTabbedPane();
+        // add(tabCities, BorderLayout.CENTER);
         pnColonies = new JPanel();
         add(pnColonies, BorderLayout.CENTER);
         
@@ -68,9 +74,12 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         lbColonyName = new JLabel();
         pnTopLeft.add(lbColonyName);
         
-        tfColonyTime = new JTextField(15);
+        tfColonyTime = new JTextField(14);
         tfColonyTime.setEditable(false);
         pnTopRight.add(tfColonyTime);
+        
+        progHp = new JProgressBar(JProgressBar.HORIZONTAL);
+        pnTopRight.add(progHp);
     }
     
     @Override
@@ -92,6 +101,9 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
 
     @Override
     public void refresh(int cycle, City city, Colony colony, ColonyMan superInstance) { // city is null
+        progHp.setMaximum(colony.getMaxHp());
+        progHp.setValue(colony.getHp());
+        
         if(cycle == 0 || cycle % 100 == 0) {
             pnColonies.removeAll();
             for(CityPanel c : pnCities) { c.dispose(); }
