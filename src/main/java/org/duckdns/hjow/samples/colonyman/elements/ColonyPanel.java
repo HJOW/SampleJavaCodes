@@ -3,15 +3,17 @@ package org.duckdns.hjow.samples.colonyman.elements;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
 
 import org.duckdns.hjow.samples.colonyman.ColonyMan;
 
@@ -20,11 +22,12 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
     protected Colony colony;
     
     protected transient List<CityPanel> pnCities = new Vector<CityPanel>();
-    protected transient JPanel pnColonies, pnColonyBasics;
+    protected transient JPanel pnColonyBasics;
     protected transient JTabbedPane tabCities;
     protected transient JProgressBar progHp;
-    protected transient JLabel lbColonyName;
-    protected transient JTextField tfColonyTime;
+    protected transient JTextField tfColonyName, tfColonyTime;
+    protected transient JTextArea ta;
+    protected transient JToolBar toolbar;
     
     public ColonyPanel() {
         super();
@@ -41,10 +44,8 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         
         setLayout(new BorderLayout());
         
-        // tabCities = new JTabbedPane();
-        // add(tabCities, BorderLayout.CENTER);
-        pnColonies = new JPanel();
-        add(pnColonies, BorderLayout.CENTER);
+        tabCities = new JTabbedPane();
+        add(tabCities, BorderLayout.CENTER);
         
         JPanel pnColTop, pnColBottom;
         pnColTop = new JPanel();
@@ -58,21 +59,34 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         pnColonyBasics = new JPanel();
         pnColonyBasics.setLayout(new BorderLayout());
         
-        JPanel pnTopLeft, pnTopCenter, pnTopRight;
+        JPanel pnTopLeft, pnTopCenter, pnTopRight, pnTopSouth;
         pnTopLeft   = new JPanel();
         pnTopCenter = new JPanel();
         pnTopRight  = new JPanel();
+        pnTopSouth  = new JPanel();
         pnTopLeft.setLayout(new FlowLayout(FlowLayout.LEFT));
         pnTopCenter.setLayout(new BorderLayout());
         pnTopRight.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        pnTopSouth.setLayout(new BorderLayout());
         
         pnColonyBasics.add(pnTopLeft  , BorderLayout.WEST);
         pnColonyBasics.add(pnTopCenter, BorderLayout.CENTER);
         pnColonyBasics.add(pnTopRight , BorderLayout.EAST);
+        pnColonyBasics.add(pnTopSouth , BorderLayout.SOUTH);
         pnColTop.add(pnColonyBasics, BorderLayout.CENTER);
         
-        lbColonyName = new JLabel();
-        pnTopLeft.add(lbColonyName);
+        tfColonyName = new JTextField(15);
+        pnTopLeft.add(tfColonyName);
+        tfColonyName.addActionListener(new ActionListener() {   
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Colony c = getColony();
+                if(c != null) {
+                    c.setName(tfColonyName.getText());
+                    superInstance.refreshColonyList();
+                }
+            }
+        });
         
         tfColonyTime = new JTextField(14);
         tfColonyTime.setEditable(false);
@@ -80,6 +94,17 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         
         progHp = new JProgressBar(JProgressBar.HORIZONTAL);
         pnTopRight.add(progHp);
+        
+        JPanel pnTopDetail = new JPanel();
+        pnTopDetail.setLayout(new BorderLayout());
+        pnTopSouth.add(pnTopDetail, BorderLayout.CENTER);
+        
+        ta = new JTextArea();
+        ta.setEditable(false);
+        pnTopDetail.add(ta, BorderLayout.CENTER);
+        
+        toolbar = new JToolBar();
+        pnTopDetail.add(toolbar, BorderLayout.SOUTH);
     }
     
     @Override
@@ -93,6 +118,7 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
 
     @Override
     public void setEditable(boolean editable) {
+        tfColonyName.setEditable(editable);
         for(CityPanel c : pnCities) {
             if(c.getCity().getHp() <= 0) c.setEditable(false);
             else c.setEditable(editable);
@@ -101,33 +127,37 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
 
     @Override
     public void refresh(int cycle, City city, Colony colony, ColonyMan superInstance) { // city is null
+        if(colony == null) {
+            tfColonyName.setText("");
+            tfColonyTime.setText("");
+            ta.setText("");
+            return;
+        }
+        
         progHp.setMaximum(colony.getMaxHp());
         progHp.setValue(colony.getHp());
         
-        if(cycle == 0 || cycle % 100 == 0) {
-            pnColonies.removeAll();
+        List<City> cities = colony.getCities();
+        if(cycle == 0 || cycle % 100 == 0 || tabCities.getTabCount() != cities.size()) {
+            tabCities.removeAll();
             for(CityPanel c : pnCities) { c.dispose(); }
             pnCities.clear();
             
-            List<City> cities = colony.getCities();
-            
-            JPanel[] pns = new JPanel[cities.size() + 1];
-            pnColonies.setLayout(new GridLayout(pns.length, 1));
-            
             for(int idx=0; idx<cities.size(); idx++) {
                 CityPanel c = new CityPanel(cities.get(idx), colony, superInstance);
-                pns[idx] = c;
                 pnCities.add(c);
-                pnColonies.add(c);
+                tabCities.add(cities.get(idx).getName(), c);
             }
-            
-            JPanel pnEmpty = new JPanel();
-            pns[pns.length - 1] = pnEmpty;
-            pnColonies.add(pnEmpty);
+        } else {
+            for(int idx=0; idx<pnCities.size(); idx++) {
+                City cityCurrent = pnCities.get(idx).getCity();
+                tabCities.setTitleAt(idx, cityCurrent == null ? "" : cityCurrent.getName());
+            }
         }
         
-        lbColonyName.setText(colony.getName());
+        tfColonyName.setText(colony.getName());
         tfColonyTime.setText(colony.getDateString());
+        ta.setText(colony.getStatusString(superInstance));
         
         for(CityPanel c : pnCities) {
             c.refresh(cycle, c.getCity(), colony, superInstance);

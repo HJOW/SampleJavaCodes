@@ -98,23 +98,7 @@ public class ColonyMan implements GUIProgram {
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                setEditable(false);
-                
-                final Vector<String> flagShutdowns = new Vector<String>();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() { 
-                        dispose(false);
-                        flagShutdowns.add("1");
-                    }
-                }).start();
-                int numInfLoopPrev = 0;
-                while(true) {
-                    if(flagShutdowns.size() >= 1) break;
-                    try { Thread.sleep(100L); } catch(InterruptedException ex) { break; }
-                    numInfLoopPrev++;
-                    if(numInfLoopPrev >= 100) break;
-                }
+                onWindowClosing();
             }
         });
         
@@ -176,19 +160,7 @@ public class ColonyMan implements GUIProgram {
         btnThrPlay.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                threadPaused = (! threadPaused);
-                if(threadPaused) {
-                    btnThrPlay.setText("시뮬레이션 시작");
-                    btnSaveAs.setEnabled(true);
-                    btnLoadAs.setEnabled(true);
-                    cbxColony.setEnabled(true);
-                } else {
-                    reserveSaving = true;
-                    btnThrPlay.setText("시뮬레이션 정지");
-                    btnSaveAs.setEnabled(false);
-                    btnLoadAs.setEnabled(false);
-                    cbxColony.setEnabled(false);
-                }
+                toggleSimulationRunning();
             }
         });
         
@@ -406,14 +378,42 @@ public class ColonyMan implements GUIProgram {
         saveColonies();
     }
     
+    public void onWindowClosing() {
+        setEditable(false);
+        
+        final Vector<String> flagShutdowns = new Vector<String>();
+        new Thread(new Runnable() {
+            @Override
+            public void run() { 
+                dispose(false);
+                flagShutdowns.add("1");
+            }
+        }).start();
+        int numInfLoopPrev = 0;
+        while(true) {
+            if(flagShutdowns.size() >= 1) break;
+            try { Thread.sleep(100L); } catch(InterruptedException ex) { break; }
+            numInfLoopPrev++;
+            if(numInfLoopPrev >= 100) break;
+        }
+    }
+    
     public void setEditable(boolean editable) {
-        // TODO
         if(editable) {
             if(cardMain != null) cardMain.show(pnMain, "C1");
-            
         } else {
             if(cardMain != null) cardMain.show(pnMain, "C2");
+        }
+        
+        for(ColonyPanel c : pnColonies) {
+            Colony col = c.getColony();
             
+            if(editable) {
+                if(col == null) return;
+                if(col.getHp() <= 0) return;
+            }
+            
+            c.setEditable(editable); 
         }
     }
 
@@ -441,6 +441,29 @@ public class ColonyMan implements GUIProgram {
         if(selectedColony < 0) return null;
         if(selectedColony >= colonies.size()) { selectedColony = 0; return null; }
         return colonies.get(selectedColony);
+    }
+    
+    public void toggleSimulationRunning() {
+        threadPaused = (! threadPaused);
+        if(threadPaused) {
+            btnThrPlay.setText("시뮬레이션 시작");
+            btnSaveAs.setEnabled(true);
+            btnLoadAs.setEnabled(true);
+            cbxColony.setEnabled(true);
+            for(ColonyPanel c : pnColonies) {
+                Colony col = c.getColony();
+                if(col == null) return;
+                if(col.getHp() <= 0) return;
+                c.setEditable(true); 
+            }
+        } else {
+            reserveSaving = true;
+            btnThrPlay.setText("시뮬레이션 정지");
+            btnSaveAs.setEnabled(false);
+            btnLoadAs.setEnabled(false);
+            cbxColony.setEnabled(false);
+            for(ColonyPanel c : pnColonies) { c.setEditable(false); }
+        }
     }
     
     public void oneSecond() {

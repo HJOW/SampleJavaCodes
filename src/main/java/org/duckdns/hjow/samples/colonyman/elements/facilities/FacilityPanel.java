@@ -3,13 +3,15 @@ package org.duckdns.hjow.samples.colonyman.elements.facilities;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 import org.duckdns.hjow.samples.colonyman.ColonyMan;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
@@ -23,7 +25,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     
     protected transient JProgressBar progHp;
     protected transient JPanel pnUp, pnCenter, pnDown;
-    protected transient JLabel lb;
+    protected transient JTextField tfName;
     protected transient JTextArea ta;
     
     protected long facilityKey = 0L;
@@ -33,12 +35,12 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         super();
     }
     
-    public FacilityPanel(Facility f) {
+    public FacilityPanel(Facility f, City city, Colony colony, ColonyMan superInstance) {
         this();
-        init(f);   
+        init(f, city, colony, superInstance);   
     }
     
-    public void init(Facility f) {
+    public void init(Facility f, final City city, final Colony colony, final ColonyMan superInstance) {
         dispose();
         setFacilityKey(f.getKey());
         setTargetName(f.getName());
@@ -58,12 +60,22 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         add(pnCenter, BorderLayout.CENTER);
         add(pnDown  , BorderLayout.SOUTH);
         
-        JPanel pnLb = new JPanel();
-        pnLb.setLayout(new FlowLayout(FlowLayout.LEFT));
-        pnUp.add(pnLb, BorderLayout.CENTER);
+        JPanel pnName = new JPanel();
+        pnName.setLayout(new FlowLayout(FlowLayout.LEFT));
+        pnUp.add(pnName, BorderLayout.CENTER);
         
-        lb = new JLabel();
-        pnLb.add(lb);
+        tfName = new JTextField(15);
+        pnName.add(tfName);
+        tfName.addActionListener(new ActionListener() {   
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Facility f = getFacility(city);
+                if(f != null) {
+                    f.setName(tfName.getText());
+                    superInstance.refreshColonyContent();
+                }
+            }
+        });
         
         JPanel pnHp = new JPanel();
         pnHp.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -103,7 +115,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
 
     public void refresh(Facility fac, City city, Colony colony, ColonyMan superInstance) {
         if(fac == null) {
-            lb.setText("");
+            tfName.setText("");
             ta.setText("");
             return;
         }
@@ -111,7 +123,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         progHp.setMaximum(fac.getMaxHp());
         progHp.setValue(fac.getHp());
         
-        lb.setText(fac.getName());
+        tfName.setText(fac.getName());
         setTargetName(fac.getName());
         
         StringBuilder res = new StringBuilder("");
@@ -156,7 +168,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
 
     @Override
     public void setEditable(boolean editable) {
-        
+        tfName.setEditable(editable);
     }
 
     @Override

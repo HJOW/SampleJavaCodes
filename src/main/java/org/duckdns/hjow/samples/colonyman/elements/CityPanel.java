@@ -75,8 +75,17 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         pnTop.add(pnHp, BorderLayout.EAST);
         
         tfName = new JTextField(15);
-        tfName.setEditable(false);
         pnTopInfos.add(tfName);
+        tfName.addActionListener(new ActionListener() {   
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                City c = getCity();
+                if(c != null) {
+                    c.setName(tfName.getText());
+                    superInstance.refreshColonyContent();
+                }
+            }
+        });
         
         progHp = new JProgressBar(JProgressBar.HORIZONTAL);
         pnHp.add(progHp);
@@ -188,9 +197,9 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
                 FacilityPanel pn;
                 if(facList.get(idx) instanceof SupportGUIFacility) {
                     SupportGUIFacility sFac = (SupportGUIFacility) facList.get(idx);
-                    pn = sFac.createPanel();
+                    pn = sFac.createPanel(city, colony, superInstance);
                 } else {
-                    pn = new FacilityPanel(facList.get(idx));
+                    pn = new FacilityPanel(facList.get(idx), city, colony, superInstance);
                 }
                 pnFacilities.add(pn);
                 facilityPns.add(pn);
@@ -220,7 +229,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         List<Citizen> citizens = city.getCitizens();
         for(Citizen c : citizens) {
             if(c.getHp() <= 0) continue;
-            CitizenPanel p = new CitizenPanel(c);
+            CitizenPanel p = new CitizenPanel(c, city, colony, superInstance);
             citizenPns.add(p);
         }
         citizens = null;
@@ -244,6 +253,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             else p.setEditable(editable); 
         }
         
+        tfName.setEditable(editable);
         tfSearchCitizen.setEditable(editable);
         tfSearchFacility.setEditable(editable);
     }

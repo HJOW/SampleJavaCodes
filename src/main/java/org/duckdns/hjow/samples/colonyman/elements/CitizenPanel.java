@@ -3,6 +3,8 @@ package org.duckdns.hjow.samples.colonyman.elements;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -25,12 +27,12 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
         super();
     }
     
-    public CitizenPanel(Citizen c) {
+    public CitizenPanel(Citizen c, City city, Colony colony, ColonyMan superInstance) {
         this();
-        init(c);
+        init(c, city, colony, superInstance);
     }
     
-    public void init(Citizen c) {
+    public void init(final Citizen c, final City city, final Colony colony, final ColonyMan superInstance) {
         dispose();
         setCitizenKey(c.getKey());
         setTargetName(c.getName());
@@ -57,8 +59,17 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
         pnNorth.add(pnHp, BorderLayout.EAST);
         
         tfName = new JTextField(20);
-        tfName.setEditable(false);
         pnName.add(tfName);
+        tfName.addActionListener(new ActionListener() {   
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Citizen c = getCitizen(city);
+                if(c != null) {
+                    c.setName(tfName.getText());
+                    superInstance.refreshColonyContent();
+                }
+            }
+        });
         
         progHp = new JProgressBar(JProgressBar.HORIZONTAL);
         pnHp.add(progHp);
@@ -78,7 +89,7 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
 
     @Override
     public void setEditable(boolean editable) {
-        
+        tfName.setEditable(editable);
     }
 
     @Override

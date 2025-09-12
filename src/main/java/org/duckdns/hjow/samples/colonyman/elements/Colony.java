@@ -2,6 +2,7 @@ package org.duckdns.hjow.samples.colonyman.elements;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Vector;
 
@@ -252,5 +253,16 @@ public class Colony implements ColonyElements {
     @Override
     public int getMaxHp() {
         return 1000000;
+    }
+    
+    public String getStatusString(ColonyMan superInstance) {
+        DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
+        // DecimalFormat formatterRate = new DecimalFormat("##0.00");
+        
+        StringBuilder desc = new StringBuilder("");
+        desc = desc.append("\t").append("HP : ").append(formatterInt.format(getHp())).append(" / ").append(formatterInt.format(getMaxHp()));
+        desc = desc.append("\t").append("자금 : ").append(formatterInt.format(getMoney()));
+        
+        return desc.toString().trim();
     }
 }
