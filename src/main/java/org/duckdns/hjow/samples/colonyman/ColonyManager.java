@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -68,6 +69,8 @@ public class ColonyManager implements GUIProgram {
     protected transient List<ColonyPanel> pnColonies = new Vector<ColonyPanel>();
     
     protected transient JProgressBar progThreadStatus;
+    protected transient JFileChooser fileChooser;
+    protected transient javax.swing.filechooser.FileFilter filterCol, filterColGz;
     
     public ColonyManager(SampleJavaCodes superInstance) {
         super();
@@ -101,6 +104,42 @@ public class ColonyManager implements GUIProgram {
                 onWindowClosing();
             }
         });
+        
+        if(fileChooser == null) {
+            fileChooser = new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setMultiSelectionEnabled(false);
+            filterCol = new javax.swing.filechooser.FileFilter() {
+                @Override
+                public String getDescription() {
+                    return "Colony (*.colony)";
+                }
+                
+                @Override
+                public boolean accept(File f) {
+                    if(f == null) return false;
+                    if(f.isDirectory()) return false;
+                    
+                    return f.getName().toLowerCase().endsWith(".colony");
+                }
+            };
+            filterColGz = new javax.swing.filechooser.FileFilter() {
+                @Override
+                public String getDescription() {
+                    return "Colony (*.colgz)";
+                }
+                
+                @Override
+                public boolean accept(File f) {
+                    if(f == null) return false;
+                    if(f.isDirectory()) return false;
+                    
+                    return f.getName().toLowerCase().endsWith(".colgz");
+                }
+            };
+            fileChooser.addChoosableFileFilter(filterCol);
+            fileChooser.addChoosableFileFilter(filterColGz);
+        }
         
         JPanel pnMainCard1, pnMainCard2;
         pnMain      = new JPanel();
@@ -147,9 +186,21 @@ public class ColonyManager implements GUIProgram {
         
         btnSaveAs = new JButton(UIManager.getIcon("FileView.floppyDriveIcon"));
         toolbarNorth.add(btnSaveAs);
+        btnSaveAs.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onSaveRequested();
+            }
+        });
         
         btnLoadAs = new JButton(UIManager.getIcon("FileView.directoryIcon"));
         toolbarNorth.add(btnLoadAs);
+        btnLoadAs.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onLoadRequested();
+            }
+        });
         
         cbxColony  = new JComboBox<Colony>();
         toolbarNorth.add(cbxColony);
@@ -191,6 +242,7 @@ public class ColonyManager implements GUIProgram {
                 });
             }
         });
+        
         refreshColonyContent();
         cardMain.show(pnMain, "C2");
     }
@@ -233,6 +285,26 @@ public class ColonyManager implements GUIProgram {
         setEditable(true);
     }
     
+    protected void onSaveRequested() {
+        Colony c = getColony();
+        if(c == null) { alert("저장할 정착지를 선택해 주세요."); return; }
+        
+        int s = fileChooser.showSaveDialog(getDialog());
+        if(s == JFileChooser.APPROVE_OPTION) {
+            File f = fileChooser.getSelectedFile();
+            saveColony(c, f, true);
+        }
+    }
+
+    protected void onLoadRequested() {
+        int s = fileChooser.showOpenDialog(getDialog());
+        if(s == JFileChooser.APPROVE_OPTION) {
+            File f = fileChooser.getSelectedFile();
+            loadColony(f, true);
+            refreshColonyList();
+        }
+    }
+    
     public void loadColonies() {
         File root = ResourceUtil.getHomeDir("samplejavacodes", "colony");
         File[] lists = root.listFiles(new FileFilter() {   
@@ -244,17 +316,8 @@ public class ColonyManager implements GUIProgram {
         });
         
         colonies.clear();
-        boolean exists = false;
         for(File f : lists) {
-            try { 
-                Colony c = new Colony(f);
-                exists = false;
-                for(Colony cx : colonies) { if(c.getName().equals(cx.getName())) exists = true; break; }
-                if(exists) continue;
-                
-                c.setOriginalFileName(f.getName());
-                colonies.add(c); 
-            } catch(Exception ex) { ex.printStackTrace(); }
+            if(filterCol.accept(f)) loadColony(f, false);
         }
         
         if(colonies.isEmpty()) {
@@ -264,6 +327,19 @@ public class ColonyManager implements GUIProgram {
         }
     }
     
+    public void loadColony(File f, boolean alert) {
+        boolean exists = false;
+        try { 
+            Colony c = new Colony(f);
+            exists = false;
+            for(Colony cx : colonies) { if(c.getName().equals(cx.getName())) exists = true; break; }
+            if(exists) return;
+            
+            c.setOriginalFileName(f.getName());
+            colonies.add(c); 
+        } catch(Exception ex) { ex.printStackTrace(); if(alert) alert("오류 : " + ex.getMessage()); }
+    }
+    
     public void saveColonies() {
         File root = ResourceUtil.getHomeDir("samplejavacodes", "colony");
         for(Colony c : colonies) {
@@ -271,9 +347,12 @@ public class ColonyManager implements GUIProgram {
             if(name == null) name = "col_" + c.getKey() + ".colony";
             
             File colFile = new File(root.getAbsolutePath() + File.separator + name);
-            try { FileUtil.writeString(colFile, "UTF-8", c.toJson().toJSON()); } catch(Exception ex) { ex.printStackTrace(); }
+            saveColony(c, colFile, false);
         }
-        
+    }
+    
+    public void saveColony(Colony c, File f, boolean alert) {
+        try { c.save(f); } catch(Exception ex) { ex.printStackTrace(); if(alert) alert("오류 : " + ex.getMessage()); }
     }
     
     public void newColony() {
@@ -367,6 +446,9 @@ public class ColonyManager implements GUIProgram {
         
         if(pnMain != null) pnMain.removeAll();
         pnMain = null;
+        
+        if(fileChooser != null) fileChooser.setVisible(false);
+        fileChooser = null;
         
         if(dialog != null && closeDialog) dialog.setVisible(false);
         dialog = null;

@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Vector;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
@@ -33,7 +35,16 @@ public class Colony implements ColonyElements {
     
     public Colony(File f) throws Exception {
         this();
-        String strJson = FileUtil.readString(f, "UTF-8");
+        
+        String fileName = f.getName().toLowerCase();
+        String strJson;
+        
+        if(fileName.endsWith(".colgz")) {
+            strJson = FileUtil.readString(f, "UTF-8", GZIPInputStream.class);
+        } else {
+            strJson = FileUtil.readString(f, "UTF-8");
+        }
+        
         JsonObject objJson = (JsonObject) JsonObject.parseJson(strJson);
         fromJson(objJson);
     }
@@ -203,6 +214,22 @@ public class Colony implements ColonyElements {
     }
     
     @Override
+    public int getMaxHp() {
+        return 1000000;
+    }
+    
+    public String getStatusString(ColonyManager superInstance) {
+        DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
+        // DecimalFormat formatterRate = new DecimalFormat("##0.00");
+        
+        StringBuilder desc = new StringBuilder("");
+        desc = desc.append("\t").append("HP : ").append(formatterInt.format(getHp())).append(" / ").append(formatterInt.format(getMaxHp()));
+        desc = desc.append("\t").append("자금 : ").append(formatterInt.format(getMoney()));
+        
+        return desc.toString().trim();
+    }
+    
+    @Override
     public String toString() {
         return getName();
     }
@@ -250,19 +277,12 @@ public class Colony implements ColonyElements {
         }
     }
 
-    @Override
-    public int getMaxHp() {
-        return 1000000;
-    }
-    
-    public String getStatusString(ColonyManager superInstance) {
-        DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
-        // DecimalFormat formatterRate = new DecimalFormat("##0.00");
-        
-        StringBuilder desc = new StringBuilder("");
-        desc = desc.append("\t").append("HP : ").append(formatterInt.format(getHp())).append(" / ").append(formatterInt.format(getMaxHp()));
-        desc = desc.append("\t").append("자금 : ").append(formatterInt.format(getMoney()));
-        
-        return desc.toString().trim();
+    public void save(File f) throws Exception {
+        String fileName = f.getName().toLowerCase();
+        if(fileName.endsWith(".colgz")) {
+            FileUtil.writeString(f, "UTF-8", toJson().toJSON(), GZIPOutputStream.class); 
+        } else {
+            FileUtil.writeString(f, "UTF-8", toJson().toJSON()); 
+        }
     }
 }

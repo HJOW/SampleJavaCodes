@@ -102,14 +102,9 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
         progHp.setValue(c.getHp());
         
         tfName.setText(c.getName());
-        ta.setText(getCitizenStatusText().trim());
+        ta.setText(c.getStatusString(superInstance));
     }
     
-    public String getCitizenStatusText() {
-        
-        return "";
-    }
-
     @Override
     public void dispose() {
         citizenKey = 0L;

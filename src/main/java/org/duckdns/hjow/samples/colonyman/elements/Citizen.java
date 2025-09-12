@@ -1,5 +1,7 @@
 package org.duckdns.hjow.samples.colonyman.elements;
 
+import java.text.DecimalFormat;
+
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 
@@ -276,5 +278,14 @@ public class Citizen implements ColonyElements {
         setWorkingFacility(Long.parseLong(json.get("workingFacility").toString()));
         setWorkingCity(    Long.parseLong(json.get("workingCity"    ).toString()));
         setLivingHome(     Long.parseLong(json.get("livingHome"     ).toString()));
+    }
+    
+    public String getStatusString(ColonyManager superInstance) {
+        DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
+        
+        StringBuilder desc = new StringBuilder("");
+        desc = desc.append("\n").append("자금 : ").append(formatterInt.format(getMoney()));
+        desc = desc.append("\n").append("행복도 : ").append(formatterInt.format(getHappy())).append(" / ").append("100");
+        return desc.toString().trim();
     }
 }
