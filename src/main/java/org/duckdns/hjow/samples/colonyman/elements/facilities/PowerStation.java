@@ -1,14 +1,14 @@
 package org.duckdns.hjow.samples.colonyman.elements.facilities;
 
 import org.duckdns.hjow.commons.json.JsonObject;
-import org.duckdns.hjow.samples.colonyman.ColonyMan;
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 
 public class PowerStation extends DefaultFacility {
     private static final long serialVersionUID = 4079646708867981024L;
-    protected String name = "발전소_" + ColonyMan.generateNaturalNumber();
+    protected String name = "발전소_" + ColonyManager.generateNaturalNumber();
     protected int capacity = 100;
     
     @Override

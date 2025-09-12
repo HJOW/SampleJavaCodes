@@ -22,7 +22,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
-import org.duckdns.hjow.samples.colonyman.ColonyMan;
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityPanel;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.SupportGUIFacility;
 
@@ -41,12 +41,12 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         
     }
     
-    public CityPanel(City city, Colony colony, ColonyMan superInstance) {
+    public CityPanel(City city, Colony colony, ColonyManager superInstance) {
         super();
         init(city, colony, superInstance);
     }
     
-    public void init(City city, Colony colony, ColonyMan superInstance) {
+    public void init(City city, Colony colony, ColonyManager superInstance) {
         if(this.city != null) dispose();
         
         this.city = city;
@@ -156,7 +156,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
     }
     
     @Override
-    public void refresh(int cycle, City city, Colony colony, ColonyMan superInstance) {
+    public void refresh(int cycle, City city, Colony colony, ColonyManager superInstance) {
         if(city == null) { city = getCity(); }
         if(city == null) {
             tfName.setText("");

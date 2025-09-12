@@ -9,16 +9,16 @@ import java.util.Vector;
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.commons.util.FileUtil;
-import org.duckdns.hjow.samples.colonyman.ColonyMan;
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 
 public class Colony implements ColonyElements {
     private static final long serialVersionUID = -3144963237818493111L;
-    protected transient volatile long key = ColonyMan.generateKey();
+    protected transient volatile long key = ColonyManager.generateKey();
     
     protected List<City>  cities  = new Vector<City>();
     protected List<Enemy> enemies = new Vector<Enemy>();
-    protected String name = "정착지_" + ColonyMan.generateNaturalNumber();
+    protected String name = "정착지_" + ColonyManager.generateNaturalNumber();
     protected int  hp    = getMaxHp();
     protected long money = 1000000L;
     protected long tech  = 0L;
@@ -255,7 +255,7 @@ public class Colony implements ColonyElements {
         return 1000000;
     }
     
-    public String getStatusString(ColonyMan superInstance) {
+    public String getStatusString(ColonyManager superInstance) {
         DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
         // DecimalFormat formatterRate = new DecimalFormat("##0.00");
         

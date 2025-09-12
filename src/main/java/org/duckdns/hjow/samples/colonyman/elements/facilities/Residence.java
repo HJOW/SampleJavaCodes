@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.duckdns.hjow.commons.json.JsonObject;
-import org.duckdns.hjow.samples.colonyman.ColonyMan;
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
@@ -13,7 +13,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Colony;
 public class Residence extends DefaultFacility implements Home {
     private static final long serialVersionUID = -2930901725309688206L;
     
-    protected String name = "보급형_주거모듈_" + ColonyMan.generateNaturalNumber();
+    protected String name = "보급형_주거모듈_" + ColonyManager.generateNaturalNumber();
     protected int comportGrade = 0;
 
     public Residence() {

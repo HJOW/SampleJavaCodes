@@ -12,7 +12,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.duckdns.hjow.samples.colonyman.ColonyMan;
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
 
 public class CitizenPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = 8988684923024941632L;
@@ -27,12 +27,12 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
         super();
     }
     
-    public CitizenPanel(Citizen c, City city, Colony colony, ColonyMan superInstance) {
+    public CitizenPanel(Citizen c, City city, Colony colony, ColonyManager superInstance) {
         this();
         init(c, city, colony, superInstance);
     }
     
-    public void init(final Citizen c, final City city, final Colony colony, final ColonyMan superInstance) {
+    public void init(final Citizen c, final City city, final Colony colony, final ColonyManager superInstance) {
         dispose();
         setCitizenKey(c.getKey());
         setTargetName(c.getName());
@@ -93,7 +93,7 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
     }
 
     @Override
-    public void refresh(int cycle, City city, Colony colony, ColonyMan superInstance) {
+    public void refresh(int cycle, City city, Colony colony, ColonyManager superInstance) {
         Citizen c = getCitizen(city);
         if(c == null) { tfName.setName(""); ta.setText(""); return; }
         setTargetName(c.getName());

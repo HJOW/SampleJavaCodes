@@ -1,12 +1,12 @@
 package org.duckdns.hjow.samples.colonyman.elements;
 
 import org.duckdns.hjow.commons.json.JsonObject;
-import org.duckdns.hjow.samples.colonyman.ColonyMan;
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
 
 public class Citizen implements ColonyElements {
     private static final long serialVersionUID = -6856576686789163067L;
-    protected transient volatile long key = ColonyMan.generateKey();
-    protected String name = "시민_" + ColonyMan.generateNaturalNumber();
+    protected transient volatile long key = ColonyManager.generateKey();
+    protected String name = "시민_" + ColonyManager.generateNaturalNumber();
     
     protected int hp = 100;
     protected int hunger  = 50;

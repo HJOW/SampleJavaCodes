@@ -15,7 +15,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
-import org.duckdns.hjow.samples.colonyman.ColonyMan;
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
 
 public class ColonyPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = 3851432705333464777L;
@@ -33,12 +33,12 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         super();
     }
     
-    public ColonyPanel(Colony colony, ColonyMan superInstance) {
+    public ColonyPanel(Colony colony, ColonyManager superInstance) {
         this();
         init(colony, superInstance);
     }
     
-    public void init(Colony colony, ColonyMan superInstance) {
+    public void init(Colony colony, ColonyManager superInstance) {
         if(colony != null) dispose();
         this.colony = colony;
         
@@ -126,7 +126,7 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
     }
 
     @Override
-    public void refresh(int cycle, City city, Colony colony, ColonyMan superInstance) { // city is null
+    public void refresh(int cycle, City city, Colony colony, ColonyManager superInstance) { // city is null
         if(colony == null) {
             tfColonyName.setText("");
             tfColonyTime.setText("");

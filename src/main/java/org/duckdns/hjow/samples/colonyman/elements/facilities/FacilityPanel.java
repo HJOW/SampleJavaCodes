@@ -13,7 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.duckdns.hjow.samples.colonyman.ColonyMan;
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
@@ -35,12 +35,12 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         super();
     }
     
-    public FacilityPanel(Facility f, City city, Colony colony, ColonyMan superInstance) {
+    public FacilityPanel(Facility f, City city, Colony colony, ColonyManager superInstance) {
         this();
         init(f, city, colony, superInstance);   
     }
     
-    public void init(Facility f, final City city, final Colony colony, final ColonyMan superInstance) {
+    public void init(Facility f, final City city, final Colony colony, final ColonyManager superInstance) {
         dispose();
         setFacilityKey(f.getKey());
         setTargetName(f.getName());
@@ -113,7 +113,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         return null;
     }
 
-    public void refresh(Facility fac, City city, Colony colony, ColonyMan superInstance) {
+    public void refresh(Facility fac, City city, Colony colony, ColonyManager superInstance) {
         if(fac == null) {
             tfName.setText("");
             ta.setText("");
@@ -160,7 +160,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     }
     
     @Override
-    public void refresh(int cycle, City city, Colony colony, ColonyMan superInstance) {
+    public void refresh(int cycle, City city, Colony colony, ColonyManager superInstance) {
         Facility fac = getFacility(city);
         if(fac == null) { setEditable(false); return; }
         refresh(fac, city, colony, superInstance);

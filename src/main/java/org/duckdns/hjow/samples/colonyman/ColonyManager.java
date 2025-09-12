@@ -47,7 +47,7 @@ import org.duckdns.hjow.samples.colonyman.elements.facilities.Restaurant;
 import org.duckdns.hjow.samples.util.ResourceUtil;
 import org.duckdns.hjow.samples.util.UIUtil;
 
-public class ColonyMan implements GUIProgram {
+public class ColonyManager implements GUIProgram {
     private static final long serialVersionUID = -5740844908011980260L;
     protected transient SampleJavaCodes superInstance;
     protected transient Thread thread;
@@ -69,7 +69,7 @@ public class ColonyMan implements GUIProgram {
     
     protected transient JProgressBar progThreadStatus;
     
-    public ColonyMan(SampleJavaCodes superInstance) {
+    public ColonyManager(SampleJavaCodes superInstance) {
         super();
         this.superInstance = superInstance;
         
