@@ -44,4 +44,14 @@ public class FacilityManager {
     public static void register(Class<?> facilityClass) {
         facilityClasses.add(facilityClass);
     }
+    
+    public static Class<?> getFacilityClass(String name) {
+        for(Class<?> classes : facilityClasses) {
+            if(classes.getName().equals(name)) return classes;
+        }
+        for(Class<?> classes : facilityClasses) {
+            if(classes.getSimpleName().equals(name)) return classes;
+        }
+        return null;
+    }
 }

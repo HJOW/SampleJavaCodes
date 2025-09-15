@@ -35,15 +35,10 @@ import javax.swing.UIManager;
 
 import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
-import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.CityPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
-import org.duckdns.hjow.samples.colonyman.elements.Facility;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.Residence;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.Restaurant;
 import org.duckdns.hjow.samples.util.ResourceUtil;
 import org.duckdns.hjow.samples.util.UIUtil;
 
@@ -356,31 +351,7 @@ public class ColonyManager implements GUIProgram {
     
     public void newColony() {
         Colony newCol = new Colony();
-        
-        City newCity = new City();
-        newCol.getCities().add(newCity);
-        
-        Citizen citi;
-        int idx;
-        
-        for(idx=0; idx<20; idx++) {
-            citi = new Citizen();
-            newCity.getCitizens().add(citi);
-        }
-        
-        Facility fac;
-        
-        for(idx=0; idx<6; idx++) {
-            fac = new Residence();
-            ((Residence) fac).setComportGrade(0);
-            newCity.getFacility().add(fac);
-        }
-        
-        fac = new PowerStation();
-        newCity.getFacility().add(fac);
-        
-        fac = new Restaurant();
-        newCity.getFacility().add(fac);
+        newCol.newCity();
         
         colonies.add(newCol);
         refreshColonyList();

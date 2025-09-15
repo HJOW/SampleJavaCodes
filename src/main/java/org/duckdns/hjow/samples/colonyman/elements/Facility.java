@@ -15,4 +15,6 @@ public interface Facility extends ColonyElements {
     public int getWorkerCapacity();
     public int getWorkerSuitability(Citizen citizen);
     public int getCapacity();
+    public long getSalary(City city, Colony colony);
+    public long getMaintainFee(City city, Colony colony);
 }

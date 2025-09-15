@@ -11,15 +11,20 @@ import java.util.zip.GZIPOutputStream;
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.commons.util.FileUtil;
+import org.duckdns.hjow.samples.colonyman.AccountingData;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.Residence;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.Restaurant;
 
 public class Colony implements ColonyElements {
     private static final long serialVersionUID = -3144963237818493111L;
     protected transient volatile long key = ColonyManager.generateKey();
     
-    protected List<City>  cities  = new Vector<City>();
-    protected List<Enemy> enemies = new Vector<Enemy>();
+    protected List<City>       cities   = new Vector<City>();
+    protected List<Enemy>      enemies  = new Vector<Enemy>();
+    protected List<HoldingJob> holdings = new Vector<HoldingJob>();
     protected String name = "정착지_" + ColonyManager.generateNaturalNumber();
     protected int  hp    = getMaxHp();
     protected long money = 1000000L;
@@ -28,6 +33,7 @@ public class Colony implements ColonyElements {
     protected volatile BigInteger time = new BigInteger("0");
     
     protected transient String originalFileName;
+    protected transient List<AccountingData> accountingData = new Vector<AccountingData>();
     
     public Colony() {
         
@@ -74,6 +80,14 @@ public class Colony implements ColonyElements {
         this.enemies = enemies;
     }
 
+    public List<HoldingJob> getHoldings() {
+        return holdings;
+    }
+
+    public void setHoldings(List<HoldingJob> holdings) {
+        this.holdings = holdings;
+    }
+
     @Override
     public long getKey() {
         return key;
@@ -101,6 +115,13 @@ public class Colony implements ColonyElements {
 
     public void setMoney(long money) {
         this.money = money;
+    }
+    
+    public void modifyingMoney(long money, City city, ColonyElements objType, String reason) {
+        this.money += money;
+        
+        AccountingData data = new AccountingData(money, reason, city, objType);
+        addAccountingData(data);
     }
 
     public long getTech() {
@@ -202,8 +223,23 @@ public class Colony implements ColonyElements {
         this.originalFileName = originalFileName;
     }
 
+    public List<AccountingData> getAccountingData() {
+        return accountingData;
+    }
+
+    public void setAccountingData(List<AccountingData> accountingData) {
+        this.accountingData = accountingData;
+    }
+    
+    public void addAccountingData(AccountingData data) {
+        if(getAccountingData().size() >= 100000) getAccountingData().remove(0);
+        getAccountingData().add(data);
+    }
+
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) { // parameters are null
+        int idx;
+        
         for(City c : cities) {
             c.oneSecond(cycle, c, this, 100);
         }
@@ -211,6 +247,69 @@ public class Colony implements ColonyElements {
             e.oneSecond(cycle, city, colony, efficiency100);
         }
         time = time.add(BigInteger.ONE);
+        
+        // 예약 작업 처리
+        for(HoldingJob h : getHoldings()) {
+            int lefts = h.getCycleLeft();
+            h.decreaseCycle();
+            if(lefts >= 1) continue;
+            
+            executeHoldJob(h);
+        }
+        
+        // 소모된 예약 작업 삭제
+        idx = 0;
+        while(idx < getHoldings().size()) {
+            if(getHoldings().get(idx).getCycleLeft() <= 0) {
+                getHoldings().remove(idx);
+                continue;
+            }
+            idx++;
+        }
+    }
+    
+    /** 예약 작업 처리 */
+    @SuppressWarnings("unused")
+    protected void executeHoldJob(HoldingJob j) {
+        String command, params;
+        command = j.getCommand();
+        params  = j.getParameter();
+        
+        try {
+            if(command.equalsIgnoreCase("NewCity")) {
+                newCity();
+                return;
+            }
+        } catch(Exception ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
+    }
+    
+    /** 새 도시를 생성 */
+    public City newCity() {
+        City city = new City();
+        int idx;
+        
+        for(idx=0; idx<20; idx++) {
+            city.createNewCitizen();
+        }
+        
+        Facility fac;
+        
+        for(idx=0; idx<6; idx++) {
+            fac = new Residence();
+            ((Residence) fac).setComportGrade(0);
+            city.getFacility().add(fac);
+        }
+        
+        fac = new PowerStation();
+        city.getFacility().add(fac);
+        
+        fac = new Restaurant();
+        city.getFacility().add(fac);
+        
+        getCities().add(city);
+        return city;
     }
     
     @Override
@@ -248,6 +347,11 @@ public class Colony implements ColonyElements {
         JsonArray list = new JsonArray();
         for(City c : cities) { list.add(c.toJson()); }
         json.put("cities", list);
+        
+        list = new JsonArray();
+        for(HoldingJob h : holdings) { list.add(h.toJson()); }
+        json.put("holdings", list);
+        
         return json;
     }
     
@@ -269,6 +373,23 @@ public class Colony implements ColonyElements {
                     try {
                         City city = new City((JsonObject) o);
                         cities.add(city);
+                    } catch(Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+        
+        list = (JsonArray) json.get("holdings");
+        holdings.clear();
+        if(list != null) {
+            for(Object o : list) {
+                if(o instanceof String) o = JsonObject.parseJson(o.toString());
+                if(o instanceof JsonObject) {
+                    try {
+                        HoldingJob h = new HoldingJob();
+                        h.fromJson((JsonObject) o);
+                        holdings.add(h);
                     } catch(Exception ex) {
                         ex.printStackTrace();
                     }

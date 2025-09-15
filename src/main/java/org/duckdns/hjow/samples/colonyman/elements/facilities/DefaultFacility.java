@@ -89,15 +89,17 @@ public abstract class DefaultFacility implements Facility {
     
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
-        if(cycle % (60 * 60) == 0) {
-            processSalary(city, colony);
-        }
+        
     }
     
-    protected void processSalary(City city, Colony colony) {
-        for(Citizen c : getWorkingCitizens(city, colony)) {
-            c.setMoney(c.getMoney() + 100);
-        }
+    @Override
+    public long getSalary(City city, Colony colony) {
+        return 1000L;
+    }
+    
+    @Override
+    public long getMaintainFee(City city, Colony colony) {
+        return 1000L;
     }
     
     @Override

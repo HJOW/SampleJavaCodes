@@ -44,8 +44,10 @@ public class Restaurant extends DefaultFacility {
         int servicingCount = 0;
         for(Citizen c : city.getCitizens()) {
             if(c.getHunger() >= 100) continue;
+            if(c.getMoney() < 5) continue;
             
             servicingCount++;
+            c.setMoney(c.getMoney() - 5);
             c.setHunger(c.getHunger() + 50);
             
             if(getComportGrade() >= 2) {

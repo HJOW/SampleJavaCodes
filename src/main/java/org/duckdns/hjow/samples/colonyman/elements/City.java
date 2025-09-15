@@ -22,9 +22,10 @@ public class City implements ColonyElements {
     protected transient volatile long key = ColonyManager.generateKey();
     
     protected String name = "도시_" + ColonyManager.generateNaturalNumber();
-    protected List<Facility> facility = new Vector<Facility>();
-    protected List<Citizen>  citizens = new Vector<Citizen>();
-    protected List<Enemy>    enemies  = new Vector<Enemy>();
+    protected List<Facility>   facility = new Vector<Facility>();
+    protected List<Citizen>    citizens = new Vector<Citizen>();
+    protected List<Enemy>      enemies  = new Vector<Enemy>();
+    protected List<HoldingJob> holdings = new Vector<HoldingJob>();
     protected int hp = getMaxHp();
     
     public City() {
@@ -69,6 +70,14 @@ public class City implements ColonyElements {
         this.enemies = enemies;
     }
 
+    public List<HoldingJob> getHoldings() {
+        return holdings;
+    }
+
+    public void setHoldings(List<HoldingJob> holdings) {
+        this.holdings = holdings;
+    }
+
     @Override
     public void addHp(int amount) {
         hp += amount;
@@ -95,6 +104,8 @@ public class City implements ColonyElements {
     }
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) { // city should be a self
+        int idx;
+        
         // Apply Born and move Chance
         processBornChance(cycle, colony, efficiency100);
         processMoveInChance(cycle, colony, efficiency100);
@@ -104,7 +115,7 @@ public class City implements ColonyElements {
         long power = getPowerAvail(colony);
         
         // Apply Facilities
-        for(Facility f : facility) {
+        for(Facility f : getFacility()) {
             int efficiency = efficiency100;
             
             // Calculates power supply
@@ -133,7 +144,12 @@ public class City implements ColonyElements {
             
             efficiency = (int) Math.round(   ((efficiencyPow / 100.0) * (efficiencyWorker / 100.0)) * 100  );
             
-            // Facilities affect
+            if(cycle % (60 * 60) == 0) {
+                // 시설의 비용 처리
+                processFacilityFees(f, colony);
+            }
+            
+            // 시설 효과 처리
             f.oneSecond(cycle, this, colony, efficiency);
         }
         
@@ -145,9 +161,66 @@ public class City implements ColonyElements {
         allocateWorkers(colony);
         
         // Process Enemies
-        for(Enemy e : enemies) {
+        for(Enemy e : getEnemies()) {
             e.oneSecond(cycle, city, colony, efficiency100);
         }
+        
+        // 예약 작업 처리
+        for(HoldingJob h : getHoldings()) {
+            int lefts = h.getCycleLeft();
+            h.decreaseCycle();
+            if(lefts >= 1) continue;
+            
+            executeHoldJob(h);
+        }
+        
+        // 소모된 예약 작업 삭제
+        idx = 0;
+        while(idx < getHoldings().size()) {
+            if(getHoldings().get(idx).getCycleLeft() <= 0) {
+                getHoldings().remove(idx);
+                continue;
+            }
+            idx++;
+        }
+    }
+    
+    /** 시설의 비용 처리 */
+    protected void processFacilityFees(Facility f, Colony colony) {
+        // 임금 처리
+        for(Citizen c : f.getWorkingCitizens(this, colony)) {
+            long sal = f.getSalary(this, colony);
+            colony.modifyingMoney( sal * (-1), this, f, "salary" );
+            c.setMoney(c.getMoney() + sal);
+        }
+        // 유지비 처리
+        colony.modifyingMoney( f.getMaintainFee(this, colony) * (-1), this, f, "maintain" );
+    }
+    
+    /** 예약 작업 처리 */
+    protected void executeHoldJob(HoldingJob j) {
+        String command, params;
+        command = j.getCommand();
+        params  = j.getParameter();
+        
+        try {
+            if(command.equalsIgnoreCase("NewCitizen")) {
+                newCitizen();
+                return;
+            }
+            
+            if(command.equalsIgnoreCase("NewFacility")) {
+                if(params == null) return;
+                if(params.equals("")) return;
+                
+                Class<?> facilityClass = FacilityManager.getFacilityClass(params);
+                Object newOne = facilityClass.newInstance();
+                getFacility().add((Facility) newOne);
+            }
+        } catch(Exception ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
+        
     }
     
     /** Calculate total power generating */
@@ -282,6 +355,12 @@ public class City implements ColonyElements {
         }
     }
     
+    public Citizen createNewCitizen() {
+        Citizen c = new Citizen();
+        getCitizens().add(c);
+        return c;
+    }
+    
     public int getCitizenCount() {
         return citizens.size();
     }
@@ -399,12 +478,17 @@ public class City implements ColonyElements {
         json.put("hp", new Long(getHp()));
         
         JsonArray list = new JsonArray();
-        for(Facility f : facility) { list.add(f.toJson()); }
+        for(Facility f : getFacility()) { list.add(f.toJson()); }
         json.put("facilities", list);
         
         list = new JsonArray();
-        for(Citizen c : citizens) { list.add(c.toJson()); }
+        for(Citizen c : getCitizens()) { list.add(c.toJson()); }
         json.put("citizens", list);
+        
+        list = new JsonArray();
+        for(HoldingJob h : holdings) { list.add(h.toJson()); }
+        json.put("holdings", list);
+        
         return json;
     }
     
@@ -441,6 +525,23 @@ public class City implements ColonyElements {
                     try {
                         Citizen cit = new Citizen((JsonObject) o);
                         citizens.add(cit);
+                    } catch(Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+        
+        list = (JsonArray) json.get("holdings");
+        holdings.clear();
+        if(list != null) {
+            for(Object o : list) {
+                if(o instanceof String) o = JsonObject.parseJson(o.toString());
+                if(o instanceof JsonObject) {
+                    try {
+                        HoldingJob h = new HoldingJob();
+                        h.fromJson((JsonObject) o);
+                        holdings.add(h);
                     } catch(Exception ex) {
                         ex.printStackTrace();
                     }
