@@ -27,6 +27,7 @@ public class City implements ColonyElements {
     protected List<Enemy>      enemies  = new Vector<Enemy>();
     protected List<HoldingJob> holdings = new Vector<HoldingJob>();
     protected int hp = getMaxHp();
+    protected int spaces = 20 + ((int) ( 30 * Math.random() ));
     
     public City() {
         
@@ -94,6 +95,14 @@ public class City implements ColonyElements {
         if(this.hp > getMaxHp()) this.hp = getMaxHp();
     }
     
+    public int getSpaces() {
+        return spaces;
+    }
+
+    public void setSpaces(int spaces) {
+        this.spaces = spaces;
+    }
+
     @Override
     public int getMaxHp() {
         int max = 100000;
@@ -224,6 +233,14 @@ public class City implements ColonyElements {
         
     }
     
+    protected int getHoldingBuildFacility() {
+        int res = 0;
+        for(HoldingJob j : getHoldings()) {
+            if("NewFacility".equalsIgnoreCase(j.getCommand())) res++; 
+        }
+        return res;
+    }
+    
     /** Calculate total power generating */
     protected long getPowerAvail(Colony col) {
         long power = 0L;
@@ -282,11 +299,29 @@ public class City implements ColonyElements {
         }
     }
     
-    /** Allocate homeless to a new home */
+    /** 노숙자 수 계산 */
+    public int getHomelesses() {
+        int counts = 0;
+        for(Citizen c : citizens) {
+            if(c.getLivingHome() == 0L) counts++;
+        }
+        return counts;
+    }
+    
+    /** 백수의 수 계산 */
+    public int getJobSeekers() {
+        int counts = 0;
+        for(Citizen c : citizens) {
+            if(c.getWorkingFacility() == 0L) counts++;
+        }
+        return counts;
+    }
+    
+    /** 노숙자를 주거 모듈에 할당 */
     protected void allocateHome(Colony col) {
         for(Citizen c : citizens) {
             // 노숙자 여부 판단
-            if(c.getLivingHome() != 0) continue;
+            if(c.getLivingHome() != 0L) continue;
             
             // 비어있는 주거 모듈 찾기
             for(Facility f : facility) {
@@ -301,11 +336,11 @@ public class City implements ColonyElements {
         }
     }
     
-    /** Allocate job seekers to a new job */
+    /** 백수에게 새 직장 할당 */
     protected void allocateWorkers(Colony col) {
         for(Citizen c : citizens) {
-            // Check this citizen is job seeker
-            if(c.getWorkingFacility() != 0) continue;
+            // 백수 여부 판단
+            if(c.getWorkingFacility() != 0L) continue;
             
             // Find jobs for needed facilities - need to align
             List<Facility> list = new ArrayList<Facility>();
@@ -372,6 +407,14 @@ public class City implements ColonyElements {
             if(f instanceof Home) {
                 res += f.getCapacity();
             }
+        }
+        return res;
+    }
+    
+    public long getJobsCount() {
+        long res = 0L;
+        for(Facility f : getFacility()) {
+            res += f.getWorkerCapacity();
         }
         return res;
     }
@@ -477,6 +520,7 @@ public class City implements ColonyElements {
         json.put("name", getName());
         json.put("key", new Long(getKey()));
         json.put("hp", new Long(getHp()));
+        json.put("spaces", new Integer(getSpaces()));
         
         JsonArray list = new JsonArray();
         for(Facility f : getFacility()) { list.add(f.toJson()); }
@@ -499,6 +543,7 @@ public class City implements ColonyElements {
         setName(json.get("name").toString());
         key = Long.parseLong(json.get("key").toString());
         setHp(Integer.parseInt(json.get("hp").toString()));
+        setSpaces(Integer.parseInt(json.get("spaces").toString()));
         
         JsonArray list = (JsonArray) json.get("facilities");
         facility.clear();
@@ -559,7 +604,12 @@ public class City implements ColonyElements {
         
         desc = desc.append("\n").append("HP : ").append(formatterInt.format(getHp())).append(" / ").append(formatterInt.format(getMaxHp()));
         desc = desc.append("\n").append("인구 : ").append(formatterInt.format(getCitizenCount()));
+        desc = desc.append("\n").append("시설 수 : ").append(formatterInt.format(facility.size())).append(" / ").append(formatterInt.format(getSpaces()));
         desc = desc.append("\n").append("평균 행복도 : ").append(formatterRate.format(getAverageHappiness()));
+        desc = desc.append("\n").append("노숙자 : ").append(formatterInt.format(getHomelesses()));
+        desc = desc.append("\n").append("거주 한도 : ").append(formatterInt.format(getHomeCapacity()));
+        desc = desc.append("\n").append("백수 : ").append(formatterInt.format(getJobSeekers()));
+        desc = desc.append("\n").append("직장 한도 : ").append(formatterInt.format(getJobsCount()));
         
         return desc.toString().trim();
     }

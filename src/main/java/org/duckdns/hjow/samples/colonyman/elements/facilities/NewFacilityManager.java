@@ -21,7 +21,7 @@ import javax.swing.JTextArea;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
-import org.duckdns.hjow.samples.colonyman.elements.Facility;
+import org.duckdns.hjow.samples.colonyman.elements.HoldingJob;
 import org.duckdns.hjow.samples.util.UIUtil;
 
 public class NewFacilityManager extends JDialog {
@@ -132,9 +132,10 @@ public class NewFacilityManager extends JDialog {
                     return;
                 };
                 
-                Facility newOne = FacilityManager.newFacilityObject(info.getFacilityClass());
-                city.getFacility().add(newOne);
-                col.modifyingMoney(info.getPrice() * (-1) , city, newOne, info.getTitle() + " 건설");
+                HoldingJob job = new HoldingJob(info.getBuildingCycle(), "NewFacility", info.getName());
+                city.getHoldings().add(job);
+                
+                col.modifyingMoney(info.getPrice() * (-1) , city, city, info.getTitle() + " 건설");
                 
                 colonyManager.refreshColonyContent();
                 dispose();

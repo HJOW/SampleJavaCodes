@@ -4,7 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -14,6 +15,7 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -40,6 +42,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
     protected JToolBar toolbarCity;
     protected JButton btnNewFac;
     protected JSplitPane splits;
+    protected GridBagLayout layoutFacility, layoutCitizen;
     protected NewFacilityManager dialogNewFac;
     protected List<FacilityPanel> facilityPns = new Vector<FacilityPanel>();
     protected List<CitizenPanel>  citizenPns  = new Vector<CitizenPanel>();
@@ -128,6 +131,12 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         pnFacilities = new JPanel();
         pnCitizens   = new JPanel();
         
+        layoutFacility = new GridBagLayout();
+        layoutCitizen  = new GridBagLayout();
+        
+        pnFacilities.setLayout(layoutFacility);
+        pnCitizens.setLayout(layoutCitizen);
+        
         pnFacRoot.add(new JScrollPane(pnFacilities), BorderLayout.CENTER);
         pnCitiRoot.add(new JScrollPane(pnCitizens), BorderLayout.CENTER);
         
@@ -162,8 +171,14 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(dialogNewFac != null) dialogNewFac.dispose();
-                dialogNewFac = new NewFacilityManager(superInstance, city);
-                dialogNewFac.setVisible(true);
+                dialogNewFac = null;
+                
+                if(city.getFacility().size() < city.getSpaces()) {
+                    dialogNewFac = new NewFacilityManager(superInstance, city);
+                    dialogNewFac.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(colonyManager.getDialog(), "이 도시에는 더 이상 시설을 건설할 수 없습니다.");
+                }
             }
         });
         
@@ -186,6 +201,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             ta.setText("");
             pnFacilities.removeAll();
             pnCitizens.removeAll();
+            setEditable(false);
             return;
         }
         
@@ -196,9 +212,12 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         
         List<Facility> facList = city.getFacility();
         int idx = 0;
+        int rowNo = 0;
         int sizes = facList.size();
+        GridBagConstraints gridBagConst;
+        JPanel pnEmpty;
         
-        // Remove destroyed facilities panel
+        // 파괴된 시설을 출력하는 영역 제거
         for(Facility f : facList) {
             if(f.getHp() <= 0) {
                 idx = 0;
@@ -210,11 +229,13 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         }
         
         idx = 0;
+        rowNo = 0;
+        
         if(sizes != facilityPns.size()) {
             for(FacilityPanel p : facilityPns) { p.dispose(); }
             facilityPns.clear();
             pnFacilities.removeAll();
-            pnFacilities.setLayout(new GridLayout(sizes, 1));
+            // pnFacilities.setLayout(new GridLayout(sizes, 1));
             
             for(idx=0; idx<sizes; idx++) {
                 FacilityPanel pn;
@@ -224,10 +245,31 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
                 } else {
                     pn = new FacilityPanel(facList.get(idx), city, colony, superInstance);
                 }
-                pnFacilities.add(pn);
+                
+                gridBagConst = new GridBagConstraints();
+                gridBagConst.gridx = 0;
+                gridBagConst.gridy = rowNo; rowNo++;
+                gridBagConst.gridwidth = 1;
+                gridBagConst.gridheight = 1;
+                gridBagConst.weightx = 1.0;  // fill 옵션으로 가로 채우기가 안되면 이 옵션이 필요함.
+                gridBagConst.fill = GridBagConstraints.HORIZONTAL;
+                
+                pnFacilities.add(pn, gridBagConst);
                 facilityPns.add(pn);
             }
         }
+        
+        pnEmpty = new JPanel();
+        
+        gridBagConst = new GridBagConstraints();
+        gridBagConst.gridx = 0;
+        gridBagConst.gridy = rowNo; rowNo++;
+        gridBagConst.gridwidth = 1;
+        gridBagConst.gridheight = 1;
+        gridBagConst.weightx = 1.0;
+        gridBagConst.fill = GridBagConstraints.BOTH;
+        
+        pnFacilities.add(pnEmpty, gridBagConst);
         
         for(idx=0; idx<sizes; idx++) {
             FacilityPanel pn = facilityPns.get(idx);
@@ -256,17 +298,45 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             citizenPns.add(p);
         }
         citizens = null;
-        pnCitizens.setLayout(new GridLayout(citizenPns.size(), 1));
+        rowNo = 0;
+        // pnCitizens.setLayout(new GridLayout(citizenPns.size(), 1));
         for(CitizenPanel p : citizenPns) {
-            pnCitizens.add(p);
+            gridBagConst = new GridBagConstraints();
+            gridBagConst.gridx = 0;
+            gridBagConst.gridy = rowNo; rowNo++;
+            gridBagConst.gridwidth = 1;
+            gridBagConst.gridheight = 1;
+            gridBagConst.weightx = 1.0;
+            gridBagConst.fill = GridBagConstraints.HORIZONTAL;
+            
+            pnCitizens.add(p, gridBagConst);
             p.refresh(cycle, city, colony, superInstance);
         }
         
+        pnEmpty = new JPanel();
+        
+        gridBagConst = new GridBagConstraints();
+        gridBagConst.gridx = 0;
+        gridBagConst.gridy = rowNo; rowNo++;
+        gridBagConst.gridwidth = 1;
+        gridBagConst.gridheight = 1;
+        gridBagConst.weightx = 1.0;
+        gridBagConst.fill = GridBagConstraints.BOTH;
+        
+        pnCitizens.add(pnEmpty, gridBagConst);
+        
+        // 도시 정보 출력
         ta.setText(city.getStatusString(superInstance));
+        
+        // 가로 경계선 위치 조절
         splits.setDividerLocation(0.3);
         
+        // 이 도시 HP가 0이면 전부 비활성화
         if(city.getHp() <= 0) {
             setEditable(false);
+        } else {
+            // 시설 설치 가능여부 판단
+            btnNewFac.setEnabled(city.getFacility().size() < city.getSpaces());
         }
     }
     
@@ -280,7 +350,8 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         tfSearchCitizen.setEditable(editable);
         tfSearchFacility.setEditable(editable);
         toolbarCity.setEnabled(editable);
-        btnNewFac.setEnabled(editable);
+        toolbarCity.setVisible(editable);
+        // btnNewFac.setEnabled(editable);
         
         if(! editable) {
             if(dialogNewFac != null) dialogNewFac.dispose();

@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -20,6 +21,7 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
     protected String targetName;
     
     protected transient JProgressBar progHp;
+    protected transient JButton btnToggle;
     protected transient JTextField tfName;
     protected transient JTextArea  ta;
     
@@ -74,9 +76,26 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
         progHp = new JProgressBar(JProgressBar.HORIZONTAL);
         pnHp.add(progHp);
         
+        btnToggle = new JButton("▼");
+        pnHp.add(btnToggle);
+        
         ta = new JTextArea();
         ta.setEditable(false);
         pnCenter.add(new JScrollPane(ta), BorderLayout.CENTER);
+        
+        pnCenter.setVisible(false);
+        btnToggle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(pnCenter.isVisible()) {
+                    pnCenter.setVisible(false);
+                    btnToggle.setText("▼");
+                } else {
+                    pnCenter.setVisible(true);
+                    btnToggle.setText("▲");
+                }
+            }
+        });
     }
     
     public Citizen getCitizen(City city) {

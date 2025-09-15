@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -25,6 +27,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     
     protected transient JProgressBar progHp;
     protected transient JPanel pnUp, pnCenter, pnDown;
+    protected transient JButton btnToggle, btnDestroy;
     protected transient JTextField tfName;
     protected transient JTextArea ta;
     
@@ -40,7 +43,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         init(f, city, colony, superInstance);   
     }
     
-    public void init(Facility f, final City city, final Colony colony, final ColonyManager superInstance) {
+    public void init(final Facility f, final City city, final Colony colony, final ColonyManager superInstance) {
         dispose();
         setFacilityKey(f.getKey());
         setTargetName(f.getName());
@@ -84,9 +87,45 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         progHp = new JProgressBar(JProgressBar.HORIZONTAL);
         pnHp.add(progHp);
         
+        btnToggle = new JButton("▼");
+        pnHp.add(btnToggle);
+        
         ta = new JTextArea();
         ta.setEditable(false);
         pnCenter.add(new JScrollPane(ta), BorderLayout.CENTER);
+        
+        JPanel pnCenterDown = new JPanel();
+        pnCenterDown.setLayout(new BorderLayout());
+        pnCenter.add(pnCenterDown, BorderLayout.SOUTH);
+        
+        pnCenter.setVisible(false);
+        btnToggle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(pnCenter.isVisible()) {
+                    pnCenter.setVisible(false);
+                    btnToggle.setText("▼");
+                } else {
+                    pnCenter.setVisible(true);
+                    btnToggle.setText("▲");
+                }
+            }
+        });
+        
+        JPanel pnCtrl = new JPanel();
+        pnCtrl.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        pnCenterDown.add(pnCtrl, BorderLayout.EAST);
+        
+        btnDestroy = new JButton("철거");
+        pnCtrl.add(btnDestroy);
+        
+        btnDestroy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                f.setHp(0);
+                JOptionPane.showMessageDialog(superInstance.getDialog(), "철거 지시가 내려졌습니다. 시뮬레이션을 진행해 주세요.");
+            }
+        });
     }
     
     public long getFacilityKey() {
@@ -140,9 +179,15 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
             res = res.append("\n").append("거주인원 : ").append(home.getCitizens(city, colony).size()).append(" / ").append(home.getCapacity());
             res = res.append("\n").append("편안함 : ").append(fac.getComportGrade());
             res = res.append("\n").append("거주자...");
-            for(Citizen c : home.getCitizens(city, colony)) {
-                res = res.append("\n    ").append(c.getName());
+            List<Citizen> citizens = home.getCitizens(city, colony);
+            if(citizens.isEmpty()) {
+                res = res.append("\n    ").append("거주 인원이 없습니다.");
+            } else {
+                for(Citizen c : citizens) {
+                    res = res.append("\n    ").append(c.getName());
+                }
             }
+            
         }
         
         List<Citizen> workers = fac.getWorkingCitizens(city, colony);
@@ -152,6 +197,8 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
             for(Citizen c : workers) {
                 res = res.append("\n    ").append(c.getName());
             }
+        } else {
+            res = res.append("\n    ").append("재직 중인 인원이 없습니다.");
         }
         
         ta.setText(res.toString().trim());
@@ -169,6 +216,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     @Override
     public void setEditable(boolean editable) {
         tfName.setEditable(editable);
+        btnDestroy.setEnabled(editable);
     }
 
     @Override
