@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -20,20 +21,26 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
 import javax.swing.border.EtchedBorder;
 
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityPanel;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.NewFacilityManager;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.SupportGUIFacility;
 
 public class CityPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = 3475480727850203183L;
+    protected ColonyManager colonyManager;
     protected City city;
     protected JProgressBar progHp;
     protected JTextArea ta;
     protected JTextField tfName, tfSearchCitizen, tfSearchFacility;
     protected JPanel pnGrid, pnCitizens, pnFacilities;
+    protected JToolBar toolbarCity;
+    protected JButton btnNewFac;
     protected JSplitPane splits;
+    protected NewFacilityManager dialogNewFac;
     protected List<FacilityPanel> facilityPns = new Vector<FacilityPanel>();
     protected List<CitizenPanel>  citizenPns  = new Vector<CitizenPanel>();
     
@@ -48,6 +55,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
     
     public void init(City city, Colony colony, ColonyManager superInstance) {
         if(this.city != null) dispose();
+        this.colonyManager = superInstance;
         
         this.city = city;
         this.setLayout(new BorderLayout());
@@ -143,6 +151,21 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         tfSearchFacility.addKeyListener(eventSearch);
         tfSearchCitizen.addActionListener(eventEnter);
         tfSearchFacility.addActionListener(eventEnter);
+        
+        toolbarCity = new JToolBar();
+        pnDown.add(toolbarCity, BorderLayout.CENTER);
+        
+        btnNewFac = new JButton("새 시설");
+        toolbarCity.add(btnNewFac);
+        
+        btnNewFac.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(dialogNewFac != null) dialogNewFac.dispose();
+                dialogNewFac = new NewFacilityManager(superInstance, city);
+                dialogNewFac.setVisible(true);
+            }
+        });
         
         refresh(0, city, colony, superInstance);
     }
@@ -256,6 +279,13 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         tfName.setEditable(editable);
         tfSearchCitizen.setEditable(editable);
         tfSearchFacility.setEditable(editable);
+        toolbarCity.setEnabled(editable);
+        btnNewFac.setEnabled(editable);
+        
+        if(! editable) {
+            if(dialogNewFac != null) dialogNewFac.dispose();
+            dialogNewFac = null;
+        }
     }
     
     @Override
@@ -265,7 +295,9 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         facilityPns.clear();
         for(CitizenPanel p : citizenPns) { p.dispose(); }
         citizenPns.clear();
-        
+        if(dialogNewFac != null) dialogNewFac.dispose();
+        this.dialogNewFac = null;
+        this.colonyManager = null;
         removeAll();
     }
     

@@ -586,6 +586,16 @@ public class ColonyManager implements GUIProgram {
         return colPn.getCityPanel(city);
     }
     
+    /** 도시가 속한 정착지 찾기 */
+    public Colony getColonyFrom(City city) {
+        for(Colony c : colonies) {
+            for(City ct : c.getCities()) {
+                if(ct.getKey() == city.getKey()) return c;
+            }
+        }
+        return null;
+    }
+    
     public static long generateKey() {
         Random rd = new Random();
         long key = rd.nextLong();

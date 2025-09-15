@@ -110,6 +110,10 @@ public class Arcade extends DefaultFacility {
         return "아케이드";
     }
     
+    public static String getFacilityTitle() {
+        return getFacilityName();
+    }
+    
     public static String getFacilityDescription() {
         return "시민들의 행복을 위한 기본적인 오락 시설입니다.";
     }
@@ -120,5 +124,9 @@ public class Arcade extends DefaultFacility {
     
     public static Integer getFacilityBuildingCycle() {
         return new Integer(1200);
+    }
+    
+    public static Long getTechNeeded() {
+        return new Long(0);
     }
 }

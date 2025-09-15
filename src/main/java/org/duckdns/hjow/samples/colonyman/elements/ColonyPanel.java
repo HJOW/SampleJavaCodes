@@ -71,9 +71,6 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         pnAccountingMain.add(new JScrollPane(new JTable(tableAccounting)), BorderLayout.CENTER);
         pnAccountingMain.add(tfIncomes, BorderLayout.SOUTH);
         
-        
-        
-        
         JPanel pnColTop, pnColBottom;
         pnColTop = new JPanel();
         pnColBottom = new JPanel();
@@ -140,6 +137,7 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         for(CityPanel c : pnCities) {
             c.dispose();
         }
+        pnCities.clear();
         removeAll();
     }
 

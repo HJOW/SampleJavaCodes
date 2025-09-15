@@ -135,6 +135,10 @@ public class Restaurant extends DefaultFacility {
         return "식당";
     }
     
+    public static String getFacilityTitle() {
+        return getFacilityName();
+    }
+    
     public static String getFacilityDescription() {
         return "식당으로, 시민들에게 유상으로 음식을 제공합니다.";
     }
@@ -145,5 +149,9 @@ public class Restaurant extends DefaultFacility {
     
     public static Integer getFacilityBuildingCycle() {
         return new Integer(1200);
+    }
+    
+    public static Long getTechNeeded() {
+        return new Long(0);
     }
 }

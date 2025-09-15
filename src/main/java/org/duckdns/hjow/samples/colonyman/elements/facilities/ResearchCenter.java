@@ -84,6 +84,10 @@ public class ResearchCenter extends DefaultFacility {
         return "연구 모듈";
     }
     
+    public static String getFacilityTitle() {
+        return getFacilityName();
+    }
+    
     public static String getFacilityDescription() {
         return "기술 개발 시설입니다.";
     }
@@ -94,5 +98,9 @@ public class ResearchCenter extends DefaultFacility {
     
     public static Integer getFacilityBuildingCycle() {
         return new Integer(1800);
+    }
+    
+    public static Long getTechNeeded() {
+        return new Long(0);
     }
 }

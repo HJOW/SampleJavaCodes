@@ -124,6 +124,10 @@ public abstract class DefaultFacility implements Facility {
         return "";
     }
     
+    public static String getFacilityTitle() {
+        return getFacilityName();
+    }
+    
     public static String getFacilityDescription() {
         return "";
     }
@@ -134,5 +138,9 @@ public abstract class DefaultFacility implements Facility {
     
     public static Integer getFacilityBuildingCycle() {
         return new Integer(1200);
+    }
+    
+    public static Long getTechNeeded() {
+        return new Long(0);
     }
 }

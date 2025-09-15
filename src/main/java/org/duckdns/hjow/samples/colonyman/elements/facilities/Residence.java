@@ -154,6 +154,10 @@ public class Residence extends DefaultFacility implements Home {
         return "주거 모듈";
     }
     
+    public static String getFacilityTitle() {
+        return getFacilityName();
+    }
+    
     public static String getFacilityDescription() {
         return "기본적인 주거 모듈로 시민이 거주하는 데 필요한 기본적인 시설이 포함됩니다.";
     }
@@ -164,5 +168,9 @@ public class Residence extends DefaultFacility implements Home {
     
     public static Integer getFacilityBuildingCycle() {
         return new Integer(1200);
+    }
+    
+    public static Long getTechNeeded() {
+        return new Long(0);
     }
 }

@@ -332,7 +332,8 @@ public class Colony implements ColonyElements {
         
         StringBuilder desc = new StringBuilder("");
         desc = desc.append("\t").append("HP : ").append(formatterInt.format(getHp())).append(" / ").append(formatterInt.format(getMaxHp()));
-        desc = desc.append("\t").append("자금 : ").append(formatterInt.format(getMoney()));
+        desc = desc.append("\t").append("예산 : ").append(formatterInt.format(getMoney()));
+        desc = desc.append("\t").append("기술 : ").append(formatterInt.format(getTech()));
         
         return desc.toString().trim();
     }

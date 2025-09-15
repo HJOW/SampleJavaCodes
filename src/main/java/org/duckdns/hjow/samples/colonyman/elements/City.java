@@ -106,15 +106,15 @@ public class City implements ColonyElements {
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) { // city should be a self
         int idx;
         
-        // Apply Born and move Chance
+        // 출산율 및 이주 계산
         processBornChance(cycle, colony, efficiency100);
         processMoveInChance(cycle, colony, efficiency100);
         processMoveOutChance(cycle, colony, efficiency100);
         
-        // Calculate power generation
+        // 전력 생산량 계산
         long power = getPowerAvail(colony);
         
-        // Apply Facilities
+        // 시설 파워 및 효율성 계산, 효과 처리
         for(Facility f : getFacility()) {
             int efficiency = efficiency100;
             
@@ -153,14 +153,14 @@ public class City implements ColonyElements {
             f.oneSecond(cycle, this, colony, efficiency);
         }
         
-        // Remove dead objects
+        // 사망 개체 제거
         removeDeads(colony);
         
-        // Allocates
+        // 거주자 및 일자리 할당
         allocateHome(colony);
         allocateWorkers(colony);
         
-        // Process Enemies
+        // 적 처리
         for(Enemy e : getEnemies()) {
             e.oneSecond(cycle, city, colony, efficiency100);
         }
@@ -285,10 +285,10 @@ public class City implements ColonyElements {
     /** Allocate homeless to a new home */
     protected void allocateHome(Colony col) {
         for(Citizen c : citizens) {
-            // Check this citizen is homeless
-            if(c.getLivingHome() >= 0) continue;
+            // 노숙자 여부 판단
+            if(c.getLivingHome() != 0) continue;
             
-            // Find homes
+            // 비어있는 주거 모듈 찾기
             for(Facility f : facility) {
                 if(f instanceof Home) {
                     Home home = (Home) f;
@@ -305,7 +305,7 @@ public class City implements ColonyElements {
     protected void allocateWorkers(Colony col) {
         for(Citizen c : citizens) {
             // Check this citizen is job seeker
-            if(c.getWorkingFacility() >= 0) continue;
+            if(c.getWorkingFacility() != 0) continue;
             
             // Find jobs for needed facilities - need to align
             List<Facility> list = new ArrayList<Facility>();
@@ -562,5 +562,10 @@ public class City implements ColonyElements {
         desc = desc.append("\n").append("평균 행복도 : ").append(formatterRate.format(getAverageHappiness()));
         
         return desc.toString().trim();
+    }
+    
+    /** 소속 정착지 찾기 */
+    public Colony getColony(ColonyManager man) {
+        return man.getColonyFrom(this);
     }
 }

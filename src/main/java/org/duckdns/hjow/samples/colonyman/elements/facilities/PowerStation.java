@@ -101,6 +101,10 @@ public class PowerStation extends DefaultFacility {
         return "발전 모듈";
     }
     
+    public static String getFacilityTitle() {
+        return getFacilityName();
+    }
+    
     public static String getFacilityDescription() {
         return "기본적인 전력 생산 시설입니다.";
     }
@@ -111,5 +115,9 @@ public class PowerStation extends DefaultFacility {
     
     public static Integer getFacilityBuildingCycle() {
         return new Integer(1800);
+    }
+    
+    public static Long getTechNeeded() {
+        return new Long(0);
     }
 }
