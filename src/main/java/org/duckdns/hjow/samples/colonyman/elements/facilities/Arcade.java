@@ -106,4 +106,19 @@ public class Arcade extends DefaultFacility {
         }
     }
 
+    public static String getFacilityName() {
+        return "아케이드";
+    }
+    
+    public static String getFacilityDescription() {
+        return "시민들의 행복을 위한 기본적인 오락 시설입니다.";
+    }
+    
+    public static Long getFacilityPrice() {
+        return new Long(10000L);
+    }
+    
+    public static Integer getFacilityBuildingCycle() {
+        return new Integer(1200);
+    }
 }

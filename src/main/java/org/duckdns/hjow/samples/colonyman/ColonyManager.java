@@ -523,7 +523,14 @@ public class ColonyManager implements GUIProgram {
         if(col == null) return;
         
         try { col.oneSecond(cycle, null, col, 100); } catch(Exception ex) { ex.printStackTrace(); }
-        try { refreshArenaPanel(cycle);             } catch(Exception ex) { ex.printStackTrace(); }
+        try {
+            SwingUtilities.invokeLater(new Runnable() { 
+                @Override
+                public void run() {
+                    refreshArenaPanel(cycle);
+                }
+            });
+        } catch(Exception ex) { ex.printStackTrace(); }
         
         cycle++;
         if(cycle >= 10000000) cycle = 0;
@@ -564,9 +571,7 @@ public class ColonyManager implements GUIProgram {
             if(cpNow != null) pnCols.add(colPn, BorderLayout.CENTER);
         }
         
-        if(cycle == 0 || cycle % 100 == 0) {
-            colPn.refresh(cycle, null, col, this);
-        }
+        colPn.refresh(cycle, null, col, this);
     }
     
     public CityPanel getCityPanel(City city) {

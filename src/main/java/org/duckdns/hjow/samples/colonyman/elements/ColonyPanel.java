@@ -5,16 +5,21 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.table.DefaultTableModel;
 
+import org.duckdns.hjow.samples.colonyman.AccountingData;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 
 public class ColonyPanel extends JPanel implements ColonyElementPanel {
@@ -22,10 +27,11 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
     protected Colony colony;
     
     protected transient List<CityPanel> pnCities = new Vector<CityPanel>();
-    protected transient JPanel pnColonyBasics;
-    protected transient JTabbedPane tabCities;
+    protected transient JPanel pnColonyBasics, pnAccountingMain;
+    protected transient DefaultTableModel tableAccounting;
+    protected transient JTabbedPane tabMain, tabCities;
     protected transient JProgressBar progHp;
-    protected transient JTextField tfColonyName, tfColonyTime;
+    protected transient JTextField tfColonyName, tfColonyTime, tfIncomes;
     protected transient JTextArea ta;
     protected transient JToolBar toolbar;
     
@@ -44,8 +50,29 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         
         setLayout(new BorderLayout());
         
+        tabMain = new JTabbedPane();
+        add(tabMain, BorderLayout.CENTER);
+        
         tabCities = new JTabbedPane();
-        add(tabCities, BorderLayout.CENTER);
+        tabMain.add("도시", tabCities);
+        
+        pnAccountingMain = new JPanel();
+        tabMain.add("예산", pnAccountingMain);
+        
+        tableAccounting = new DefaultTableModel();
+        tableAccounting.addColumn("사유");
+        tableAccounting.addColumn("대상");
+        tableAccounting.addColumn("금액");
+        
+        tfIncomes = new JTextField();
+        tfIncomes.setEditable(false);
+        
+        pnAccountingMain.setLayout(new BorderLayout());
+        pnAccountingMain.add(new JScrollPane(new JTable(tableAccounting)), BorderLayout.CENTER);
+        pnAccountingMain.add(tfIncomes, BorderLayout.SOUTH);
+        
+        
+        
         
         JPanel pnColTop, pnColBottom;
         pnColTop = new JPanel();
@@ -162,6 +189,8 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         for(CityPanel c : pnCities) {
             c.refresh(cycle, c.getCity(), colony, superInstance);
         }
+        
+        refreshAccoutingTable();
     }
     
     public CityPanel getCityPanel(City city) {
@@ -189,5 +218,83 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
     @Override
     public String getTargetName() {
         return colony.getName();
+    }
+    
+    /** 모든 행 삭제 */
+    public void clearAccountingTable() {
+        while(tableAccounting.getRowCount() >= 1) { tableAccounting.removeRow(0); }
+    }
+    
+    /** 회계 정보 새로고침 */
+    public void refreshAccoutingTable() {
+        // 모든 행 삭제
+        clearAccountingTable();
+        
+        Colony col = getColony();
+        Vector<Object> rows;
+        
+        // 데이터 쌓기
+        List<AccountingData> list = col.getAccountingData();
+        BigInteger timeStd = new BigInteger(col.getTime().toByteArray()).subtract(new BigInteger(String.valueOf(col.getAccountingPeriod())));
+        long incomes = 0L;
+        for(AccountingData data : list) {
+            if(data.isDisposed()) continue;
+            
+            BigInteger time = data.getTime();
+            
+            if(timeStd.compareTo(time) >= 0) {
+                rows = new Vector<Object>();
+                
+                rows.add(data.getReason());
+                
+                City cityCurrent = null;
+                for(City ct : col.getCities()) {
+                    if(ct.getKey() == data.getCityKey()) {
+                        cityCurrent = ct;
+                        break;
+                    }
+                }
+                if(cityCurrent == null) continue;
+                
+                String sourceName = null;
+                for(Facility f : cityCurrent.getFacility()) {
+                    if(f.getKey() == data.getSourceKey()) {
+                        sourceName = f.getName();
+                        break;
+                    }
+                }
+                if(sourceName == null) {
+                    for(Citizen c : cityCurrent.getCitizens()) {
+                        if(c.getKey() == data.getSourceKey()) {
+                            sourceName = c.getName();
+                            break;
+                        }
+                    }
+                }
+                if(sourceName == null) sourceName = "UNKNOWN";
+                
+                rows.add(sourceName);
+                
+                long val = data.getAmount();
+                rows.add(new Long(val));
+                
+                tableAccounting.addRow(rows);
+                incomes += val;
+            } else {
+                data.dispose();
+                continue;
+            }
+            tfIncomes.setText(String.valueOf(incomes));
+        }
+        
+        // 오래된 회계자료 제거
+        int idx = 0;
+        while(idx < col.getAccountingData().size()) {
+            if(col.getAccountingData().get(idx).isDisposed()) {
+                col.getAccountingData().remove(idx);
+                continue;
+            }
+            idx++;
+        }
     }
 }

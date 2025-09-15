@@ -119,4 +119,20 @@ public abstract class DefaultFacility implements Facility {
         
         return json;
     }
+    
+    public static String getFacilityName() {
+        return "";
+    }
+    
+    public static String getFacilityDescription() {
+        return "";
+    }
+    
+    public static Long getFacilityPrice() {
+        return new Long(10000L);
+    }
+    
+    public static Integer getFacilityBuildingCycle() {
+        return new Integer(1200);
+    }
 }

@@ -240,7 +240,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         }
         
         ta.setText(city.getStatusString(superInstance));
-        splits.setDividerLocation(0.5);
+        splits.setDividerLocation(0.3);
         
         if(city.getHp() <= 0) {
             setEditable(false);

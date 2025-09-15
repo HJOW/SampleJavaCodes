@@ -144,7 +144,7 @@ public class City implements ColonyElements {
             
             efficiency = (int) Math.round(   ((efficiencyPow / 100.0) * (efficiencyWorker / 100.0)) * 100  );
             
-            if(cycle % (60 * 60) == 0) {
+            if(cycle % (colony.getAccountingPeriod()) == 0) {
                 // 시설의 비용 처리
                 processFacilityFees(f, colony);
             }
@@ -214,6 +214,7 @@ public class City implements ColonyElements {
                 if(params.equals("")) return;
                 
                 Class<?> facilityClass = FacilityManager.getFacilityClass(params);
+                if(facilityClass == null) return;
                 Object newOne = facilityClass.newInstance();
                 getFacility().add((Facility) newOne);
             }

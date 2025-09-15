@@ -130,4 +130,20 @@ public class Restaurant extends DefaultFacility {
         
         return json;
     }
+    
+    public static String getFacilityName() {
+        return "식당";
+    }
+    
+    public static String getFacilityDescription() {
+        return "식당으로, 시민들에게 유상으로 음식을 제공합니다.";
+    }
+    
+    public static Long getFacilityPrice() {
+        return new Long(10000L);
+    }
+    
+    public static Integer getFacilityBuildingCycle() {
+        return new Integer(1200);
+    }
 }

@@ -118,9 +118,9 @@ public class Colony implements ColonyElements {
     }
     
     public void modifyingMoney(long money, City city, ColonyElements objType, String reason) {
-        this.money += money;
+        setMoney(getMoney() + money);
         
-        AccountingData data = new AccountingData(money, reason, city, objType);
+        AccountingData data = new AccountingData(getTime(), money, reason, city, objType);
         addAccountingData(data);
     }
 
@@ -240,13 +240,15 @@ public class Colony implements ColonyElements {
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) { // parameters are null
         int idx;
         
+        // 도시별 사이클 처리
         for(City c : cities) {
             c.oneSecond(cycle, c, this, 100);
         }
+        
+        // 적 사이클 처리
         for(Enemy e : enemies) {
             e.oneSecond(cycle, city, colony, efficiency100);
         }
-        time = time.add(BigInteger.ONE);
         
         // 예약 작업 처리
         for(HoldingJob h : getHoldings()) {
@@ -266,6 +268,9 @@ public class Colony implements ColonyElements {
             }
             idx++;
         }
+        
+        // 시간 지남
+        time = time.add(BigInteger.ONE);
     }
     
     /** 예약 작업 처리 */
@@ -317,6 +322,10 @@ public class Colony implements ColonyElements {
         return 1000000;
     }
     
+    public int getAccountingPeriod() {
+        return 60;
+    }
+    
     public String getStatusString(ColonyManager superInstance) {
         DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
         // DecimalFormat formatterRate = new DecimalFormat("##0.00");
@@ -342,15 +351,19 @@ public class Colony implements ColonyElements {
         json.put("hp", new Long(getHp()));
         json.put("money", new Long(getMoney()));
         json.put("tech", new Long(getTech()));
-        json.put("time", time.toString());
+        json.put("time", getTime().toString());
         
         JsonArray list = new JsonArray();
-        for(City c : cities) { list.add(c.toJson()); }
+        for(City c : getCities()) { list.add(c.toJson()); }
         json.put("cities", list);
         
         list = new JsonArray();
-        for(HoldingJob h : holdings) { list.add(h.toJson()); }
+        for(HoldingJob h : getHoldings()) { list.add(h.toJson()); }
         json.put("holdings", list);
+        
+        list = new JsonArray();
+        for(AccountingData d : getAccountingData()) { list.add(d.toJson()); }
+        json.put("accountinghis", list);
         
         return json;
     }
@@ -390,6 +403,23 @@ public class Colony implements ColonyElements {
                         HoldingJob h = new HoldingJob();
                         h.fromJson((JsonObject) o);
                         holdings.add(h);
+                    } catch(Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+        
+        list = (JsonArray) json.get("accountinghis");
+        accountingData.clear();
+        if(list != null) {
+            for(Object o : list) {
+                if(o instanceof String) o = JsonObject.parseJson(o.toString());
+                if(o instanceof JsonObject) {
+                    try {
+                        AccountingData d = new AccountingData();
+                        d.fromJson((JsonObject) o);
+                        accountingData.add(d);
                     } catch(Exception ex) {
                         ex.printStackTrace();
                     }
