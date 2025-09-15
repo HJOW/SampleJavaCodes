@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -38,7 +39,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
     protected JProgressBar progHp;
     protected JTextArea ta;
     protected JTextField tfName, tfSearchCitizen, tfSearchFacility;
-    protected JPanel pnGrid, pnCitizens, pnFacilities;
+    protected JPanel pnGrid, pnCitizens, pnFacilities, pnHoldings;
     protected JToolBar toolbarCity;
     protected JButton btnNewFac;
     protected JSplitPane splits;
@@ -108,9 +109,17 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         pnGrid.setLayout(new BorderLayout());
         splits.setRightComponent(pnGrid);
         
+        JPanel pnTextStatus = new JPanel();
+        pnTextStatus.setLayout(new GridLayout(2, 1));
+        
         ta = new JTextArea();
         ta.setEditable(false);
-        splits.setLeftComponent(new JScrollPane(ta));
+        pnTextStatus.add(new JScrollPane(ta));
+        
+        pnHoldings = new JPanel();
+        pnTextStatus.add(new JScrollPane(pnHoldings));
+        
+        splits.setLeftComponent(pnTextStatus);
         
         JTabbedPane tab = new JTabbedPane();
         pnGrid.add(tab, BorderLayout.CENTER);
@@ -324,6 +333,16 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         gridBagConst.fill = GridBagConstraints.BOTH;
         
         pnCitizens.add(pnEmpty, gridBagConst);
+        
+        // 작업중 항목 출력
+        pnHoldings.removeAll();
+        List<HoldingJob> listJobs = city.getHoldings();
+        pnHoldings.setLayout(new GridLayout(listJobs.size(), 1));
+        for(HoldingJob j : listJobs) {
+            JPanel pnHoldingOne = new JPanel();
+            // TODO
+            pnHoldings.add(pnHoldingOne);
+        }
         
         // 도시 정보 출력
         ta.setText(city.getStatusString(superInstance));

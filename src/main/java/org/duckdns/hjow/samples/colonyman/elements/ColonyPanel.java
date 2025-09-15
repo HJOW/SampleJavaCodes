@@ -27,7 +27,7 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
     protected Colony colony;
     
     protected transient List<CityPanel> pnCities = new Vector<CityPanel>();
-    protected transient JPanel pnColonyBasics, pnAccountingMain;
+    protected transient JPanel pnColonyBasics, pnAccountingMain, pnHoldings;
     protected transient DefaultTableModel tableAccounting;
     protected transient JTabbedPane tabMain, tabCities;
     protected transient JProgressBar progHp;
@@ -129,6 +129,9 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         
         toolbar = new JToolBar();
         pnTopDetail.add(toolbar, BorderLayout.SOUTH);
+        
+        pnHoldings = new JPanel();
+        pnTopDetail.add(toolbar, BorderLayout.NORTH);
     }
     
     @Override
@@ -187,6 +190,8 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         for(CityPanel c : pnCities) {
             c.refresh(cycle, c.getCity(), colony, superInstance);
         }
+        
+        pnHoldings.removeAll();
         
         refreshAccoutingTable();
     }
