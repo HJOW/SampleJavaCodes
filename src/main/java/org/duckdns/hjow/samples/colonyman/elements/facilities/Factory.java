@@ -109,7 +109,7 @@ public class Factory extends DefaultFacility {
     }
     
     public static Integer getFacilityBuildingCycle() {
-        return new Integer(1800);
+        return new Integer(1200);
     }
     
     public static Long getTechNeeded() {

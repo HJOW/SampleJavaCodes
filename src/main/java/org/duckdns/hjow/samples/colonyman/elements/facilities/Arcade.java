@@ -123,7 +123,7 @@ public class Arcade extends DefaultFacility {
     }
     
     public static Integer getFacilityBuildingCycle() {
-        return new Integer(1200);
+        return new Integer(240);
     }
     
     public static Long getTechNeeded() {

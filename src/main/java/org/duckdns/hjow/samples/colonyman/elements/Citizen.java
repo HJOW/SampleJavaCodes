@@ -23,9 +23,9 @@ public class Citizen implements ColonyElements {
     protected long money           = 100L;
     protected long experience      =   0L;
     
-    protected long workingFacility = -1L;
-    protected long workingCity     = -1L;
-    protected long livingHome      = -1L;
+    protected long workingFacility = 0L;
+    protected long workingCity     = 0L;
+    protected long livingHome      = 0L;
     
     public Citizen() {
         
@@ -280,12 +280,23 @@ public class Citizen implements ColonyElements {
         setLivingHome(     Long.parseLong(json.get("livingHome"     ).toString()));
     }
     
-    public String getStatusString(ColonyManager superInstance) {
+    public String getStatusString(City city, Colony colony, ColonyManager superInstance) {
         DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
         
         StringBuilder desc = new StringBuilder("");
         desc = desc.append("\n").append("자금 : ").append(formatterInt.format(getMoney()));
         desc = desc.append("\n").append("행복도 : ").append(formatterInt.format(getHappy())).append(" / ").append("100");
+        
+        Facility f = null;
+        Facility h = null;
+        
+        if(getWorkingFacility() != 0L) f = city.getFacility(getWorkingFacility());
+        if(getLivingHome()      != 0L) h = city.getFacility(getLivingHome());
+        
+        
+        if(h != null) desc = desc.append("\n").append("거주 : ").append(h.getName());
+        if(f != null) desc = desc.append("\n").append("직장 : ").append(f.getName());
+        
         return desc.toString().trim();
     }
 }

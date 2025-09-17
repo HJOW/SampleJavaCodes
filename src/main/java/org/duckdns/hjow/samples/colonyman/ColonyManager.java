@@ -280,7 +280,7 @@ public class ColonyManager implements GUIProgram {
     }
     
     protected void onSaveRequested() {
-        Colony c = getColony();
+        Colony c = getSelectedColony();
         if(c == null) { alert("저장할 정착지를 선택해 주세요."); return; }
         
         int s = fileChooser.showSaveDialog(getDialog());
@@ -489,10 +489,21 @@ public class ColonyManager implements GUIProgram {
         return dialog;
     }
     
-    public Colony getColony() {
+    public Colony getSelectedColony() {
         if(selectedColony < 0) return null;
         if(selectedColony >= colonies.size()) { selectedColony = 0; return null; }
         return colonies.get(selectedColony);
+    }
+    
+    public Colony getColony() {
+        return getSelectedColony();
+    }
+    
+    public Colony getColony(long colonyKey) {
+        for(Colony c : colonies) {
+            if(c.getKey() == colonyKey) return c;
+        }
+        return null;
     }
     
     public void toggleSimulationRunning() {
@@ -519,7 +530,7 @@ public class ColonyManager implements GUIProgram {
     }
     
     public void oneSecond() {
-        Colony col = getColony();
+        Colony col = getSelectedColony();
         if(col == null) return;
         
         try { col.oneSecond(cycle, null, col, 100); } catch(Exception ex) { ex.printStackTrace(); }
@@ -547,7 +558,7 @@ public class ColonyManager implements GUIProgram {
     }
     
     public synchronized void refreshArenaPanel(int cycle) {
-        Colony col = getColony();
+        Colony col = getSelectedColony();
         if(col == null) {
             pnCols.removeAll();
             return;
@@ -575,7 +586,7 @@ public class ColonyManager implements GUIProgram {
     }
     
     public CityPanel getCityPanel(City city) {
-        Colony col = getColony();
+        Colony col = getSelectedColony();
         ColonyPanel colPn = null;
         for(ColonyPanel cp : pnColonies) {
             if(cp.getColony().getKey() == col.getKey()) {

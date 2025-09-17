@@ -16,6 +16,7 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -335,17 +336,10 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         pnCitizens.add(pnEmpty, gridBagConst);
         
         // 작업중 항목 출력
-        pnHoldings.removeAll();
-        List<HoldingJob> listJobs = city.getHoldings();
-        pnHoldings.setLayout(new GridLayout(listJobs.size(), 1));
-        for(HoldingJob j : listJobs) {
-            JPanel pnHoldingOne = new JPanel();
-            // TODO
-            pnHoldings.add(pnHoldingOne);
-        }
+        refreshHoldingJobs();
         
         // 도시 정보 출력
-        ta.setText(city.getStatusString(superInstance));
+        ta.setText(city.getStatusString(colony, superInstance));
         
         // 가로 경계선 위치 조절
         splits.setDividerLocation(0.3);
@@ -356,6 +350,43 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         } else {
             // 시설 설치 가능여부 판단
             btnNewFac.setEnabled(city.getFacility().size() < city.getSpaces());
+        }
+    }
+    
+    /** 작업중 항목 출력 */
+    protected void refreshHoldingJobs() {
+        pnHoldings.removeAll();
+        List<HoldingJob> listJobs = city.getHoldings();
+        pnHoldings.setLayout(new GridLayout(listJobs.size(), 1));
+        for(HoldingJob j : listJobs) {
+            JPanel pnHoldingOne = new JPanel();
+            pnHoldingOne.setLayout(new BorderLayout());
+            
+            JPanel pnLabel, pnStatus;
+            pnLabel  = new JPanel();
+            pnStatus = new JPanel();
+            pnLabel.setLayout(new FlowLayout(FlowLayout.LEFT));
+            pnStatus.setLayout(new FlowLayout(FlowLayout.RIGHT));
+            
+            pnHoldingOne.add(pnLabel , BorderLayout.CENTER);
+            pnHoldingOne.add(pnStatus, BorderLayout.EAST);
+            
+            String str = j.getCommand();
+            if(j.getParameter() != null) str += " - " + j.getParameter();
+            
+            pnLabel.add(new JLabel(str));
+            
+            JProgressBar prog = new JProgressBar();
+            if(j.getCycleMax() <= 0 || j.getCycleLeft() < 0) {
+                prog.setIndeterminate(true);
+            } else {
+                prog.setMaximum(j.getCycleMax());
+                prog.setValue(j.getCycleMax() - j.getCycleLeft());
+            }
+            
+            pnStatus.add(prog);
+            
+            pnHoldings.add(pnHoldingOne);
         }
     }
     

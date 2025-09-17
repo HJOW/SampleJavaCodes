@@ -49,6 +49,12 @@ public class City implements ColonyElements {
     public List<Facility> getFacility() {
         return facility;
     }
+    public Facility getFacility(long facKey) {
+        for(Facility f : getFacility()) {
+            if(f.getKey() == facKey) return f;
+        }
+        return null;
+    }
     public void setName(String name) {
         this.name = name;
     }
@@ -61,6 +67,13 @@ public class City implements ColonyElements {
 
     public void setCitizens(List<Citizen> citizens) {
         this.citizens = citizens;
+    }
+    
+    public Citizen getCitizen(long citizenKey) {
+        for(Citizen c : getCitizens()) {
+            if(c.getKey() == citizenKey) return c;
+        }
+        return null;
     }
     
     public List<Enemy> getEnemies() {
@@ -596,14 +609,20 @@ public class City implements ColonyElements {
         }
     }
     
-    public String getStatusString(ColonyManager superInstance) {
+    public String getStatusString(Colony col, ColonyManager superInstance) {
         StringBuilder desc = new StringBuilder("");
         
         DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
         DecimalFormat formatterRate = new DecimalFormat("##0.00");
         
+        long powerConsume = 0L;
+        for(Facility f : getFacility()) {
+            powerConsume += f.getPowerConsume();
+        }
+        
         desc = desc.append("\n").append("HP : ").append(formatterInt.format(getHp())).append(" / ").append(formatterInt.format(getMaxHp()));
         desc = desc.append("\n").append("인구 : ").append(formatterInt.format(getCitizenCount()));
+        desc = desc.append("\n").append("전력 : ").append(formatterInt.format(powerConsume)).append(" / ").append(formatterInt.format(getPowerAvail(getColony(superInstance))));
         desc = desc.append("\n").append("시설 수 : ").append(formatterInt.format(facility.size())).append(" / ").append(formatterInt.format(getSpaces()));
         desc = desc.append("\n").append("평균 행복도 : ").append(formatterRate.format(getAverageHappiness()));
         desc = desc.append("\n").append("노숙자 : ").append(formatterInt.format(getHomelesses()));

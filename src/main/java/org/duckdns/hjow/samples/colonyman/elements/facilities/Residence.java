@@ -167,7 +167,7 @@ public class Residence extends DefaultFacility implements Home {
     }
     
     public static Integer getFacilityBuildingCycle() {
-        return new Integer(1200);
+        return new Integer(180);
     }
     
     public static Long getTechNeeded() {

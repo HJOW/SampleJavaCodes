@@ -132,7 +132,7 @@ public class NewFacilityManager extends JDialog {
                     return;
                 };
                 
-                HoldingJob job = new HoldingJob(info.getBuildingCycle(), "NewFacility", info.getName());
+                HoldingJob job = new HoldingJob(info.getBuildingCycle(), info.getBuildingCycle(), "NewFacility", info.getName());
                 city.getHoldings().add(job);
                 
                 col.modifyingMoney(info.getPrice() * (-1) , city, city, info.getTitle() + " 건설");

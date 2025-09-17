@@ -67,6 +67,13 @@ public class Colony implements ColonyElements {
     public List<City> getCities() {
         return cities;
     }
+    
+    public City getCity(long key) {
+        for(City c : getCities()) {
+            if(c.getKey() == key) return c;
+        }
+        return null;
+    }
 
     public void setCities(List<City> cities) {
         this.cities = cities;
