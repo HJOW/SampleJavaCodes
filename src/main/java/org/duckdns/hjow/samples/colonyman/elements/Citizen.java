@@ -23,9 +23,10 @@ public class Citizen implements ColonyElements {
     protected long money           = 100L;
     protected long experience      =   0L;
     
-    protected long workingFacility = 0L;
-    protected long workingCity     = 0L;
-    protected long livingHome      = 0L;
+    protected long workingFacility  = 0L;
+    protected long workingCity      = 0L;
+    protected long livingHome       = 0L;
+    protected long buildingFacility = 0L;
     
     public Citizen() {
         
@@ -152,6 +153,14 @@ public class Citizen implements ColonyElements {
         return workingCity;
     }
 
+    public long getBuildingFacility() {
+        return buildingFacility;
+    }
+
+    public void setBuildingFacility(long buildingFacility) {
+        this.buildingFacility = buildingFacility;
+    }
+
     public void setHp(int hp) {
         this.hp = hp;
     }
@@ -254,6 +263,7 @@ public class Citizen implements ColonyElements {
         json.put("money"             , new Long(getMoney()));
         json.put("experience"        , new Long(getExperience()));
         json.put("workingFacility"   , new Long(getWorkingFacility()));
+        json.put("buildingFacility"  , new Long(getBuildingFacility()));
         json.put("workingCity"       , new Long(getWorkingCity()));
         json.put("livingHome"        , new Long(getLivingHome()));
         
@@ -274,10 +284,11 @@ public class Citizen implements ColonyElements {
         setAgility(    Integer.parseInt(json.get("agility"    ).toString()));
         setCarisma(    Integer.parseInt(json.get("carisma"    ).toString()));
         setIntelligent(Integer.parseInt(json.get("intelligent").toString()));
-        setExperience(     Long.parseLong(json.get("experience"     ).toString()));
-        setWorkingFacility(Long.parseLong(json.get("workingFacility").toString()));
-        setWorkingCity(    Long.parseLong(json.get("workingCity"    ).toString()));
-        setLivingHome(     Long.parseLong(json.get("livingHome"     ).toString()));
+        setExperience(      Long.parseLong(json.get("experience"      ).toString()));
+        setWorkingFacility( Long.parseLong(json.get("workingFacility" ).toString()));
+        setBuildingFacility(Long.parseLong(json.get("buildingFacility").toString()));
+        setWorkingCity(     Long.parseLong(json.get("workingCity"     ).toString()));
+        setLivingHome(      Long.parseLong(json.get("livingHome"      ).toString()));
     }
     
     public String getStatusString(City city, Colony colony, ColonyManager superInstance) {
@@ -289,13 +300,15 @@ public class Citizen implements ColonyElements {
         
         Facility f = null;
         Facility h = null;
+        Facility b = null;
         
-        if(getWorkingFacility() != 0L) f = city.getFacility(getWorkingFacility());
-        if(getLivingHome()      != 0L) h = city.getFacility(getLivingHome());
-        
+        if(getWorkingFacility()  != 0L) f = city.getFacility(getWorkingFacility());
+        if(getLivingHome()       != 0L) h = city.getFacility(getLivingHome());
+        if(getBuildingFacility() != 0L) b = city.getFacility(getBuildingFacility());
         
         if(h != null) desc = desc.append("\n").append("거주 : ").append(h.getName());
         if(f != null) desc = desc.append("\n").append("직장 : ").append(f.getName());
+        if(b != null) desc = desc.append("\n").append("건설 : ").append(b.getName());
         
         return desc.toString().trim();
     }

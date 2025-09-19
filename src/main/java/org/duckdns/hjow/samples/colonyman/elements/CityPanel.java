@@ -180,19 +180,37 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         btnNewFac.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(dialogNewFac != null) dialogNewFac.dispose();
-                dialogNewFac = null;
-                
-                if(city.getFacility().size() < city.getSpaces()) {
-                    dialogNewFac = new NewFacilityManager(superInstance, city);
-                    dialogNewFac.setVisible(true);
-                } else {
-                    JOptionPane.showMessageDialog(colonyManager.getDialog(), "이 도시에는 더 이상 시설을 건설할 수 없습니다.");
-                }
+                onNewFacilityButtonPressed(superInstance);
             }
         });
         
         refresh(0, city, colony, superInstance);
+    }
+    
+    /** 시설 추가 건설 가능여부 확인, null 리턴 시 가능한 것. null이 아닌 경우, 불가능한 사유 메시지가 리턴된 것. */
+    protected String canAddFacilities() {
+        String msg = null;
+        
+        if(city.getFacility().size() >= city.getSpaces()) {
+            return "이 도시에는 더 이상 시설을 건설할 수 없습니다.";
+        }
+        
+        return msg;
+    }
+    
+    /** 새 시설 건설 버튼 클릭 시 호출 */
+    protected void onNewFacilityButtonPressed(ColonyManager superInstance) {
+        if(dialogNewFac != null) dialogNewFac.dispose();
+        dialogNewFac = null;
+        
+        String msg = canAddFacilities();
+        if(msg != null) {
+            JOptionPane.showMessageDialog(colonyManager.getDialog(), msg);
+            return;
+        }
+        
+        dialogNewFac = new NewFacilityManager(superInstance, city);
+        dialogNewFac.setVisible(true);
     }
 
     public City getCity() {
