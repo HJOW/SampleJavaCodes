@@ -17,14 +17,16 @@ import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Residence;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Restaurant;
+import org.duckdns.hjow.samples.colonyman.elements.research.Research;
 
 public class Colony implements ColonyElements {
     private static final long serialVersionUID = -3144963237818493111L;
-    protected transient volatile long key = ColonyManager.generateKey();
+    protected volatile long key = ColonyManager.generateKey();
     
-    protected List<City>       cities   = new Vector<City>();
-    protected List<Enemy>      enemies  = new Vector<Enemy>();
-    protected List<HoldingJob> holdings = new Vector<HoldingJob>();
+    protected List<City>       cities     = new Vector<City>();
+    protected List<Enemy>      enemies    = new Vector<Enemy>();
+    protected List<HoldingJob> holdings   = new Vector<HoldingJob>();
+    protected List<Research>   researches = new Vector<Research>();
     protected String name = "정착지_" + ColonyManager.generateNaturalNumber();
     protected int  hp    = getMaxHp();
     protected long money = 1000000L;
@@ -95,11 +97,28 @@ public class Colony implements ColonyElements {
         this.holdings = holdings;
     }
 
+    public List<Research> getResearches() {
+        return researches;
+    }
+
+    public void setResearches(List<Research> researches) {
+        this.researches = researches;
+    }
+    
+    public void resetResearches() {
+        researches.clear();
+        // TODO
+    }
+
     @Override
     public long getKey() {
         return key;
     }
     
+    public void setKey(long key) {
+        this.key = key;
+    }
+
     @Override
     public void addHp(int amount) {
         hp += amount;
@@ -374,6 +393,10 @@ public class Colony implements ColonyElements {
         for(AccountingData d : getAccountingData()) { list.add(d.toJson()); }
         json.put("accountinghis", list);
         
+        list = new JsonArray();
+        for(Research d : getResearches()) { list.add(d.toJson()); }
+        json.put("researches", list);
+        
         return json;
     }
     
@@ -429,6 +452,26 @@ public class Colony implements ColonyElements {
                         AccountingData d = new AccountingData();
                         d.fromJson((JsonObject) o);
                         accountingData.add(d);
+                    } catch(Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+        
+        list = (JsonArray) json.get("researches");
+        resetResearches();
+        if(list != null) {
+            for(Object o : list) {
+                if(o instanceof String) o = JsonObject.parseJson(o.toString());
+                if(o instanceof JsonObject) {
+                    try {
+                        long key = Long.parseLong(String.valueOf(((JsonObject) o).get("key")));
+                        for(Research r : getResearches()) {
+                            if(key == r.getKey()) {
+                                r.fromJson((JsonObject) o);
+                            }
+                        }
                     } catch(Exception ex) {
                         ex.printStackTrace();
                     }

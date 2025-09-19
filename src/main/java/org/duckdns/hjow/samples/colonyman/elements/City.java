@@ -19,7 +19,7 @@ import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
 
 public class City implements ColonyElements {
     private static final long serialVersionUID = -8442328554683565064L;
-    protected transient volatile long key = ColonyManager.generateKey();
+    protected volatile long key = ColonyManager.generateKey();
     
     protected String name = "도시_" + ColonyManager.generateNaturalNumber();
     protected List<Facility>   facility = new Vector<Facility>();
@@ -42,6 +42,10 @@ public class City implements ColonyElements {
     public long getKey() {
         return key;
     }
+    public void setKey(long key) {
+        this.key = key;
+    }
+
     @Override
     public String getName() {
         return name;

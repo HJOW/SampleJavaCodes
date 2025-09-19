@@ -12,7 +12,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Facility;
 
 public abstract class DefaultFacility implements Facility {
     private static final long serialVersionUID = 8012568139388326869L;
-    protected transient volatile long key = ColonyManager.generateKey();
+    protected volatile long key = ColonyManager.generateKey();
     protected int hp = getMaxHp();
     
     @Override
@@ -48,6 +48,10 @@ public abstract class DefaultFacility implements Facility {
         return key;
     }
     
+    public void setKey(long key) {
+        this.key = key;
+    }
+
     @Override
     public int getWorkingCitizensCount(City city, Colony colony) {
         int count = 0;

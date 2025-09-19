@@ -7,7 +7,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 
 public class Citizen implements ColonyElements {
     private static final long serialVersionUID = -6856576686789163067L;
-    protected transient volatile long key = ColonyManager.generateKey();
+    protected volatile long key = ColonyManager.generateKey();
     protected String name = "시민_" + ColonyManager.generateNaturalNumber();
     
     protected int hp = 100;
@@ -40,6 +40,10 @@ public class Citizen implements ColonyElements {
     @Override
     public long getKey() {
         return key;
+    }
+
+    public void setKey(long key) {
+        this.key = key;
     }
 
     @Override
