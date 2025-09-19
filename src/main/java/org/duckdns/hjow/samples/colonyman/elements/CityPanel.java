@@ -118,6 +118,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         pnTextStatus.add(new JScrollPane(ta));
         
         pnHoldings = new JPanel();
+        pnHoldings.setLayout(new GridBagLayout());
         pnTextStatus.add(new JScrollPane(pnHoldings));
         
         splits.setLeftComponent(pnTextStatus);
@@ -289,6 +290,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
                 gridBagConst.gridheight = 1;
                 gridBagConst.weightx = 1.0;  // fill 옵션으로 가로 채우기가 안되면 이 옵션이 필요함.
                 gridBagConst.fill = GridBagConstraints.HORIZONTAL;
+                gridBagConst.anchor = GridBagConstraints.NORTH;
                 
                 pnFacilities.add(pn, gridBagConst);
                 facilityPns.add(pn);
@@ -304,6 +306,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         gridBagConst.gridheight = 1;
         gridBagConst.weightx = 1.0;
         gridBagConst.fill = GridBagConstraints.BOTH;
+        gridBagConst.weighty = 1.0;
         
         pnFacilities.add(pnEmpty, gridBagConst);
         
@@ -345,6 +348,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             gridBagConst.gridheight = 1;
             gridBagConst.weightx = 1.0;
             gridBagConst.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConst.anchor = GridBagConstraints.NORTH;
             
             pnCitizens.add(p, gridBagConst);
             p.refresh(cycle, city, colony, superInstance);
@@ -359,6 +363,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         gridBagConst.gridheight = 1;
         gridBagConst.weightx = 1.0;
         gridBagConst.fill = GridBagConstraints.BOTH;
+        gridBagConst.weighty = 1.0;
         
         pnCitizens.add(pnEmpty, gridBagConst);
         
@@ -384,7 +389,10 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
     protected void refreshHoldingJobs() {
         pnHoldings.removeAll();
         List<HoldingJob> listJobs = city.getHoldings();
-        pnHoldings.setLayout(new GridLayout(listJobs.size(), 1));
+        // pnHoldings.setLayout(new GridLayout(listJobs.size(), 1));
+        GridBagConstraints gridBagConst;
+        int rowNo = 0;
+        
         for(HoldingJob j : listJobs) {
             JPanel pnHoldingOne = new JPanel();
             pnHoldingOne.setLayout(new BorderLayout());
@@ -414,8 +422,27 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             
             pnStatus.add(prog);
             
-            pnHoldings.add(pnHoldingOne);
+            gridBagConst = new GridBagConstraints();
+            gridBagConst.gridx = 0;
+            gridBagConst.gridy = rowNo; rowNo++;
+            gridBagConst.gridwidth = 1;
+            gridBagConst.gridheight = 1;
+            gridBagConst.weightx = 1.0;  // fill 옵션으로 가로 채우기가 안되면 이 옵션이 필요함.
+            gridBagConst.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConst.anchor = GridBagConstraints.NORTH;
+            
+            pnHoldings.add(pnHoldingOne, gridBagConst);
         }
+        
+        gridBagConst = new GridBagConstraints();
+        gridBagConst.gridx = 0;
+        gridBagConst.gridy = rowNo; rowNo++;
+        gridBagConst.gridwidth = 1;
+        gridBagConst.gridheight = 1;
+        gridBagConst.weightx = 1.0;  // fill 옵션으로 가로 채우기가 안되면 이 옵션이 필요함.
+        gridBagConst.fill = GridBagConstraints.BOTH;
+        gridBagConst.weighty = 1.0;
+        pnHoldings.add(new JPanel(), gridBagConst);
     }
     
     public void setEditable(boolean editable) {

@@ -10,6 +10,8 @@ import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
@@ -89,8 +91,17 @@ public class ColonyManager implements GUIProgram {
         else dialog = new JDialog();
         
         Dimension winSize = UIUtil.getScreenSize();
+        int w, h;
+        w = (int) (winSize.getWidth()  * 0.8);
+        h = (int) (winSize.getHeight() * 0.8);
         
-        dialog.setSize((int) (winSize.getWidth() - 20), (int) (winSize.getHeight() - 70));
+        if(w >= winSize.getWidth()  - 50) w = (int) (winSize.getWidth()  - 50);
+        if(h >= winSize.getHeight() - 50) h = (int) (winSize.getHeight() - 80);
+        
+        if(w < 800) w = 800;
+        if(h < 600) h = 600;
+        
+        dialog.setSize(w, h);
         UIUtil.center(dialog);
         dialog.setTitle("Colonization");
         dialog.setIconImage(UIUtil.iconToImage(getIcon()));
@@ -99,6 +110,12 @@ public class ColonyManager implements GUIProgram {
             @Override
             public void windowClosing(WindowEvent e) {
                 onWindowClosing();
+            }
+        });
+        dialog.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                refreshArenaPanel(0);
             }
         });
         
