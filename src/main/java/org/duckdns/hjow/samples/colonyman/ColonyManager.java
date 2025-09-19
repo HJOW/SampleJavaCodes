@@ -282,6 +282,7 @@ public class ColonyManager implements GUIProgram {
         setEditable(true);
     }
     
+    /** 정착지 하나를 별도 파일로 저장 요청 시 호출됨 */
     protected void onSaveRequested() {
         Colony c = getSelectedColony();
         if(c == null) { alert("저장할 정착지를 선택해 주세요."); return; }
@@ -292,7 +293,8 @@ public class ColonyManager implements GUIProgram {
             saveColony(c, f, true);
         }
     }
-
+    
+    /** 정착지 파일 불러오기 요청 시 호출됨 */
     protected void onLoadRequested() {
         int s = fileChooser.showOpenDialog(getDialog());
         if(s == JFileChooser.APPROVE_OPTION) {
@@ -302,6 +304,7 @@ public class ColonyManager implements GUIProgram {
         }
     }
     
+    /** 정착지들을 기본 경로에서 불러오기 */
     public void loadColonies() {
         File root = ResourceUtil.getHomeDir("samplejavacodes", "colony");
         File[] lists = root.listFiles(new FileFilter() {   
@@ -324,6 +327,7 @@ public class ColonyManager implements GUIProgram {
         }
     }
     
+    /** 정착지를 별도 파일에서 불러오기 (화면에는 반영하지 않으므로, 사용 후 refreshColonyList 호출 필요) */
     public void loadColony(File f, boolean alert) {
         boolean exists = false;
         try { 
@@ -337,6 +341,7 @@ public class ColonyManager implements GUIProgram {
         } catch(Exception ex) { ex.printStackTrace(); if(alert) alert("오류 : " + ex.getMessage()); }
     }
     
+    /** 정착지들을 기본 경로에 저장 */
     public void saveColonies() {
         File root = ResourceUtil.getHomeDir("samplejavacodes", "colony");
         for(Colony c : colonies) {
@@ -348,15 +353,26 @@ public class ColonyManager implements GUIProgram {
         }
     }
     
+    /** 해당 정착지를 별도 파일로 저장 */
     public void saveColony(Colony c, File f, boolean alert) {
         try { c.save(f); } catch(Exception ex) { ex.printStackTrace(); if(alert) alert("오류 : " + ex.getMessage()); }
     }
     
+    /** 새 정착지 생성 */
     public void newColony() {
         Colony newCol = new Colony();
         newCol.newCity();
         
         colonies.add(newCol);
+        refreshColonyList();
+    }
+    
+    /** 정착지 추가 */
+    public void addColony(Colony col) {
+        for(Colony c : colonies) {
+            if(c.getKey() == col.getKey()) return;
+        }
+        colonies.add(col);
         refreshColonyList();
     }
 
@@ -492,16 +508,27 @@ public class ColonyManager implements GUIProgram {
         return dialog;
     }
     
+    public int getDialogWidth() {
+        return getDialog().getWidth();
+    }
+    
+    public int getDialogHeight() {
+        return getDialog().getHeight();
+    }
+    
+    /** 현재 선택된 정착지 반환 */
     public Colony getSelectedColony() {
         if(selectedColony < 0) return null;
         if(selectedColony >= colonies.size()) { selectedColony = 0; return null; }
         return colonies.get(selectedColony);
     }
     
+    /** 현재 선택된 정착지 반환 */
     public Colony getColony() {
         return getSelectedColony();
     }
     
+    /** 해당 키를 갖는 정착지 찾아 반환 (목록에 없으면 null 반환) */
     public Colony getColony(long colonyKey) {
         for(Colony c : colonies) {
             if(c.getKey() == colonyKey) return c;
