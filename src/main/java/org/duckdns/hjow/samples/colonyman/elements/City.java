@@ -87,6 +87,13 @@ public class City implements ColonyElements {
     public List<HoldingJob> getHoldings() {
         return holdings;
     }
+    
+    public HoldingJob getHoldingJobOne(long key) {
+        for(HoldingJob j : getHoldings()) {
+            if(j.getKey() == key) return j;
+        }
+        return null;
+    }
 
     public void setHoldings(List<HoldingJob> holdings) {
         this.holdings = holdings;
@@ -134,7 +141,7 @@ public class City implements ColonyElements {
         processMoveOutChance(cycle, colony, efficiency100);
         
         // 전력 생산량 계산
-        long power = getPowerAvail(colony);
+        long power = getPowerGenerate(colony);
         
         // 시설 파워 및 효율성 계산, 효과 처리
         for(Facility f : getFacility()) {
@@ -190,16 +197,28 @@ public class City implements ColonyElements {
         // 예약 작업 처리
         for(HoldingJob h : getHoldings()) {
             int lefts = h.getCycleLeft();
+            
+            if("NewFacility".equalsIgnoreCase(h.getCommand())) {
+                if(h.getWorkingCitizens(this).isEmpty()) continue; // 시설 건설의 경우, 건설에 시민이 필요함
+            }
+            
             h.decreaseCycle();
-            if(lefts >= 1) continue;
+            if(lefts >= 1) continue; // 아직 사이클이 남아있으면 execute 하지 않고 건너뜀
             
             executeHoldJob(h);
         }
         
-        // 소모된 예약 작업 삭제
+        // 완료된 예약 작업 삭제
         idx = 0;
         while(idx < getHoldings().size()) {
-            if(getHoldings().get(idx).getCycleLeft() <= 0) {
+            HoldingJob j = getHoldings().get(idx);
+            if(j.getCycleLeft() <= 0) {
+                // 건설하고 있는 시민들 노숙자로 변경
+                for(Citizen c : j.getWorkingCitizens(this)) {
+                    if(c.getBuildingFacility() == j.getKey()) c.setBuildingFacility(0L);
+                }
+                
+                // 삭제
                 getHoldings().remove(idx);
                 continue;
             }
@@ -227,7 +246,7 @@ public class City implements ColonyElements {
         
         try {
             if(command.equalsIgnoreCase("NewCitizen")) {
-                newCitizen();
+                createNewCitizen();
                 return;
             }
             
@@ -245,8 +264,8 @@ public class City implements ColonyElements {
         }
         
     }
-    
-    protected int getHoldingBuildFacility() {
+    /** 건설 중인 시설 수 반환 */
+    public int getHoldingBuildFacility() {
         int res = 0;
         for(HoldingJob j : getHoldings()) {
             if("NewFacility".equalsIgnoreCase(j.getCommand())) res++; 
@@ -254,11 +273,10 @@ public class City implements ColonyElements {
         return res;
     }
     
-    /** Calculate total power generating */
-    protected long getPowerAvail(Colony col) {
+    /** 총 전력 생산량 반환 (사용량 미반영) */
+    public long getPowerGenerate(Colony col) {
         long power = 0L;
         
-        // Calculation power
         for(Facility f : facility) {
             int working = f.getWorkingCitizensCount(this, col);
             if(working >= 1) {
@@ -272,11 +290,11 @@ public class City implements ColonyElements {
         return power;
     }
     
-    /** Remove dead citizens and facilities */
-    protected void removeDeads(Colony col) {
+    /** HP가 0인 시민과 시설 제거 */
+    public void removeDeads(Colony col) {
         int idx = 0;
         
-        // Citizens
+        // 시민
         while(idx < citizens.size()) {
             Citizen c = citizens.get(idx);
             if(c.getHp() <= 0) {
@@ -286,7 +304,7 @@ public class City implements ColonyElements {
             idx++;
         }
         
-        // Facilities
+        // 시설
         idx = 0;
         while(idx < facility.size()) {
             Facility f = facility.get(idx);
@@ -316,7 +334,7 @@ public class City implements ColonyElements {
     public int getHomelesses() {
         int counts = 0;
         for(Citizen c : citizens) {
-            if(c.getLivingHome() == 0L) counts++;
+            if(c.isHomeless()) counts++;
         }
         return counts;
     }
@@ -325,16 +343,28 @@ public class City implements ColonyElements {
     public int getJobSeekers() {
         int counts = 0;
         for(Citizen c : citizens) {
-            if(c.getWorkingFacility() == 0L) counts++;
+            if(c.isJobSeeker()) counts++;
         }
         return counts;
     }
     
     /** 노숙자를 주거 모듈에 할당 */
     protected void allocateHome(Colony col) {
+        // 시민들 확인해서, 존재하지 않는 주거 모듈에 산다고 되어 있으면 리셋
+        for(Citizen c : citizens) {
+            // 거주민 여부 확인
+            if(c.isHomeless()) continue;
+            
+            if(c.getLivingHome() != 0L) {
+                Facility h = c.getLivingHome(this);
+                if(h == null) c.setLivingHome(0L);
+            }
+        }
+        
+        // 시민들 별로 주거 할당
         for(Citizen c : citizens) {
             // 노숙자 여부 판단
-            if(c.getLivingHome() != 0L) continue;
+            if(! c.isHomeless()) continue;
             
             // 비어있는 주거 모듈 찾기
             for(Facility f : facility) {
@@ -351,12 +381,48 @@ public class City implements ColonyElements {
     
     /** 백수에게 새 직장 할당 */
     protected void allocateWorkers(Colony col) {
-        for(Citizen c : citizens) {
-            // 백수 여부 판단
-            if(c.getWorkingFacility() != 0L) continue;
+        List<Facility> list = new ArrayList<Facility>();
+        // 시민들 확인해서, 존재하지 않는 직장에 있는지 확인
+        for(final Citizen c : citizens) {
+            // 직장인 여부 판단
+            if(c.isJobSeeker()) continue;
             
-            // Find jobs for needed facilities - need to align
-            List<Facility> list = new ArrayList<Facility>();
+            // 존재하지 않는 직장인 경우 (직장 시설이 없어졌거나 등등) 리셋
+            if(c.getWorkingFacility() != 0L) {
+                Facility f = c.getWorkingFacility(this);
+                if(f == null) c.setWorkingFacility(0L);
+            }
+            
+            // 존재하지 않는 건설 현장인 경우 (완공되었거나 등등) 리셋
+            if(c.getBuildingFacility() != 0L) {
+                HoldingJob j = c.getBuildingFacility(this);
+                if(j == null) c.setBuildingFacility(0L);
+            }
+        }
+        
+        // 시민별로 일자리 할당
+        for(final Citizen c : citizens) {
+            // 백수 여부 판단
+            if(! c.isJobSeeker()) continue;
+            
+            // 건설 일자리들 확인
+            list.clear();
+            HoldingJob building = null;
+            for(HoldingJob j : getHoldings()) {
+                if(! "NewFacility".equalsIgnoreCase(j.getCommand())) continue;
+                int working = j.getWorkingCitizens(this).size();
+                if(working <= 0) {
+                    building = j;
+                    break;
+                }
+            }
+            if(building != null) {
+                c.setBuildingFacility(building.getKey());
+                continue;
+            }
+            
+            // 일자리가 당장 필요한 직장들 찾기 - 정렬 고민해야...
+            list.clear();
             for(Facility f : facility) {
                 if(f.getWorkerNeeded() > f.getWorkingCitizensCount(this, col)) {
                     list.add(f);
@@ -364,11 +430,11 @@ public class City implements ColonyElements {
             }
             
             if(! list.isEmpty()) {
-                final Citizen ct = c;
+                // 이 시민이 일하기에 적합한 정도 순으로 정렬
                 Collections.sort(list, new Comparator<Facility>() {
                     @Override
                     public int compare(Facility o1, Facility o2) {
-                        int res = o1.getWorkerSuitability(ct) - o2.getWorkerSuitability(ct);
+                        int res = o1.getWorkerSuitability(c) - o2.getWorkerSuitability(c);
                         if(res <  0) return -1;
                         if(res == 0) return  0;
                         return 1;
@@ -379,7 +445,7 @@ public class City implements ColonyElements {
                 continue;
             }
             
-            // Find jobs for left facilities - need to align
+            // 일자리를 더 제공할 수 있는 직장들 찾기 - 정렬 고민해야...
             list.clear();
             for(Facility f : facility) {
                 if(f.getWorkerCapacity() > f.getWorkingCitizensCount(this, col)) {
@@ -388,11 +454,11 @@ public class City implements ColonyElements {
             }
             
             if(! list.isEmpty()) {
-                final Citizen ct = c;
+                // 이 시민이 일하기에 적합한 정도 순으로 정렬
                 Collections.sort(list, new Comparator<Facility>() {
                     @Override
                     public int compare(Facility o1, Facility o2) {
-                        int res = o1.getWorkerSuitability(ct) - o2.getWorkerSuitability(ct);
+                        int res = o1.getWorkerSuitability(c) - o2.getWorkerSuitability(c);
                         if(res <  0) return -1;
                         if(res == 0) return  0;
                         return 1;
@@ -404,16 +470,19 @@ public class City implements ColonyElements {
         }
     }
     
+    /** 새 시민 생성 */
     public Citizen createNewCitizen() {
         Citizen c = new Citizen();
         getCitizens().add(c);
         return c;
     }
     
+    /**  시민 수 반환 */
     public int getCitizenCount() {
         return citizens.size();
     }
     
+    /** 이 도시 내 거주 시설 수용 인원 반환 (이미 거주 중인 자리도 포함) */
     public long getHomeCapacity() {
         long res = 0L;
         for(Facility f : getFacility()) {
@@ -424,6 +493,19 @@ public class City implements ColonyElements {
         return res;
     }
     
+    /** 이 도시 내 잔여 거주 시설 수용 인원 반환 */
+    public long getHomeCapacityLeft() {
+        long res = 0L;
+        for(Facility f : getFacility()) {
+            if(f instanceof Home) {
+                res += f.getCapacity();
+                for(Citizen c : getCitizens()) { if(c.getLivingHome() == f.getKey()) res--; }
+            }
+        }
+        return res;
+    }
+    
+    /** 이 도시 내 직장 자리 수 반환 (이미 일하고 있는 자리 수도 포함) */
     public long getJobsCount() {
         long res = 0L;
         for(Facility f : getFacility()) {
@@ -432,10 +514,16 @@ public class City implements ColonyElements {
         return res;
     }
     
-    public void newCitizen() {
-        Citizen c = new Citizen();
-        getCitizens().add(c);
+    /** 이 도시 내 잔여 직장 자리 수 반환 */
+    public long getLeftJobsCount() {
+        long res = 0L;
+        for(Facility f : getFacility()) {
+            res += f.getWorkerCapacity();
+            for(Citizen c : getCitizens()) { if(c.getWorkingFacility() == f.getKey()) res--; }
+        }
+        return res;
     }
+    
     
     /** 출산률 계산 */
     public double getBornChanceRate(Colony col, int efficiency100) {
@@ -449,7 +537,7 @@ public class City implements ColonyElements {
         if(cycle % 600 == 0) {
             if(getHomeCapacity() > getCitizenCount()) {
                 if(Math.random() < ( getBornChanceRate(col, efficiency100))) {
-                    newCitizen();
+                    createNewCitizen();
                 }
             }
         }
@@ -499,7 +587,7 @@ public class City implements ColonyElements {
         double moveRate = getMoveChangeRate(col, efficiency100);
         if(cycle % 600 == 0) {
             if(Math.random() < moveRate) {
-                newCitizen();
+                createNewCitizen();
             }
         }
     }
@@ -609,6 +697,7 @@ public class City implements ColonyElements {
         }
     }
     
+    /** 상태 메시지 생성 (UI 내 JTextArea 에 출력됨) */
     public String getStatusString(Colony col, ColonyManager superInstance) {
         StringBuilder desc = new StringBuilder("");
         
@@ -622,7 +711,7 @@ public class City implements ColonyElements {
         
         desc = desc.append("\n").append("HP : ").append(formatterInt.format(getHp())).append(" / ").append(formatterInt.format(getMaxHp()));
         desc = desc.append("\n").append("인구 : ").append(formatterInt.format(getCitizenCount()));
-        desc = desc.append("\n").append("전력 : ").append(formatterInt.format(powerConsume)).append(" / ").append(formatterInt.format(getPowerAvail(getColony(superInstance))));
+        desc = desc.append("\n").append("전력 : ").append(formatterInt.format(powerConsume)).append(" / ").append(formatterInt.format(getPowerGenerate(getColony(superInstance))));
         desc = desc.append("\n").append("시설 수 : ").append(formatterInt.format(facility.size())).append(" / ").append(formatterInt.format(getSpaces()));
         desc = desc.append("\n").append("평균 행복도 : ").append(formatterRate.format(getAverageHappiness()));
         desc = desc.append("\n").append("노숙자 : ").append(formatterInt.format(getHomelesses()));

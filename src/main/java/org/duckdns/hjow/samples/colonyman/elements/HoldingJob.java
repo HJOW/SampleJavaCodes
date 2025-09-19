@@ -1,10 +1,14 @@
 package org.duckdns.hjow.samples.colonyman.elements;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
 public class HoldingJob implements Serializable {
     private static final long serialVersionUID = -8030473577462698183L;
+    protected long   key       = ColonyManager.generateKey();
     protected int    cycleMax  = 0;
     protected int    cycleLeft = 0;
     protected String command   = null;
@@ -22,6 +26,14 @@ public class HoldingJob implements Serializable {
         this.parameter = parameter;
     }
 
+    public long getKey() {
+        return key;
+    }
+
+    public void setKey(long key) {
+        this.key = key;
+    }
+
     public int getCycleMax() {
         return cycleMax;
     }
@@ -37,6 +49,12 @@ public class HoldingJob implements Serializable {
 
     public String getCommand() {
         return command;
+    }
+    
+    public String getCommandTitle() {
+        if("NewFacility".equals(getCommand())) return "건설";
+        if("NewCitizen".equals(getCommand())) return "이주";
+        return "작업";
     }
 
     public void setCycleLeft(int cycleLeft) {
@@ -61,9 +79,18 @@ public class HoldingJob implements Serializable {
         this.parameter = parameter;
     }
     
+    public List<Citizen> getWorkingCitizens(City city) {
+        List<Citizen> citizens = new ArrayList<Citizen>();
+        for(Citizen c : city.getCitizens()) {
+            if(c.getBuildingFacility() == getKey()) citizens.add(c);
+        }
+        return citizens;
+    }
+    
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
         json.put("type", "HoldingJob");
+        json.put("key", new Long(getKey()));
         json.put("cycleMax", new Integer(getCycleMax()));
         json.put("cycleLeft", new Integer(getCycleLeft()));
         json.put("command"  , getCommand());
@@ -73,7 +100,7 @@ public class HoldingJob implements Serializable {
     
     public void fromJson(JsonObject json) {
         if(! "HoldingJob".equals(json.get("type"))) throw new RuntimeException("This object is not HoldingJob type.");
-        
+        key = Long.parseLong(json.get("key").toString());
         setCycleMax(Integer.parseInt(json.get("cycleMax").toString()));
         setCycleLeft(Integer.parseInt(json.get("cycleLeft").toString()));
         setCommand(json.get("command").toString());

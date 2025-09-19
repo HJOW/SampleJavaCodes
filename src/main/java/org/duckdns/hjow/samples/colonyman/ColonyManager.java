@@ -3,6 +3,7 @@ package org.duckdns.hjow.samples.colonyman;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Image;
@@ -87,7 +88,9 @@ public class ColonyManager implements GUIProgram {
         else if(superDialog instanceof Dialog) dialog = new JDialog((Dialog)superDialog);
         else dialog = new JDialog();
         
-        dialog.setSize(800, 600);
+        Dimension winSize = UIUtil.getScreenSize();
+        
+        dialog.setSize((int) (winSize.getWidth() - 20), (int) (winSize.getHeight() - 70));
         UIUtil.center(dialog);
         dialog.setTitle("Colonization");
         dialog.setIconImage(UIUtil.iconToImage(getIcon()));

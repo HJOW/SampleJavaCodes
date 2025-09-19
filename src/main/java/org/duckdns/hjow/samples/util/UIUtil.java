@@ -39,8 +39,12 @@ public class UIUtil {
         } catch(Exception ex) { ex.printStackTrace(); }
     }
     
+    public static Dimension getScreenSize() {
+        return Toolkit.getDefaultToolkit().getScreenSize();
+    }
+    
     public static void center(Window win) {
-    	Dimension sc = Toolkit.getDefaultToolkit().getScreenSize();
+    	Dimension sc = getScreenSize();
     	win.setLocation((int)((sc.getWidth() / 2) - (win.getWidth() / 2)), (int)((sc.getHeight() / 2) - (win.getHeight() / 2)));
     }
     

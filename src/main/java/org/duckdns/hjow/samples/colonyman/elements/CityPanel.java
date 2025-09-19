@@ -389,7 +389,8 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             pnHoldingOne.add(pnLabel , BorderLayout.CENTER);
             pnHoldingOne.add(pnStatus, BorderLayout.EAST);
             
-            String str = j.getCommand();
+            String str = j.getCommandTitle();
+            if(str == null) str = j.getCommand();
             if(j.getParameter() != null) str += " - " + j.getParameter();
             
             pnLabel.add(new JLabel(str));

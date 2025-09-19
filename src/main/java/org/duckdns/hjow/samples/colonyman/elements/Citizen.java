@@ -148,6 +148,10 @@ public class Citizen implements ColonyElements {
     public long getWorkingFacility() {
         return workingFacility;
     }
+    
+    public Facility getWorkingFacility(City c) {
+        return c.getFacility(getWorkingFacility());
+    }
 
     public long getWorkingCity() {
         return workingCity;
@@ -156,9 +160,26 @@ public class Citizen implements ColonyElements {
     public long getBuildingFacility() {
         return buildingFacility;
     }
+    
+    public HoldingJob getBuildingFacility(City c) {
+        return c.getHoldingJobOne(getBuildingFacility());
+    }
 
     public void setBuildingFacility(long buildingFacility) {
         this.buildingFacility = buildingFacility;
+    }
+    
+    /** 일자리 찾는 중인지를 반환 */
+    public boolean isJobSeeker() {
+        if(getWorkingFacility()  != 0L) return false;
+        if(getBuildingFacility() != 0L) return false;
+        return true;
+    }
+    
+    /** 노숙자인지를 반환 */
+    public boolean isHomeless() {
+        if(getLivingHome() != 0L) return false;
+        return true;
     }
 
     public void setHp(int hp) {
@@ -227,6 +248,10 @@ public class Citizen implements ColonyElements {
     public long getLivingHome() {
         return livingHome;
     }
+    
+    public Facility getLivingHome(City c) {
+        return c.getFacility(getLivingHome());
+    }
 
     public void setLivingHome(long livingHome) {
         this.livingHome = livingHome;
@@ -291,6 +316,7 @@ public class Citizen implements ColonyElements {
         setLivingHome(      Long.parseLong(json.get("livingHome"      ).toString()));
     }
     
+    /** 상태 메시지 생성 (UI 내 JTextArea 에 출력됨) */
     public String getStatusString(City city, Colony colony, ColonyManager superInstance) {
         DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
         
