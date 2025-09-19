@@ -64,11 +64,11 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         add(pnDown  , BorderLayout.SOUTH);
         
         JPanel pnName = new JPanel();
-        pnName.setLayout(new FlowLayout(FlowLayout.LEFT));
+        pnName.setLayout(new BorderLayout());
         pnUp.add(pnName, BorderLayout.CENTER);
         
-        tfName = new JTextField(15);
-        pnName.add(tfName);
+        tfName = new JTextField();
+        pnName.add(tfName, BorderLayout.CENTER);
         tfName.addActionListener(new ActionListener() {   
             @Override
             public void actionPerformed(ActionEvent e) {

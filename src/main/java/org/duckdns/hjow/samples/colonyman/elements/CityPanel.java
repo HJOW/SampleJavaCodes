@@ -233,14 +233,18 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             return;
         }
         
+        // 이름, HP 출력
         tfName.setText(city.getName());
         
         progHp.setMaximum(city.getMaxHp());
         progHp.setValue(city.getHp());
         
+        // 시설 목록 출력
         List<Facility> facList = city.getFacility();
+        int columns = 1;
         int idx = 0;
         int rowNo = 0;
+        int colNo = 0;
         int sizes = facList.size();
         GridBagConstraints gridBagConst;
         JPanel pnEmpty;
@@ -256,8 +260,12 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             }
         }
         
+        columns = (int) Math.ceil((superInstance.getDialogWidth() - 200.0) / 600.0);
+        if(columns <= 0) columns = 1;
+        
         idx = 0;
         rowNo = 0;
+        colNo = 0;
         
         if(sizes != facilityPns.size()) {
             for(FacilityPanel p : facilityPns) { p.dispose(); }
@@ -275,8 +283,8 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
                 }
                 
                 gridBagConst = new GridBagConstraints();
-                gridBagConst.gridx = 0;
-                gridBagConst.gridy = rowNo; rowNo++;
+                gridBagConst.gridx = colNo; colNo++;
+                gridBagConst.gridy = rowNo; if(colNo >= columns) { colNo = 0; rowNo++; }
                 gridBagConst.gridwidth = 1;
                 gridBagConst.gridheight = 1;
                 gridBagConst.weightx = 1.0;  // fill 옵션으로 가로 채우기가 안되면 이 옵션이 필요함.
@@ -290,8 +298,8 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         pnEmpty = new JPanel();
         
         gridBagConst = new GridBagConstraints();
-        gridBagConst.gridx = 0;
-        gridBagConst.gridy = rowNo; rowNo++;
+        gridBagConst.gridx = colNo; colNo++;
+        gridBagConst.gridy = rowNo; if(colNo >= columns) { colNo = 0; rowNo++; }
         gridBagConst.gridwidth = 1;
         gridBagConst.gridheight = 1;
         gridBagConst.weightx = 1.0;
@@ -327,11 +335,12 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         }
         citizens = null;
         rowNo = 0;
+        colNo = 0;
         // pnCitizens.setLayout(new GridLayout(citizenPns.size(), 1));
         for(CitizenPanel p : citizenPns) {
             gridBagConst = new GridBagConstraints();
-            gridBagConst.gridx = 0;
-            gridBagConst.gridy = rowNo; rowNo++;
+            gridBagConst.gridx = colNo; colNo++;
+            gridBagConst.gridy = rowNo; if(colNo >= columns) { colNo = 0; rowNo++; }
             gridBagConst.gridwidth = 1;
             gridBagConst.gridheight = 1;
             gridBagConst.weightx = 1.0;
@@ -344,8 +353,8 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         pnEmpty = new JPanel();
         
         gridBagConst = new GridBagConstraints();
-        gridBagConst.gridx = 0;
-        gridBagConst.gridy = rowNo; rowNo++;
+        gridBagConst.gridx = colNo; colNo++;
+        gridBagConst.gridy = rowNo; if(colNo >= columns) { colNo = 0; rowNo++; }
         gridBagConst.gridwidth = 1;
         gridBagConst.gridheight = 1;
         gridBagConst.weightx = 1.0;

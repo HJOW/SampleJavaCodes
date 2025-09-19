@@ -53,15 +53,15 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
         JPanel pnName, pnHp;
         
         pnName = new JPanel();
-        pnName.setLayout(new FlowLayout(FlowLayout.LEFT));
+        pnName.setLayout(new BorderLayout());
         pnNorth.add(pnName, BorderLayout.CENTER);
         
         pnHp = new JPanel();
         pnHp.setLayout(new FlowLayout(FlowLayout.RIGHT));
         pnNorth.add(pnHp, BorderLayout.EAST);
         
-        tfName = new JTextField(20);
-        pnName.add(tfName);
+        tfName = new JTextField();
+        pnName.add(tfName, BorderLayout.CENTER);
         tfName.addActionListener(new ActionListener() {   
             @Override
             public void actionPerformed(ActionEvent e) {
