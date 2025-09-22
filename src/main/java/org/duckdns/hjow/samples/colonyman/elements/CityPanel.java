@@ -295,20 +295,39 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
                 pnFacilities.add(pn, gridBagConst);
                 facilityPns.add(pn);
             }
+            
+            if(colNo < columns) {
+            	while(colNo < columns) { // 남은 빈 공간 채우기
+            		pnEmpty = new JPanel();
+            		
+            		gridBagConst = new GridBagConstraints();
+                    gridBagConst.gridx = colNo; colNo++;
+                    gridBagConst.gridy = rowNo;
+                    gridBagConst.gridwidth = 1;
+                    gridBagConst.gridheight = 1;
+                    gridBagConst.weightx = 1.0;  // fill 옵션으로 가로 채우기가 안되면 이 옵션이 필요함.
+                    gridBagConst.fill = GridBagConstraints.HORIZONTAL;
+                    gridBagConst.anchor = GridBagConstraints.NORTH;
+            		
+            		pnFacilities.add(pnEmpty, gridBagConst);
+            	}
+            }
+            colNo = 0;
+            rowNo++;
+            
+            pnEmpty = new JPanel();
+            
+            gridBagConst = new GridBagConstraints();
+            gridBagConst.gridx = colNo; colNo++;
+            gridBagConst.gridy = rowNo; if(colNo >= columns) { colNo = 0; rowNo++; }
+            gridBagConst.gridwidth = columns;
+            gridBagConst.gridheight = 1;
+            gridBagConst.weightx = 1.0;
+            gridBagConst.weighty = 1.0;
+            gridBagConst.fill = GridBagConstraints.BOTH;
+            
+            pnFacilities.add(pnEmpty, gridBagConst);
         }
-        
-        pnEmpty = new JPanel();
-        
-        gridBagConst = new GridBagConstraints();
-        gridBagConst.gridx = colNo; colNo++;
-        gridBagConst.gridy = rowNo; if(colNo >= columns) { colNo = 0; rowNo++; }
-        gridBagConst.gridwidth = 1;
-        gridBagConst.gridheight = 1;
-        gridBagConst.weightx = 1.0;
-        gridBagConst.fill = GridBagConstraints.BOTH;
-        gridBagConst.weighty = 1.0;
-        
-        pnFacilities.add(pnEmpty, gridBagConst);
         
         for(idx=0; idx<sizes; idx++) {
             FacilityPanel pn = facilityPns.get(idx);
