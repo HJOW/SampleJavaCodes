@@ -137,7 +137,7 @@
           <configuration>
               <archive>
                   <manifest>
-                      <mainClass>com.hjow.propcryptor.SimpleCryptor</mainClass>
+                      <mainClass>org.duckdns.hjow.samples.base.GUISampleJavaCodes</mainClass>
                       <addClasspath>true</addClasspath>
                       <classpathPrefix>lib/</classpathPrefix>
                   </manifest>
