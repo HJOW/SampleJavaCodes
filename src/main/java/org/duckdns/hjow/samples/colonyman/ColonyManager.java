@@ -14,6 +14,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -29,10 +30,14 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -68,6 +73,12 @@ public class ColonyManager implements GUIProgram {
     protected transient JProgressBar progThreadStatus;
     protected transient JFileChooser fileChooser;
     protected transient javax.swing.filechooser.FileFilter filterCol, filterColGz;
+    
+    protected transient JMenuBar menuBar;
+    protected transient JMenu menuFile, menuAction;
+    protected transient JMenuItem menuActionThrPlay;
+    
+    protected transient boolean flagSaveBeforeClose = true;
     
     public ColonyManager(SampleJavaCodes superInstance) {
         super();
@@ -126,7 +137,7 @@ public class ColonyManager implements GUIProgram {
             filterCol = new javax.swing.filechooser.FileFilter() {
                 @Override
                 public String getDescription() {
-                    return "Colony (*.colony)";
+                    return "정착지 파일 (*.colony)";
                 }
                 
                 @Override
@@ -140,7 +151,7 @@ public class ColonyManager implements GUIProgram {
             filterColGz = new javax.swing.filechooser.FileFilter() {
                 @Override
                 public String getDescription() {
-                    return "Colony (*.colgz)";
+                    return "정착지 GZ 압축형 파일 (*.colgz)";
                 }
                 
                 @Override
@@ -257,6 +268,72 @@ public class ColonyManager implements GUIProgram {
             }
         });
         
+        menuBar = new JMenuBar();
+        dialog.setJMenuBar(menuBar);
+        
+        JMenuItem menuItem;
+        
+        menuFile = new JMenu("파일");
+        menuBar.add(menuFile);
+        
+        menuItem = new JMenuItem("다른 이름으로 저장");
+        menuFile.add(menuItem);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK));
+        menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onSaveRequested();
+			}
+		});
+        
+        menuItem = new JMenuItem("외부 정착지 파일 불러오기");
+        menuFile.add(menuItem);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_MASK));
+        menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onSaveRequested();
+			}
+		});
+        
+        menuFile.addSeparator();
+        
+        menuItem = new JMenuItem("정착지 모두 포기");
+        menuFile.add(menuItem);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F3, KeyEvent.ALT_MASK));
+        menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onResetAllRequested();
+			}
+		});
+        
+        menuFile.addSeparator();
+        
+        menuItem = new JMenuItem("종료");
+        menuFile.add(menuItem);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_MASK));
+        menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				flagSaveBeforeClose = false;
+				dispose(true);
+			}
+		});
+        
+        menuAction = new JMenu("동작");
+        menuBar.add(menuAction);
+        
+        menuActionThrPlay = new JMenuItem("시뮬레이션 시작");
+        menuAction.add(menuActionThrPlay);
+        menuActionThrPlay.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK));
+        menuActionThrPlay.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				toggleSimulationRunning();
+			}
+		});
+        
         refreshColonyContent();
         cardMain.show(pnMain, "C2");
     }
@@ -287,14 +364,17 @@ public class ColonyManager implements GUIProgram {
                 threadShutdown = true;
                 progThreadStatus.setIndeterminate(false);
                 btnThrPlay.setEnabled(false);
+                menuActionThrPlay.setEnabled(false);
             }
         });
         threadSwitch   = true;
         threadPaused   = true;
         threadShutdown = false;
         reserveSaving  = false;
+        flagSaveBeforeClose = true;
         btnThrPlay.setText("시뮬레이션 시작");
         btnThrPlay.setEnabled(true);
+        menuActionThrPlay.setEnabled(true);
         thread.start();
         setEditable(true);
     }
@@ -321,16 +401,44 @@ public class ColonyManager implements GUIProgram {
         }
     }
     
-    /** 정착지들을 기본 경로에서 불러오기 */
-    public void loadColonies() {
-        File root = ResourceUtil.getHomeDir("samplejavacodes", "colony");
-        File[] lists = root.listFiles(new FileFilter() {   
-            @Override
+    /** 정착지 세이브 모두 초기화 요청 시 호출됨 */
+    protected void onResetAllRequested() {
+    	int sel = JOptionPane.showConfirmDialog(getDialog(), "정착지들을 모두 포기하시겠습니까?\n별도로 저장하지 않은 모든 정착지가 사라집니다 !", "확인", JOptionPane.YES_NO_OPTION);
+    	if(sel == JOptionPane.YES_OPTION) {
+    		cardMain.show(pnMain, "C2");
+    		pauseSimulation();
+    		new Thread(new Runnable() {
+				@Override
+				public void run() {
+					resetAllColony();
+		    		refreshArenaPanel(0);
+		    		cardMain.show(pnMain, "C1");
+				}
+			}).start();
+    	}
+    }
+    
+    /** 정착지 세이브 파일 필터 생성 */
+    public FileFilter getColonyFileFilter() {
+    	return new FileFilter() {
+    		@Override
             public boolean accept(File pathname) {
                 if(pathname.isDirectory()) return false;
-                return pathname.getName().toLowerCase().endsWith(".colony");
+                String nameLower = pathname.getName().toLowerCase();
+                return nameLower.endsWith(".colony") || nameLower.endsWith(".colgz");
             }
-        });
+		};
+    }
+    
+    /** 정착지 세이브 기본 경로 반환 */
+    public File getColonySaveRootDirectory() {
+    	return ResourceUtil.getHomeDir("samplejavacodes", "colony");
+    }
+    
+    /** 정착지들을 기본 경로에서 불러오기 */
+    public void loadColonies() {
+        File root = getColonySaveRootDirectory();
+        File[] lists = root.listFiles(getColonyFileFilter());
         
         colonies.clear();
         for(File f : lists) {
@@ -342,6 +450,17 @@ public class ColonyManager implements GUIProgram {
         } else {
             refreshColonyList();
         }
+    }
+    
+    /** 정착지 모두 포기, 초기화 */
+    protected void resetAllColony() {
+    	colonies.clear();
+    	File root = getColonySaveRootDirectory();
+    	File[] lists = root.listFiles(getColonyFileFilter());
+    	for(File f : lists) {
+    		f.delete();
+    	}
+    	newColony();
     }
     
     /** 정착지를 별도 파일에서 불러오기 (화면에는 반영하지 않으므로, 사용 후 refreshColonyList 호출 필요) */
@@ -468,6 +587,8 @@ public class ColonyManager implements GUIProgram {
     
     public void onWindowClosing() {
         setEditable(false);
+        if(! flagSaveBeforeClose) return;
+        flagSaveBeforeClose = false;
         
         final Vector<String> flagShutdowns = new Vector<String>();
         new Thread(new Runnable() {
@@ -553,29 +674,43 @@ public class ColonyManager implements GUIProgram {
         return null;
     }
     
+    /** 시뮬레이션 시작/정지 토글 */
     public void toggleSimulationRunning() {
         threadPaused = (! threadPaused);
         if(threadPaused) {
-            btnThrPlay.setText("시뮬레이션 시작");
-            btnSaveAs.setEnabled(true);
-            btnLoadAs.setEnabled(true);
-            cbxColony.setEnabled(true);
-            for(ColonyPanel c : pnColonies) {
-                Colony col = c.getColony();
-                if(col == null) return;
-                if(col.getHp() <= 0) return;
-                c.setEditable(true); 
-            }
+        	pauseSimulation();
         } else {
-            reserveSaving = true;
-            btnThrPlay.setText("시뮬레이션 정지");
-            btnSaveAs.setEnabled(false);
-            btnLoadAs.setEnabled(false);
-            cbxColony.setEnabled(false);
-            for(ColonyPanel c : pnColonies) { c.setEditable(false); }
+        	resumeSimulation();
         }
     }
     
+    public void pauseSimulation() {
+    	threadPaused = true;
+    	btnThrPlay.setText("시뮬레이션 시작");
+    	menuActionThrPlay.setText("시뮬레이션 시작");
+        btnSaveAs.setEnabled(true);
+        btnLoadAs.setEnabled(true);
+        cbxColony.setEnabled(true);
+        for(ColonyPanel c : pnColonies) {
+            Colony col = c.getColony();
+            if(col == null) return;
+            if(col.getHp() <= 0) return;
+            c.setEditable(true); 
+        }
+    }
+    
+    public void resumeSimulation() {
+    	threadPaused = false;
+    	reserveSaving = true;
+        btnThrPlay.setText("시뮬레이션 정지");
+        menuActionThrPlay.setText("시뮬레이션 정지");
+        btnSaveAs.setEnabled(false);
+        btnLoadAs.setEnabled(false);
+        cbxColony.setEnabled(false);
+        for(ColonyPanel c : pnColonies) { c.setEditable(false); }
+    }
+    
+    /** 쓰레드에서 1 사이클 당 1회 호출됨 */
     public void oneSecond() {
         Colony col = getSelectedColony();
         if(col == null) return;
@@ -594,16 +729,19 @@ public class ColonyManager implements GUIProgram {
         if(cycle >= 10000000) cycle = 0;
     }
     
+    /** 정착지 목록과 화면 내용 갱신 */
     public void refreshColonyList() {
         cbxColony.setModel(new DefaultComboBoxModel<Colony>(colonies));
         selectedColony = cbxColony.getSelectedIndex();
         refreshColonyContent();
     }
     
+    /** 정착지 화면 내용 갱신 */
     public void refreshColonyContent() {
         refreshArenaPanel(0);
     }
     
+    /** 사이클 진행에 따른 정착지 화면 내용 갱신 (성능을 위해 항상 전체를 새로고침하지는 않음. 확실히 새로고침하려면 refreshColonyContent 메소드 사용) */
     public synchronized void refreshArenaPanel(int cycle) {
         Colony col = getSelectedColony();
         if(col == null) {
@@ -632,6 +770,7 @@ public class ColonyManager implements GUIProgram {
         colPn.refresh(cycle, null, col, this);
     }
     
+    /** 해당 도시를 출력하는 도시 영역 반환 */
     public CityPanel getCityPanel(City city) {
         Colony col = getSelectedColony();
         ColonyPanel colPn = null;

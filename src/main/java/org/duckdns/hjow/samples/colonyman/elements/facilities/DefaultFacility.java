@@ -1,5 +1,6 @@
 package org.duckdns.hjow.samples.colonyman.elements.facilities;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -150,4 +151,13 @@ public abstract class DefaultFacility implements Facility {
     
     /** 건설 가능여부 체크. 단, 도시 내 건설가능 구역 수와 건설인력은 이 메소드에서 체크하지 않는다. 건설 불가능 사유 발생 시 그 메시지 반환, 건설 가능 시 null 반환. */
     public static String isBuildAvail(Colony col, City city) { return null; }
+    
+    @Override
+    public BigInteger getCheckerValue() {
+    	BigInteger res = new BigInteger(String.valueOf(getKey()));
+    	for(int idx=0; idx<getType().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getType().charAt(idx)))); }
+    	for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
+    	res = res.add(new BigInteger(String.valueOf(getHp())));
+    	return res;
+    }
 }

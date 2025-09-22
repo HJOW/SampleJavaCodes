@@ -1,5 +1,6 @@
 package org.duckdns.hjow.samples.colonyman.elements;
 
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 
 import org.duckdns.hjow.commons.json.JsonObject;
@@ -366,5 +367,27 @@ public class Citizen implements ColonyElements {
         if(b != null) desc = desc.append("\n").append("건설 : ").append(b.getName());
         
         return desc.toString().trim();
+    }
+    
+    @Override
+    public BigInteger getCheckerValue() {
+    	BigInteger res = new BigInteger(String.valueOf(getKey()));
+    	res = res.add(new BigInteger(String.valueOf(getHp())));
+    	res = res.add(new BigInteger(String.valueOf(getHunger())));
+    	res = res.add(new BigInteger(String.valueOf(getStamina())));
+    	res = res.add(new BigInteger(String.valueOf(getHappy())));
+    	res = res.add(new BigInteger(String.valueOf(getStrength())));
+    	res = res.add(new BigInteger(String.valueOf(getAgility())));
+    	res = res.add(new BigInteger(String.valueOf(getCarisma())));
+    	res = res.add(new BigInteger(String.valueOf(getIntelligent())));
+    	res = res.add(new BigInteger(String.valueOf(getEducatedIntelligence())));
+    	res = res.add(new BigInteger(String.valueOf(getEducatedPhysical())));
+    	res = res.add(new BigInteger(String.valueOf(getExperience())));
+    	res = res.add(new BigInteger(String.valueOf(getWorkingFacility())));
+    	res = res.add(new BigInteger(String.valueOf(getBuildingFacility())));
+    	res = res.add(new BigInteger(String.valueOf(getWorkingCity())));
+    	res = res.add(new BigInteger(String.valueOf(getLivingHome())));
+    	for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
+    	return res;
     }
 }

@@ -38,12 +38,15 @@ public class Colony implements ColonyElements {
     protected transient String originalFileName;
     protected transient List<AccountingData> accountingData = new Vector<AccountingData>();
     
+    protected transient boolean checked = false;
+    
     public Colony() {
-        
+    	checked = true;
     }
     
     public Colony(File f) throws Exception {
         this();
+        checked = true;
         
         String fileName = f.getName().toLowerCase();
         String strJson;
@@ -398,9 +401,11 @@ public class Colony implements ColonyElements {
         for(Research d : getResearches()) { list.add(d.toJson()); }
         json.put("researches", list);
         
+        json.put("checker", getCheckerValue().toString());
         return json;
     }
     
+    @Override
     public void fromJson(JsonObject json) {
         if(! "Colony".equals(json.get("type"))) throw new RuntimeException("This object is not Colony type.");
         setName(json.get("name").toString());
@@ -479,8 +484,26 @@ public class Colony implements ColonyElements {
                 }
             }
         }
+        
+        if(json.get("checker") != null) {
+        	BigInteger checker = new BigInteger(json.get("checker").toString());
+        	checked = (checker.equals(getCheckerValue()));
+        } else {
+        	checked = false;
+        }
+    }
+    
+    @Override
+    public BigInteger getCheckerValue() {
+    	BigInteger res = new BigInteger(String.valueOf(getKey()));
+    	for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
+    	res = res.add(new BigInteger(String.valueOf(getHp())));
+    	for(City c : getCities()) { res = res.add(c.getCheckerValue()); }
+    	
+    	return res;
     }
 
+    /** 파일로 저장 */
     public void save(File f) throws Exception {
         String fileName = f.getName().toLowerCase();
         if(fileName.endsWith(".colgz")) {

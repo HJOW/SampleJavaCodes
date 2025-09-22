@@ -2,6 +2,7 @@ package org.duckdns.hjow.samples.colonyman.elements;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -729,5 +730,18 @@ public class City implements ColonyElements {
     /** 소속 정착지 찾기 */
     public Colony getColony(ColonyManager man) {
         return man.getColonyFrom(this);
+    }
+    
+    @Override
+    public BigInteger getCheckerValue() {
+    	BigInteger res = new BigInteger(String.valueOf(getKey()));
+    	for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
+    	res = res.add(new BigInteger(String.valueOf(getHp())));
+    	for(Facility   f : getFacility()) { res = res.add(f.getCheckerValue()); }
+    	for(Citizen    c : getCitizens()) { res = res.add(c.getCheckerValue()); }
+    	for(Enemy      e : getEnemies())  { res = res.add(e.getCheckerValue()); }
+    	for(HoldingJob h : getHoldings()) { res = res.add(h.getCheckerValue()); }
+    	
+    	return res;
     }
 }

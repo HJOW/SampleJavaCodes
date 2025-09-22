@@ -1,5 +1,7 @@
 package org.duckdns.hjow.samples.colonyman.elements.research;
 
+import java.math.BigInteger;
+
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.City;
@@ -120,5 +122,17 @@ public abstract class Research implements ColonyElements {
         json.put("level"   , new Integer(getLevel()));
         json.put("progress", new Long(getProgress()));
         return json;
+    }
+    
+    @Override
+    public BigInteger getCheckerValue() {
+    	BigInteger res = new BigInteger(String.valueOf(getKey()));
+    	String type = getClass().getSimpleName();
+    	for(int idx=0; idx<type.length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) type.charAt(idx)))); }
+    	for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
+    	res = res.add(new BigInteger(String.valueOf(getLevel())));
+    	res = res.add(new BigInteger(String.valueOf(getProgress())));
+    	
+    	return res;
     }
 }
