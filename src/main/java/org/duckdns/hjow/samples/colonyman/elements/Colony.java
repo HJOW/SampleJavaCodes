@@ -18,6 +18,7 @@ import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Residence;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Restaurant;
 import org.duckdns.hjow.samples.colonyman.elements.research.Research;
+import org.duckdns.hjow.samples.colonyman.elements.research.ResearchManager;
 
 public class Colony implements ColonyElements {
     private static final long serialVersionUID = -3144963237818493111L;
@@ -107,7 +108,7 @@ public class Colony implements ColonyElements {
     
     public void resetResearches() {
         researches.clear();
-        // TODO
+        researches.addAll(ResearchManager.initList(this));
     }
 
     @Override
