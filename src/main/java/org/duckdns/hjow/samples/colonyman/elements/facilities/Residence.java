@@ -71,6 +71,11 @@ public class Residence extends DefaultFacility implements Home {
     public int getComportGrade() {
         return comportGrade;
     }
+    
+    @Override
+    public double additionalComportGradeRate(City city, Colony colony) {
+        return 0.0;
+    }
 
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
@@ -78,15 +83,23 @@ public class Residence extends DefaultFacility implements Home {
         
         int cycleComport = 20;
         int compGrade = getComportGrade();
+        double efficiencyRate = efficiency100 / 100.0;
         
-        if(efficiency100 < 10) {
+        double additionalRate = additionalComportGradeRate(city, colony);
+        if(additionalRate < 0.0) additionalRate = 0.0;
+        if(additionalRate != 0.0) {
+            efficiencyRate = efficiencyRate + ((1.0 - efficiencyRate) * additionalRate);
+        }
+        if(efficiencyRate > 1.0) efficiencyRate = 1.0;
+        
+        if(efficiencyRate < 0.1) {
             if(cycle % 600 == 0) {
                 for(Citizen c : getCitizens(city, colony)) {
                     c.addHp(-1);
                 }
             }
         } else {
-            compGrade = (int) Math.round( compGrade * (efficiency100 / 100.0) );
+            compGrade = (int) Math.round( compGrade * efficiencyRate );
             if(compGrade >= 10) cycleComport -= 10;
             else                cycleComport -= compGrade;
             

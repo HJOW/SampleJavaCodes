@@ -285,8 +285,8 @@ public class City implements ColonyElements {
             int working = f.getWorkingCitizensCount(this, col);
             if(working >= 1) {
                 if(f instanceof PowerStation) {
-                    if(working >= f.getWorkerNeeded()) power += ((PowerStation) f).getPowerGenerate();
-                    else                               power += (((PowerStation) f).getPowerGenerate()) / 2;
+                    if(working >= f.getWorkerNeeded()) power += ((PowerStation) f).getPowerGenerate(col, this);
+                    else                               power += (((PowerStation) f).getPowerGenerate(col, this)) / 2;
                 }
             }
         }

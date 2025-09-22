@@ -6,7 +6,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 
-public class Restaurant extends DefaultFacility {
+public class Restaurant extends DefaultFacility implements ServiceFacility {
     private static final long serialVersionUID = -7371044845340026748L;
     
     protected String name = "식당_" + ColonyManager.generateNaturalNumber();
@@ -36,10 +36,29 @@ public class Restaurant extends DefaultFacility {
     public void setCapacity(int c) {
         capacity = c;
     }
+    
+    @Override
+    public double additionalComportGradeRate(City city, Colony colony) {
+        return 0.0;
+    }
 
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
         super.oneSecond(cycle, city, colony, efficiency100);
+        
+        double efficiencyRate = efficiency100 / 100.0;
+        double additionalRate = additionalComportGradeRate(city, colony);
+        if(additionalRate < 0.0) additionalRate = 0.0;
+        if(additionalRate != 0.0) {
+            efficiencyRate = efficiencyRate + ((1.0 - efficiencyRate) * additionalRate);
+        }
+        if(efficiencyRate > 1.0) efficiencyRate = 1.0;
+        
+        int solvingHunger = 50;
+        solvingHunger = (int) Math.round(solvingHunger * efficiencyRate);
+        
+        int compGrade = getComportGrade();
+        compGrade = (int) Math.round(compGrade * efficiencyRate);
         
         int servicingCount = 0;
         for(Citizen c : city.getCitizens()) {
@@ -48,10 +67,10 @@ public class Restaurant extends DefaultFacility {
             
             servicingCount++;
             c.setMoney(c.getMoney() - 5);
-            c.setHunger(c.getHunger() + 50);
+            c.setHunger(c.getHunger() + solvingHunger);
             
-            if(getComportGrade() >= 2) {
-                c.setHappy(c.getHappy() + (getComportGrade() / 2));
+            if(compGrade >= 2) {
+                c.setHappy(c.getHappy() + (compGrade / 2));
             }
             
             if(servicingCount >= getCapacity()) break;

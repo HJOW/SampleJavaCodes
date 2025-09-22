@@ -6,7 +6,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 
-public class Arcade extends DefaultFacility {
+public class Arcade extends DefaultFacility implements ServiceFacility {
     private static final long serialVersionUID = 6472512678804457223L;
     protected String name = "아케이드_" + ColonyManager.generateNaturalNumber();
     protected int comportGrade = 0;
@@ -88,10 +88,26 @@ public class Arcade extends DefaultFacility {
     public void setComportGrade(int g) {
         comportGrade = g;
     }
+    
+    @Override
+    public double additionalComportGradeRate(City city, Colony colony) {
+        return 0.0;
+    }
 
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
         super.oneSecond(cycle, city, colony, efficiency100);
+        
+        double efficiencyRate = efficiency100 / 100.0;
+        double additionalRate = additionalComportGradeRate(city, colony);
+        if(additionalRate < 0.0) additionalRate = 0.0;
+        if(additionalRate != 0.0) {
+            efficiencyRate = efficiencyRate + ((1.0 - efficiencyRate) * additionalRate);
+        }
+        if(efficiencyRate > 1.0) efficiencyRate = 1.0;
+        
+        int compGrade = getComportGrade();
+        compGrade = (int) Math.round(compGrade * efficiencyRate);
         
         int servicingCount = 0;
         for(Citizen c : city.getCitizens()) {
@@ -99,7 +115,7 @@ public class Arcade extends DefaultFacility {
             if(c.getMoney() < 2) continue;
             
             servicingCount++;
-            c.setHappy(c.getHappy() + 5 + (getComportGrade() / 2));
+            c.setHappy(c.getHappy() + 5 + (compGrade / 2));
             c.setMoney(c.getMoney() - 2);
             
             if(servicingCount >= getCapacity()) break;

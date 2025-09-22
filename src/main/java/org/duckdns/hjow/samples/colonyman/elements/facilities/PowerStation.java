@@ -60,7 +60,7 @@ public class PowerStation extends DefaultFacility {
     public int getPowerConsume() {
         return 0;
     }
-    public int getPowerGenerate() {
+    public int getPowerGenerate(Colony col, City city) {
         return getCapacity();
     }
     @Override
