@@ -20,6 +20,9 @@ public class Citizen implements ColonyElements {
     protected int carisma     = (int) (Math.random() * 5) + 4;
     protected int intelligent = (int) (Math.random() * 5) + 4;
     
+    protected int educatedIntelligence = 0;
+    protected int educatedPhysical     = 0;
+    
     protected long money           = 100L;
     protected long experience      =   0L;
     
@@ -226,6 +229,22 @@ public class Citizen implements ColonyElements {
         this.carisma = carisma;
     }
 
+    public int getEducatedIntelligence() {
+        return educatedIntelligence;
+    }
+
+    public int getEducatedPhysical() {
+        return educatedPhysical;
+    }
+
+    public void setEducatedIntelligence(int educatedIntelligence) {
+        this.educatedIntelligence = educatedIntelligence;
+    }
+
+    public void setEducatedPhysical(int educatedPhysical) {
+        this.educatedPhysical = educatedPhysical;
+    }
+
     public void setMoney(long money) {
         this.money = money;
         if(this.money < 0) this.money = 0L;
@@ -289,6 +308,8 @@ public class Citizen implements ColonyElements {
         json.put("agility"           , new Integer(getAgility()));
         json.put("carisma"           , new Integer(getCarisma()));
         json.put("intelligent"       , new Integer(getIntelligent()));
+        json.put("educatedIntel"     , new Integer(getEducatedIntelligence()));
+        json.put("educatedPhysical"  , new Integer(getEducatedPhysical()));
         json.put("money"             , new Long(getMoney()));
         json.put("experience"        , new Long(getExperience()));
         json.put("workingFacility"   , new Long(getWorkingFacility()));
@@ -313,6 +334,10 @@ public class Citizen implements ColonyElements {
         setAgility(    Integer.parseInt(json.get("agility"    ).toString()));
         setCarisma(    Integer.parseInt(json.get("carisma"    ).toString()));
         setIntelligent(Integer.parseInt(json.get("intelligent").toString()));
+        
+        setEducatedIntelligence(Integer.parseInt(json.get("educatedIntel"   ).toString()));
+        setEducatedPhysical(    Integer.parseInt(json.get("educatedPhysical").toString()));
+        
         setExperience(      Long.parseLong(json.get("experience"      ).toString()));
         setWorkingFacility( Long.parseLong(json.get("workingFacility" ).toString()));
         setBuildingFacility(Long.parseLong(json.get("buildingFacility").toString()));

@@ -47,7 +47,10 @@ public abstract class Research implements ColonyElements {
         if(this.progress > getMaxProgress()) this.progress = getMaxProgress();
     }
     
+    /** 진행 상태 증가 (레벨업 로직 포함 - adds는 반드시 양수로 입력해야 함) */
     public void increaseProgress(int adds) {
+        if(adds < 0) adds = 0;
+        
         this.progress += adds;
         if(this.progress < 0) this.progress = 0;
         if(this.progress > getMaxProgress()) this.progress = getMaxProgress();
@@ -64,8 +67,6 @@ public abstract class Research implements ColonyElements {
         }
     }
     
-    public abstract long getMaxProgress();
-
     public int getLevel() {
         return level;
     }
@@ -74,14 +75,34 @@ public abstract class Research implements ColonyElements {
         this.level = level;
     }
     
+    /** 도달할 수 있는 최대 레벨 */
     public int getMaxLevel() {
         return 1;
     }
     
+    /** 다음 레벨까지 도달하기에 필요한 진행상태(cycle) 필요 요구량 계산 */
+    public long getMaxProgress() {
+        long res = getMaxProgressStarts();
+        int nowLevelLefts = getLevel() - 1;
+        if(nowLevelLefts < 0) nowLevelLefts = 0;
+        
+        while(nowLevelLefts >= 1) {
+            if(res >= Long.MAX_VALUE / 2) return res;
+            res = (long) Math.round(res * getMaxProgressIncreaseRate());
+            nowLevelLefts--;
+        }
+        return res;
+    }
+    
+    public long   getMaxProgressStarts()       { return 600L; }
+    public double getMaxProgressIncreaseRate() { return 1.5;  }
+    
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) { }
     
+    /** 연구 시작 가능여부 반환 (선행 연구 완료여부만 체크) */
     public abstract boolean isResearchAvail(Colony col);
+    /** 연구 이름 반환 */
     public abstract String  getTitle();
     
     @Override

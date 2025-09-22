@@ -10,7 +10,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Colony;
 public class ResearchManager {
     protected static List<Class<?>> classes = new Vector<Class<?>>();
     static {
-        
+        classes.add(BasicScience.class);
     }
     
     public static Research createResearchInstance(String type) {

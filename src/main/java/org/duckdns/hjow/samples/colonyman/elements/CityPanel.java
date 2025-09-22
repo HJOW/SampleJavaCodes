@@ -175,7 +175,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         toolbarCity = new JToolBar();
         pnDown.add(toolbarCity, BorderLayout.CENTER);
         
-        btnNewFac = new JButton("새 시설");
+        btnNewFac = new JButton("새 시설 건설");
         toolbarCity.add(btnNewFac);
         
         btnNewFac.addActionListener(new ActionListener() {
