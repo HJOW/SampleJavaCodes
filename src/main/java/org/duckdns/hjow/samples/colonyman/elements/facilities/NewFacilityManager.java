@@ -8,6 +8,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.Method;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -119,26 +120,40 @@ public class NewFacilityManager extends JDialog {
         btnOk.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                FacilityInformation info = (FacilityInformation) cbxFacInfos.getSelectedItem();
-                Colony col = city.getColony(colonyManager);
+                FacilityInformation info;
+                Colony col;
                 
-                if(col.getMoney() < info.getPrice().longValue()) {
-                    JOptionPane.showMessageDialog(getDialog(), "예산이 부족합니다.\n" + (info.getPrice() - col.getMoney()) + " 의 예산이 더 필요합니다.");
-                    return;
-                };
-                
-                if(col.getTech() < info.getTech().longValue()) {
-                    JOptionPane.showMessageDialog(getDialog(), "기술이 부족합니다.\n" + (info.getTech() - col.getTech()) + " 의 기술이 더 필요합니다.");
-                    return;
-                };
-                
-                HoldingJob job = new HoldingJob(info.getBuildingCycle(), info.getBuildingCycle(), "NewFacility", info.getName());
-                city.getHoldings().add(job);
-                
-                col.modifyingMoney(info.getPrice() * (-1) , city, city, info.getTitle() + " 건설");
-                
-                colonyManager.refreshColonyContent();
-                dispose();
+                try {
+                    info = (FacilityInformation) cbxFacInfos.getSelectedItem();
+                    col = city.getColony(colonyManager);
+                    
+                    if(col.getMoney() < info.getPrice().longValue()) {
+                        JOptionPane.showMessageDialog(getDialog(), "예산이 부족합니다.\n" + (info.getPrice() - col.getMoney()) + " 의 예산이 더 필요합니다.");
+                        return;
+                    };
+                    
+                    if(col.getTech() < info.getTech().longValue()) {
+                        JOptionPane.showMessageDialog(getDialog(), "기술이 부족합니다.\n" + (info.getTech() - col.getTech()) + " 의 기술이 더 필요합니다.");
+                        return;
+                    };
+                    
+                    Method mthdChecker = info.getFacilityClass().getMethod("isBuildAvail", Colony.class, City.class);
+                    String chkRes = (String) mthdChecker.invoke(null, col, city);
+                    if(chkRes != null) {
+                        JOptionPane.showMessageDialog(getDialog(), chkRes);
+                        return;
+                    }
+                    
+                    HoldingJob job = new HoldingJob(info.getBuildingCycle(), info.getBuildingCycle(), "NewFacility", info.getName());
+                    city.getHoldings().add(job);
+                    
+                    col.modifyingMoney(info.getPrice() * (-1) , city, city, info.getTitle() + " 건설");
+                    
+                    colonyManager.refreshColonyContent();
+                    dispose();
+                } catch(Exception ex) {
+                    JOptionPane.showMessageDialog(getDialog(), "오류가 발생하였습니다.\n" + ex.getMessage());
+                }
             }
         });
         

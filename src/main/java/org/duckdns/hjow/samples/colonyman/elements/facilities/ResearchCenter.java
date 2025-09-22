@@ -9,6 +9,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Colony;
 public class ResearchCenter extends DefaultFacility {
     private static final long serialVersionUID = 9084689175126703785L;
     protected String name = "연구소_" + ColonyManager.generateNaturalNumber();
+    protected long researchKey = 0L;
 
     @Override
     public void setName(String name) {
@@ -49,6 +50,14 @@ public class ResearchCenter extends DefaultFacility {
     @Override
     public String getName() {
         return name;
+    }
+    
+    public long getResearchKey() {
+        return researchKey;
+    }
+
+    public void setResearchKey(long researchKey) {
+        this.researchKey = researchKey;
     }
     
     @Override
@@ -103,4 +112,7 @@ public class ResearchCenter extends DefaultFacility {
     public static Long getTechNeeded() {
         return new Long(0);
     }
+    
+    /** 건설 가능여부 체크. 단, 도시 내 건설가능 구역 수와 건설인력은 이 메소드에서 체크하지 않는다. 건설 불가능 사유 발생 시 그 메시지 반환, 건설 가능 시 null 반환. */
+    public static String isBuildAvail(Colony col, City city) { return null; }
 }
