@@ -137,7 +137,7 @@
           <configuration>
               <archive>
                   <manifest>
-                      <mainClass>org.duckdns.hjow.samples.base.GUISampleJavaCodes</mainClass>
+                      <mainClass>org.duckdns.hjow.samples.base.SampleJavaCodes</mainClass>
                       <addClasspath>true</addClasspath>
                       <classpathPrefix>lib/</classpathPrefix>
                   </manifest>
