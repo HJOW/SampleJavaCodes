@@ -5,11 +5,11 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.Facility;
 
-public class ResearchCenter extends DefaultFacility {
-    private static final long serialVersionUID = 9084689175126703785L;
-    protected String name = "연구소_" + ColonyManager.generateNaturalNumber();
-    protected long researchKey = 0L;
+public class ArchitectOffice extends DefaultFacility {
+    private static final long serialVersionUID = 2620574171874446922L;
+    protected String name = "건축사무소_" + ColonyManager.generateNaturalNumber();
 
     @Override
     public void setName(String name) {
@@ -18,7 +18,7 @@ public class ResearchCenter extends DefaultFacility {
 
     @Override
     public String getType() {
-        return "ResearchCenter";
+        return "ArchitectOffice";
     }
 
     @Override
@@ -28,27 +28,27 @@ public class ResearchCenter extends DefaultFacility {
 
     @Override
     public int getPowerConsume() {
-        return 15;
+        return 10;
     }
 
     @Override
     public int getWorkerSuitability(Citizen citizen) {
         int point = 0;
-        if(citizen.getCarisma()     >= 3) point += 2;
-        if(citizen.getAgility()     >= 4) point += 2;
-        if(citizen.getStrength()    >= 4) point += 2;
-        if(citizen.getIntelligent() >= 7) point += 4;
+        if(citizen.getCarisma()     >= 3) point += 1;
+        if(citizen.getAgility()     >= 6) point += 2;
+        if(citizen.getStrength()    >= 6) point += 3;
+        if(citizen.getIntelligent() >= 6) point += 4;
         
         return point;
     }
     
     @Override
     public int getWorkerNeeded() {
-        return 3;
+        return 5;
     }
     @Override
     public int getWorkerCapacity() {
-        return 5;
+        return 10;
     }
 
     @Override
@@ -61,27 +61,19 @@ public class ResearchCenter extends DefaultFacility {
         return name;
     }
     
-    public long getResearchKey() {
-        return researchKey;
-    }
-
-    public void setResearchKey(long researchKey) {
-        this.researchKey = researchKey;
-    }
-    
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
         super.oneSecond(cycle, city, colony, efficiency100);
         
         // 업무 처리
-        int increases = 10;
-        increases = (int) (increases * ( efficiency100 / 100.0 ));
+        double healRate = 0.5;
+        healRate = healRate * ( efficiency100 / 100.0 );
         
-        // 테크 수치 올리기
-        colony.setTech(colony.getTech() + increases);
-        
-        // 진행 중인 연구 처리
-        // TODO
+        for(Facility f : city.getFacility()) {
+            if(f.getHp() < f.getMaxHp()) {
+                if(Math.random() >= healRate) f.addHp(1); 
+            }
+        }
     }
     
     @Override
@@ -103,7 +95,7 @@ public class ResearchCenter extends DefaultFacility {
     }
     
     public static String getFacilityName() {
-        return "연구 모듈";
+        return "건설사무소";
     }
     
     public static String getFacilityTitle() {
@@ -111,7 +103,7 @@ public class ResearchCenter extends DefaultFacility {
     }
     
     public static String getFacilityDescription() {
-        return "기술 개발 시설입니다.";
+        return "건설 사무소로, 수리가 필요한 건물에 서비스를 제공합니다.";
     }
     
     public static Long getFacilityPrice() {

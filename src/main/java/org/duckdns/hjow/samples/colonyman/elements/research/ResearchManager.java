@@ -11,6 +11,8 @@ public class ResearchManager {
     protected static List<Class<?>> classes = new Vector<Class<?>>();
     static {
         classes.add(BasicScience.class);
+        classes.add(BasicHumanities.class);
+        classes.add(MilitaryTech.class);
     }
     
     public static Research createResearchInstance(String type) {
