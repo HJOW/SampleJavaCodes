@@ -22,6 +22,11 @@ public abstract class Research implements ColonyElements {
     public void setKey(long key) {
         this.key = key;
     }
+    
+    @Override
+    public String getName() {
+        return getClass().getSimpleName();
+    }
 
     @Override
     public int getHp() {
@@ -138,6 +143,12 @@ public abstract class Research implements ColonyElements {
     
     @Override
     public String toString() {
-        return getTitle();
+        return getTitle() + " (Lv " + (getLevel() + 1) + ")"; // 콤보박스 출력용이므로...
+    }
+    
+    /** 정수 둘 중 큰 값을 반환 (레벨 비교에 사용) */
+    protected int chooseMaxInt(int a, int b) {
+        if(a >= b) return a;
+        return b;
     }
 }

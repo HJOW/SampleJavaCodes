@@ -13,6 +13,10 @@ public class ResearchManager {
         classes.add(BasicScience.class);
         classes.add(BasicHumanities.class);
         classes.add(MilitaryTech.class);
+        classes.add(BasicBuildingTech.class);
+        classes.add(BasicBiology.class);
+        classes.add(BasicMedicalScience.class);
+        classes.add(BasicEngineering.class);
     }
     
     public static Research createResearchInstance(String type) {

@@ -14,7 +14,9 @@ import org.duckdns.hjow.commons.util.FileUtil;
 import org.duckdns.hjow.samples.colonyman.AccountingData;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.Factory;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.ResearchCenter;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Residence;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.ResidenceModule;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Restaurant;
@@ -43,6 +45,7 @@ public class Colony implements ColonyElements {
     
     public Colony() {
     	checked = true;
+    	resetResearches();
     }
     
     public Colony(File f) throws Exception {
@@ -342,6 +345,12 @@ public class Colony implements ColonyElements {
         city.getFacility().add(fac);
         
         fac = new Restaurant();
+        city.getFacility().add(fac);
+        
+        fac = new ResearchCenter();
+        city.getFacility().add(fac);
+        
+        fac = new Factory();
         city.getFacility().add(fac);
         
         getCities().add(city);

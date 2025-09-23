@@ -4,14 +4,14 @@ import java.util.List;
 
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 
-public class MilitaryTech extends Research {
-    private static final long serialVersionUID = -6913431604370242959L;
+public class BasicBuildingTech extends Research {
+    private static final long serialVersionUID = 1818201774541715641L;
 
-    public MilitaryTech() { super(); }
-    
+    public BasicBuildingTech() { super(); }
+
     @Override
     public String getName() {
-        return "MilitaryTech";
+        return "BasicBuildingTech";
     }
     
     @Override
@@ -19,7 +19,7 @@ public class MilitaryTech extends Research {
         return Integer.MAX_VALUE;
     }
 
-    public long   getMaxProgressStarts()       { return 800L; }
+    public long   getMaxProgressStarts()       { return 600L; }
     public double getMaxProgressIncreaseRate() { return 1.5;  }
 
     @Override
@@ -31,18 +31,18 @@ public class MilitaryTech extends Research {
         List<Research> researches = col.getResearches();
         for(Research one : researches) {
             
-            // 기초과학 레벨이 이 군사학 레벨의 4배가 되어야 연구가능
+            // 기초과학 레벨이 이 건축학 레벨의 3배가 되어야 연구가능
             if(one instanceof BasicScience) {
-                if(one.getLevel() >= chooseMaxInt(getLevel(), 1) * 4) cond1 = true;
+                if(one.getLevel() >= (int)(chooseMaxInt(getLevel(), 1) * 3)) cond1 = true;
             }
             
-             // 공학기초 레벨이 이 군사학 레벨의 2배가 되어야 연구가능
+            // 공학기초 레벨이 이 건축학 레벨의 2배가 되어야 연구가능
             if(one instanceof BasicEngineering) {
-                if(one.getLevel() >= chooseMaxInt(getLevel(), 1) * 2) cond2 = true;
+                if(one.getLevel() >= (int)(chooseMaxInt(getLevel(), 1) * 2)) cond2 = true;
             }
             
-            if(getLevel() >= 20) { // 레벨 20부터
-                // 기초인문학 레벨이 이 군사학 레벨보다 높아야 연구가능
+            if(getLevel() >= 15) { // 레벨 15부터
+                // 기초인문학 레벨이 이 건축학 레벨보다 높아야 연구가능
                 if(one instanceof BasicHumanities) {
                     if(one.getLevel() > chooseMaxInt(getLevel(), 1)) cond3 = true;
                 }
@@ -54,6 +54,6 @@ public class MilitaryTech extends Research {
 
     @Override
     public String getTitle() {
-        return "군사학";
+        return "기초건축학";
     }
 }

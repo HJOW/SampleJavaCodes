@@ -5,7 +5,7 @@ import java.util.List;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
-import org.duckdns.hjow.samples.colonyman.elements.research.BasicHumanities;
+import org.duckdns.hjow.samples.colonyman.elements.research.BasicBuildingTech;
 import org.duckdns.hjow.samples.colonyman.elements.research.BasicScience;
 import org.duckdns.hjow.samples.colonyman.elements.research.Research;
 
@@ -86,13 +86,13 @@ public class TownHouse extends Residence {
             if(r instanceof BasicScience) {
                 if(r.getLevel() >= 5) cond1 = true;
             }
-            if(r instanceof BasicHumanities) {
-                if(r.getLevel() >= 5) cond2 = true;
+            if(r instanceof BasicBuildingTech) {
+                if(r.getLevel() >= 2) cond2 = true;
             }
         }
         
         if(! cond1) return "기초과학 연구가 부족합니다.";
-        if(! cond2) return "기초인문학 연구가 부족합니다.";
+        if(! cond2) return "기초건축학 연구가 부족합니다.";
         return null;
     }
 }

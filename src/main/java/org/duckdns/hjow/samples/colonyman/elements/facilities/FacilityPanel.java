@@ -250,6 +250,8 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
             }
             tResearches = null;
             
+            System.out.println("R " + researches.size());
+            
             cbxResearch.setModel(new DefaultComboBoxModel<Research>(researches));
             
             boolean selectedRes = false;
@@ -260,8 +262,9 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
                     break;
                 }
             }
+            System.out.println("C " + cbxResearch.getItemCount());
             if(! selectedRes) {
-                cbxResearch.setSelectedIndex(0);
+                if(! researches.isEmpty()) cbxResearch.setSelectedIndex(0);
                 Research r = (Research) cbxResearch.getSelectedItem();
                 if(r == null) rcenter.setResearchKey(0L);
                 else rcenter.setResearchKey(r.getKey());

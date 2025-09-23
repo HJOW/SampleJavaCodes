@@ -28,7 +28,7 @@ public class City implements ColonyElements {
     protected List<Enemy>      enemies  = new Vector<Enemy>();
     protected List<HoldingJob> holdings = new Vector<HoldingJob>();
     protected int hp = getMaxHp();
-    protected int spaces = 20 + ((int) ( 30 * Math.random() ));
+    protected int spaces = 30 + ((int) ( 30 * Math.random() ));
     
     public City() {
         
