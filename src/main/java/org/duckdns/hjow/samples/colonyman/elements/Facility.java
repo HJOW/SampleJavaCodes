@@ -2,6 +2,8 @@ package org.duckdns.hjow.samples.colonyman.elements;
 
 import java.util.List;
 
+import org.duckdns.hjow.samples.colonyman.elements.states.State;
+
 public interface Facility extends ColonyElements {
     public void setName(String name);
     public String getType();
@@ -23,6 +25,9 @@ public interface Facility extends ColonyElements {
     
     /** 근무 중인 시민들 목록 반환 */
     public List<Citizen> getWorkingCitizens(City city, Colony colony);
+    
+    /** 상태 객체들 반환 */
+    public List<State> getStates();
     
     /** 최소 직장 자리 수 (이만큼이 채워지지 않으면 효율이 떨어짐) */
     public int getWorkerNeeded();

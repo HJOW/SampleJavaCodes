@@ -3,18 +3,23 @@ package org.duckdns.hjow.samples.colonyman.elements.facilities;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
+import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.Facility;
+import org.duckdns.hjow.samples.colonyman.elements.states.State;
 
 public abstract class DefaultFacility implements Facility {
     private static final long serialVersionUID = 8012568139388326869L;
     protected volatile long key = ColonyManager.generateKey();
     protected int hp = getMaxHp();
+    
+    protected List<State> states = new Vector<State>();
     
     @Override
     public int getComportGrade() {
@@ -94,7 +99,26 @@ public abstract class DefaultFacility implements Facility {
     
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
+        // State 영향력 동작
+        for(State st : getStates()) {
+            st.oneSecond(cycle, this, city, colony);
+        }
         
+        // State 수명 동작
+        for(State st : getStates()) {
+            st.oneSecond(cycle, city, colony, efficiency100);
+        }
+        
+        // 수명 다된 state 제거
+        int std = 0;
+        while(std < getStates().size()) {
+            State st = getStates().get(std);
+            if(st.getHp() <= 0 || st.getLefts() <= 0) {
+                getStates().remove(std);
+                continue;
+            }
+            std++;
+        }
     }
     
     @Override
@@ -112,6 +136,26 @@ public abstract class DefaultFacility implements Facility {
         setName(json.get("name").toString());
         key = Long.parseLong(json.get("key").toString());
         setHp(Integer.parseInt(json.get("hp").toString()));
+        
+        JsonArray list = (JsonArray) json.get("states");
+        states.clear();
+        if(list != null) {
+            for(Object o : list) {
+                if(o instanceof String) o = JsonObject.parseJson(o.toString());
+                if(o instanceof JsonObject) {
+                    try {
+                        JsonObject jsonObj = (JsonObject) o;
+                        State stateOne = State.createStateInstance(jsonObj.get("type").toString());
+                        if(stateOne == null) throw new NullPointerException("Cannot found these state type " + jsonObj);
+                        
+                        stateOne.fromJson(jsonObj);
+                        states.add(stateOne);
+                    } catch(Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -121,6 +165,10 @@ public abstract class DefaultFacility implements Facility {
         json.put("name", getName());
         json.put("key", new Long(getKey()));
         json.put("hp", new Long(getHp()));
+        
+        JsonArray list = new JsonArray();
+        for(State s : getStates()) { list.add(s.toJson()); }
+        json.put("states", list);
         
         return json;
     }
@@ -153,11 +201,21 @@ public abstract class DefaultFacility implements Facility {
     public static String isBuildAvail(Colony col, City city) { return null; }
     
     @Override
+    public List<State> getStates() {
+        return states;
+    }
+    
+    public void setStates(List<State> states) {
+        this.states = states;
+    }
+
+    @Override
     public BigInteger getCheckerValue() {
     	BigInteger res = new BigInteger(String.valueOf(getKey()));
     	for(int idx=0; idx<getType().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getType().charAt(idx)))); }
     	for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
     	res = res.add(new BigInteger(String.valueOf(getHp())));
+    	for(State st : getStates()) { res = res.add(st.getCheckerValue()); }
     	return res;
     }
 }

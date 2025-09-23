@@ -2,14 +2,20 @@ package org.duckdns.hjow.samples.colonyman.elements;
 
 import java.math.BigInteger;
 import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Vector;
 
+import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.elements.states.State;
 
 public class Citizen implements ColonyElements {
     private static final long serialVersionUID = -6856576686789163067L;
     protected volatile long key = ColonyManager.generateKey();
     protected String name = "시민_" + ColonyManager.generateNaturalNumber();
+    
+    protected List<State> states = new Vector<State>();
     
     protected int hp = 100;
     protected int hunger  = 50;
@@ -107,6 +113,27 @@ public class Citizen implements ColonyElements {
             hp++;
             int mx = getMaxHp();
             if(hp >= mx) hp = mx;
+        }
+        
+        // State 영향력 동작
+        for(State st : getStates()) {
+            st.oneSecond(cycle, this, city, colony);
+        }
+        
+        // State 수명 동작
+        for(State st : getStates()) {
+            st.oneSecond(cycle, city, colony, efficiency100);
+        }
+        
+        // 수명 다된 state 제거
+        std = 0;
+        while(std < getStates().size()) {
+            State st = getStates().get(std);
+            if(st.getHp() <= 0 || st.getLefts() <= 0) {
+                getStates().remove(std);
+                continue;
+            }
+            std++;
         }
     }
     
@@ -293,13 +320,20 @@ public class Citizen implements ColonyElements {
         return 100 + (getStrength() / 5) + (getAgility() / 10);
     }
     
+    public List<State> getStates() {
+        return states;
+    }
+
+    public void setStates(List<State> states) {
+        this.states = states;
+    }
+
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
         json.put("type", "Citizen");
         json.put("name", getName());
         json.put("key", new Long(getKey()));
-        json.put("hp", new Long(getHp()));
         
         json.put("hp"                , new Integer(getHp()));
         json.put("hunger"            , new Integer(getHunger()));
@@ -317,6 +351,10 @@ public class Citizen implements ColonyElements {
         json.put("buildingFacility"  , new Long(getBuildingFacility()));
         json.put("workingCity"       , new Long(getWorkingCity()));
         json.put("livingHome"        , new Long(getLivingHome()));
+        
+        JsonArray list = new JsonArray();
+        for(State s : getStates()) { list.add(s.toJson()); }
+        json.put("states", list);
         
         return json;
     }
@@ -344,6 +382,26 @@ public class Citizen implements ColonyElements {
         setBuildingFacility(Long.parseLong(json.get("buildingFacility").toString()));
         setWorkingCity(     Long.parseLong(json.get("workingCity"     ).toString()));
         setLivingHome(      Long.parseLong(json.get("livingHome"      ).toString()));
+        
+        JsonArray list = (JsonArray) json.get("states");
+        states.clear();
+        if(list != null) {
+            for(Object o : list) {
+                if(o instanceof String) o = JsonObject.parseJson(o.toString());
+                if(o instanceof JsonObject) {
+                    try {
+                        JsonObject jsonObj = (JsonObject) o;
+                        State stateOne = State.createStateInstance(jsonObj.get("type").toString());
+                        if(stateOne == null) throw new NullPointerException("Cannot found these state type " + jsonObj);
+                        
+                        stateOne.fromJson(jsonObj);
+                        states.add(stateOne);
+                    } catch(Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
     }
     
     /** 상태 메시지 생성 (UI 내 JTextArea 에 출력됨) */
@@ -365,6 +423,12 @@ public class Citizen implements ColonyElements {
         if(h != null) desc = desc.append("\n").append("거주 : ").append(h.getName());
         if(f != null) desc = desc.append("\n").append("직장 : ").append(f.getName());
         if(b != null) desc = desc.append("\n").append("건설 : ").append(b.getName());
+        
+        List<State> states = getStates();
+        if(! states.isEmpty()) {
+            desc = desc.append("\n");
+            for(State st : states) { desc = desc.append(st.getTitle()).append("\t"); }
+        }
         
         return desc.toString().trim();
     }
@@ -388,6 +452,7 @@ public class Citizen implements ColonyElements {
     	res = res.add(new BigInteger(String.valueOf(getWorkingCity())));
     	res = res.add(new BigInteger(String.valueOf(getLivingHome())));
     	for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
+    	for(State st : getStates()) { res = res.add(st.getCheckerValue()); }
     	return res;
     }
 }

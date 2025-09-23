@@ -21,6 +21,7 @@ import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElementPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Facility;
+import org.duckdns.hjow.samples.colonyman.elements.states.State;
 
 public class FacilityPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = -6078767714905474678L;
@@ -80,15 +81,18 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
             }
         });
         
-        JPanel pnHp = new JPanel();
-        pnHp.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        pnUp.add(pnHp, BorderLayout.EAST);
+        JPanel pnCtrls = new JPanel();
+        pnCtrls.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        pnUp.add(pnCtrls, BorderLayout.EAST);
         
         progHp = new JProgressBar(JProgressBar.HORIZONTAL);
-        pnHp.add(progHp);
+        pnCtrls.add(progHp);
+        
+        btnDestroy = new JButton("철거");
+        pnCtrls.add(btnDestroy);
         
         btnToggle = new JButton("▼");
-        pnHp.add(btnToggle);
+        pnCtrls.add(btnToggle);
         
         ta = new JTextArea();
         ta.setEditable(false);
@@ -112,17 +116,14 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
             }
         });
         
-        JPanel pnCtrl = new JPanel();
-        pnCtrl.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        pnCenterDown.add(pnCtrl, BorderLayout.EAST);
-        
-        btnDestroy = new JButton("철거");
-        pnCtrl.add(btnDestroy);
-        
         btnDestroy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                int sel = JOptionPane.showConfirmDialog(superInstance.getDialog(), "이 시설을 철거하시겠습니까?", "확인", JOptionPane.YES_NO_OPTION);
+                if(sel != JOptionPane.YES_OPTION) return;
+                
                 f.setHp(0);
+                superInstance.refreshColonyContent();
                 JOptionPane.showMessageDialog(superInstance.getDialog(), "철거 지시가 내려졌습니다. 시뮬레이션을 진행해 주세요.");
             }
         });
@@ -199,6 +200,15 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
             }
         } else {
             res = res.append("\n    ").append("재직 중인 인원이 없습니다.");
+        }
+        
+        List<State> states = fac.getStates();
+        if(! states.isEmpty()) {
+            res = res.append("\n").append("상태...");
+            res = res.append("\n    ");
+            for(State st : states) {
+                res = res.append(st.getTitle()).append("\t");
+            }
         }
         
         ta.setText(res.toString().trim());
