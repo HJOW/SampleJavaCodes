@@ -16,6 +16,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Residence;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.ResidenceModule;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Restaurant;
 import org.duckdns.hjow.samples.colonyman.elements.research.Research;
 import org.duckdns.hjow.samples.colonyman.elements.research.ResearchManager;
@@ -332,7 +333,7 @@ public class Colony implements ColonyElements {
         Facility fac;
         
         for(idx=0; idx<6; idx++) {
-            fac = new Residence();
+            fac = new ResidenceModule();
             ((Residence) fac).setComportGrade(0);
             city.getFacility().add(fac);
         }

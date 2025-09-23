@@ -10,14 +10,18 @@ import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 
-public class Residence extends DefaultFacility implements Home {
+public abstract class Residence extends DefaultFacility implements Home {
     private static final long serialVersionUID = -2930901725309688206L;
     
-    protected String name = "보급형_주거모듈_" + ColonyManager.generateNaturalNumber();
+    protected String name = defaultName();
     protected int comportGrade = 0;
 
     public Residence() {
         
+    }
+    
+    protected String defaultName() {
+        return "보급형_주거모듈_" + ColonyManager.generateNaturalNumber();
     }
 
     @Override

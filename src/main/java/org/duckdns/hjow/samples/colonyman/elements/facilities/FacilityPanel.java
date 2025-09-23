@@ -5,9 +5,14 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.List;
+import java.util.Vector;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -21,6 +26,7 @@ import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElementPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Facility;
+import org.duckdns.hjow.samples.colonyman.elements.research.Research;
 import org.duckdns.hjow.samples.colonyman.elements.states.State;
 
 public class FacilityPanel extends JPanel implements ColonyElementPanel {
@@ -31,6 +37,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     protected transient JButton btnToggle, btnDestroy;
     protected transient JTextField tfName;
     protected transient JTextArea ta;
+    protected transient JComboBox<Research> cbxResearch;
     
     protected long facilityKey = 0L;
     protected String targetName;
@@ -102,6 +109,23 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         pnCenterDown.setLayout(new BorderLayout());
         pnCenter.add(pnCenterDown, BorderLayout.SOUTH);
         
+        cbxResearch = new JComboBox<Research>();
+        pnCenterDown.add(cbxResearch);
+        
+        if(! (f instanceof ResearchCenter)) cbxResearch.setVisible(false);
+        else {
+            List<Research> tResearches = colony.getResearches();
+            Vector<Research> researches = new Vector<Research>();
+            
+            for(Research r : tResearches) {
+                if(r.isResearchAvail(colony)) researches.add(r);
+            }
+            
+            tResearches = null;
+            
+            cbxResearch.setModel(new DefaultComboBoxModel<Research>(researches));
+        }
+        
         pnCenter.setVisible(false);
         btnToggle.addActionListener(new ActionListener() {
             @Override
@@ -125,6 +149,19 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
                 f.setHp(0);
                 superInstance.refreshColonyContent();
                 JOptionPane.showMessageDialog(superInstance.getDialog(), "철거 지시가 내려졌습니다. 시뮬레이션을 진행해 주세요.");
+            }
+        });
+        
+        cbxResearch.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(f instanceof ResearchCenter) {
+                    ResearchCenter c = (ResearchCenter) f;
+                    Research r = (Research) cbxResearch.getSelectedItem();
+                    if(r != null) {
+                        c.setResearchKey(r.getKey());
+                    }
+                }
             }
         });
     }
@@ -202,6 +239,35 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
             res = res.append("\n    ").append("재직 중인 인원이 없습니다.");
         }
         
+        if(fac instanceof ResearchCenter) {
+            ResearchCenter rcenter = (ResearchCenter) fac;
+            long sel = rcenter.getResearchKey();
+            
+            List<Research> tResearches = colony.getResearches();
+            Vector<Research> researches = new Vector<Research>();
+            for(Research r : tResearches) {
+                if(r.isResearchAvail(colony)) researches.add(r);
+            }
+            tResearches = null;
+            
+            cbxResearch.setModel(new DefaultComboBoxModel<Research>(researches));
+            
+            boolean selectedRes = false;
+            for(Research r : researches) {
+                if(r.getKey() == sel) {
+                    cbxResearch.setSelectedItem(r);
+                    selectedRes = true;
+                    break;
+                }
+            }
+            if(! selectedRes) {
+                cbxResearch.setSelectedIndex(0);
+                Research r = (Research) cbxResearch.getSelectedItem();
+                if(r == null) rcenter.setResearchKey(0L);
+                else rcenter.setResearchKey(r.getKey());
+            }
+        }
+        
         List<State> states = fac.getStates();
         if(! states.isEmpty()) {
             res = res.append("\n").append("상태...");
@@ -227,6 +293,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     public void setEditable(boolean editable) {
         tfName.setEditable(editable);
         btnDestroy.setEnabled(editable);
+        cbxResearch.setEnabled(editable);
     }
 
     @Override

@@ -11,13 +11,15 @@ public class FacilityManager {
     protected static List<FacilityInformation> facilities = new Vector<FacilityInformation>();
     
     static {
-        register(Residence.class);
+        register(ResidenceModule.class);
         register(PowerStation.class);
         register(Restaurant.class);
         register(Arcade.class);
         register(Factory.class);
         register(ResearchCenter.class);
         register(ArchitectOffice.class);
+        register(Turret.class);
+        register(TownHouse.class);
     }
     
     public static Facility fromJson(JsonObject json) {

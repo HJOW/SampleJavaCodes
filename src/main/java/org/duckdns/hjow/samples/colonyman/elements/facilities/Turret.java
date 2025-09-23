@@ -58,12 +58,16 @@ public class Turret extends DefaultFacility {
             }
             
             if(serviceLeft >= 1) {
-                
+                enemies = colony.getEnemies();
+                for(Enemy e : enemies) {
+                    if(e.getHp() >= 1) {
+                        e.addHp(damages * (-1));
+                        serviceLeft--;
+                        if(serviceLeft <= 0) break;
+                    }
+                }
             }
         }
-        
-        
-        // TODO
     }
     
     @Override

@@ -135,4 +135,9 @@ public abstract class Research implements ColonyElements {
     	
     	return res;
     }
+    
+    @Override
+    public String toString() {
+        return getTitle();
+    }
 }

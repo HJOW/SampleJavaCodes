@@ -208,6 +208,7 @@ public class City implements ColonyElements {
             }
             
             h.decreaseCycle();
+            lefts = h.getCycleLeft();
             if(lefts >= 1) continue; // 아직 사이클이 남아있으면 execute 하지 않고 건너뜀
             
             executeHoldJob(h);

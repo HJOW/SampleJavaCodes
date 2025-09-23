@@ -5,6 +5,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.research.Research;
 
 public class ResearchCenter extends DefaultFacility {
     private static final long serialVersionUID = 9084689175126703785L;
@@ -78,10 +79,33 @@ public class ResearchCenter extends DefaultFacility {
         increases = (int) (increases * ( efficiency100 / 100.0 ));
         
         // 테크 수치 올리기
-        colony.setTech(colony.getTech() + increases);
+        if(cycle % 10 == 0) colony.setTech(colony.getTech() + increases);
         
         // 진행 중인 연구 처리
-        // TODO
+        if(getResearchKey() != 0L) {
+            Research research = null;
+            for(Research r : colony.getResearches()) {
+                if(r.getKey() == getResearchKey()) {
+                    research = r;
+                    break;
+                }
+            }
+            
+            if(research != null) {
+                research.oneSecond(cycle, city, colony, efficiency100);
+                
+                increases = 1;
+                double incFloat = (increases * (efficiency100 / 100.0));
+                
+                if(incFloat < 1) {
+                    increases = 1;
+                    if(Math.random() >= incFloat) research.increaseProgress(increases);
+                } else {
+                    increases = (int) Math.round(incFloat);
+                    research.increaseProgress(increases);
+                }
+            }
+        }
     }
     
     @Override
