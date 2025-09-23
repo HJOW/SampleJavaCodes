@@ -64,6 +64,7 @@ public class ColonyManager implements GUIProgram {
     protected transient Vector<Colony> colonies = new Vector<Colony>();
     protected transient volatile int selectedColony = -1;
     protected transient volatile int cycle = 0;
+    protected transient volatile long cycleGap = 990L;
     
     protected transient JPanel pnCols;
     protected transient ColonyPanel cpNow;
@@ -229,6 +230,27 @@ public class ColonyManager implements GUIProgram {
         
         cbxColony  = new JComboBox<Colony>();
         toolbarNorth.add(cbxColony);
+
+        Vector<String> strSpeeds = new Vector<String>();
+        strSpeeds.add("×1");
+        strSpeeds.add("×2");
+        strSpeeds.add("×4");
+        JComboBox<String> cbxSpeed = new JComboBox<String>(strSpeeds);
+        cbxSpeed.setSelectedIndex(0);
+        toolbarNorth.add(cbxSpeed);
+
+        cbxSpeed.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                int sel = cbxSpeed.getSelectedIndex();
+                if(sel < 0) sel = 0;
+                if(sel > 2) sel = 2;
+                
+                if(sel == 0) cycleGap = 990L;
+                else if(sel == 1) cycleGap = 490L;
+                else if(sel == 2) cycleGap = 240L;
+            }
+        });
         
         btnThrPlay = new JButton("시뮬레이션 시작");
         toolbarNorth.add(btnThrPlay);
@@ -355,7 +377,7 @@ public class ColonyManager implements GUIProgram {
                     threadShutdown = false;
                     
                     try { if(! threadPaused) oneSecond(); } catch(Exception ex) { ex.printStackTrace(); }
-                    try { Thread.sleep(990L); } catch(InterruptedException e) { threadSwitch = false; break; }
+                    try { Thread.sleep(cycleGap); } catch(InterruptedException e) { threadSwitch = false; break; }
                     if(reserveSaving) { try { saveColonies(); } catch(Exception ex) { ex.printStackTrace(); } reserveSaving = false; }
                     
                     threadShutdown = false;
