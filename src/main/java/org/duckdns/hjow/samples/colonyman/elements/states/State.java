@@ -13,8 +13,8 @@ import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
 public abstract class State implements ColonyElements {
     private static final long serialVersionUID = -8452951686397752158L;
     protected volatile long key = ColonyManager.generateKey();
-    protected volatile int  hp = 1;
-    protected volatile long lefts = Long.MAX_VALUE;
+    protected volatile int  hp = getMaxHp();
+    protected volatile long lefts = getDefaultLefts();
 
     @Override
     public long getKey() {
@@ -61,6 +61,8 @@ public abstract class State implements ColonyElements {
     
     public abstract String getTitle();
     
+    public abstract long getDefaultLefts();
+    
     /** 1 사이클마다 쓰레드에서 호출됨. */
     public abstract void oneSecond(int cycle, ColonyElements hosts, City city, Colony colony);
 
@@ -94,6 +96,12 @@ public abstract class State implements ColonyElements {
     }
 
     protected static List<Class<?>> stateClasses = new Vector<Class<?>>();
+    
+    static {
+        stateClasses.add(Influenza.class);
+        stateClasses.add(ImmuneInfluenza.class);
+    }
+    
     public static State createStateInstance(String type) {
         Class<?> stateClass = null;
         

@@ -8,6 +8,7 @@ import java.util.Vector;
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
 import org.duckdns.hjow.samples.colonyman.elements.states.State;
 
 public class Citizen implements ColonyElements {
@@ -300,8 +301,8 @@ public class Citizen implements ColonyElements {
         return livingHome;
     }
     
-    public Facility getLivingHome(City c) {
-        return c.getFacility(getLivingHome());
+    public Home getLivingHome(City c) {
+        return (Home) c.getFacility(getLivingHome());
     }
 
     public void setLivingHome(long livingHome) {

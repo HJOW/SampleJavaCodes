@@ -314,20 +314,20 @@ public class City implements ColonyElements {
         while(idx < facility.size()) {
             Facility f = facility.get(idx);
             if(f.getHp() <= 0) {
-                // Make working citizens to job seekers
+                // 일하는 중인 시민 구직자 만들기
                 long facKey = f.getKey();
                 for(Citizen c : citizens) {
-                    if(c.getWorkingFacility() == facKey) c.setWorkingFacility(-1L);
+                    if(c.getWorkingFacility() == facKey) c.setWorkingFacility(0L);
                 }
                 
                 if(f instanceof Home) {
-                    // Make living citizens to homeless
+                    // 살던 시민 노숙자 만들기
                     for(Citizen c : citizens) {
-                        if(c.getLivingHome() == facKey) c.setLivingHome(-1L);
+                        if(c.getLivingHome() == facKey) c.setLivingHome(0L);
                     }
                 }
                 
-                // Remove facility
+                // 시설 제거
                 facility.remove(idx);
                 continue;
             }
@@ -361,7 +361,7 @@ public class City implements ColonyElements {
             if(c.isHomeless()) continue;
             
             if(c.getLivingHome() != 0L) {
-                Facility h = c.getLivingHome(this);
+                Home h = c.getLivingHome(this);
                 if(h == null) c.setLivingHome(0L);
             }
         }
