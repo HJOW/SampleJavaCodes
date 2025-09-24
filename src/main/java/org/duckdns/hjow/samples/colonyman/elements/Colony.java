@@ -22,6 +22,7 @@ import org.duckdns.hjow.samples.colonyman.elements.facilities.ResidenceModule;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Restaurant;
 import org.duckdns.hjow.samples.colonyman.elements.research.Research;
 import org.duckdns.hjow.samples.colonyman.elements.research.ResearchManager;
+import org.duckdns.hjow.samples.colonyman.events.TimeEvent;
 
 public class Colony implements ColonyElements {
     private static final long serialVersionUID = -3144963237818493111L;
@@ -325,6 +326,16 @@ public class Colony implements ColonyElements {
             idx++;
         }
         
+        // 이벤트 처리
+        for(TimeEvent ev : getEvents()) {
+            if(ev.getEventSize() == TimeEvent.EVENTSIZE_COLONY) {
+                if(cycle % ev.getOccurCycle(this, city) == 0) {
+                    if(Math.random() <= ev.getOccurRate(this, this, city)) ev.onEventOccured(this, this, city);
+                }
+            }
+        }
+        
+        
         // 시간 지남
         time = time.add(BigInteger.ONE);
     }
@@ -553,5 +564,14 @@ public class Colony implements ColonyElements {
         } else {
             FileUtil.writeString(f, "UTF-8", toJson().toJSON()); 
         }
+    }
+    
+    /** 발생할 수 있는 이벤트 유형들 반환 */
+    public List<TimeEvent> getEvents() {
+        List<TimeEvent> events = new Vector<TimeEvent>();
+        
+        // TODO
+        
+        return events;
     }
 }

@@ -996,7 +996,7 @@ public class ColonyManager implements GUIProgram {
         if(damage < 1) damage = 1;
         
         // 명중률 적용
-        if(Math.random() > correctRate) return 0;
+        if(Math.random() > correctRate) return 0; // 명중률이므로, 명중률에 벗어나야 0 리턴, 부등호 방향 주의 !
         return damage;
     }
     

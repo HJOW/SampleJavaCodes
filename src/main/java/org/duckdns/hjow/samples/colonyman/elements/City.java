@@ -17,6 +17,7 @@ import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityManager;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
+import org.duckdns.hjow.samples.colonyman.events.TimeEvent;
 
 public class City implements ColonyElements {
     private static final long serialVersionUID = -8442328554683565064L;
@@ -244,6 +245,21 @@ public class City implements ColonyElements {
                 continue;
             }
             idx++;
+        }
+        
+        // 이벤트 처리
+        for(TimeEvent ev : colony.getEvents()) {
+            if(ev.getEventSize() == TimeEvent.EVENTSIZE_CITY) {
+                if(cycle % ev.getOccurCycle(colony, this) == 0) {
+                    if(Math.random() <= ev.getOccurRate(this, colony, this)) ev.onEventOccured(this, colony, this);
+                }
+            } else if(ev.getEventSize() == TimeEvent.EVENTSIZE_FACILITY) {
+                for(Facility fac : getFacility()) {
+                    if(cycle % ev.getOccurCycle(colony, this) == 0) {
+                        if(Math.random() <= ev.getOccurRate(fac, colony, this)) ev.onEventOccured(fac, colony, this);
+                    }
+                }
+            }
         }
     }
     
