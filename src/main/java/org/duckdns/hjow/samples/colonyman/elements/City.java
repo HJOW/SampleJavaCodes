@@ -19,6 +19,7 @@ import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
 import org.duckdns.hjow.samples.colonyman.events.TimeEvent;
 
+/** 도시 구현 클래스 */
 public class City implements ColonyElements {
     private static final long serialVersionUID = -8442328554683565064L;
     protected volatile long key = ColonyManager.generateKey();

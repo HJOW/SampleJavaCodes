@@ -12,6 +12,7 @@ import java.util.Vector;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -21,7 +22,9 @@ import javax.swing.table.DefaultTableModel;
 
 import org.duckdns.hjow.samples.colonyman.AccountingData;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.uicomponent.JLogArea;
 
+/** 정착지 정보 출력 및 컨트롤을 담당하는 UI 컴포넌트 */
 public class ColonyPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = 3851432705333464777L;
     protected Colony colony;
@@ -29,11 +32,15 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
     protected transient List<CityPanel> pnCities = new Vector<CityPanel>();
     protected transient JPanel pnColonyBasics, pnAccountingMain, pnHoldings;
     protected transient DefaultTableModel tableAccounting;
+    protected transient JSplitPane splits;
     protected transient JTabbedPane tabMain, tabCities;
     protected transient JProgressBar progHp;
     protected transient JTextField tfColonyName, tfColonyTime, tfIncomes;
-    protected transient JTextArea ta;
+    protected transient JTextArea taStatus;
+    protected transient JLogArea taLog;
     protected transient JToolBar toolbar;
+    
+    protected transient boolean flagSplitLocated = false;
     
     public ColonyPanel() {
         super();
@@ -50,8 +57,19 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         
         setLayout(new BorderLayout());
         
+        JPanel pnMain = new JPanel();
+        pnMain.setLayout(new BorderLayout());
+        add(pnMain, BorderLayout.CENTER);
+        
+        splits = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        pnMain.add(splits, BorderLayout.CENTER);
+        
+        JPanel pnCenter = new JPanel();
+        pnCenter.setLayout(new BorderLayout());
+        splits.setTopComponent(pnCenter);
+        
         tabMain = new JTabbedPane();
-        add(tabMain, BorderLayout.CENTER);
+        pnCenter.add(tabMain, BorderLayout.CENTER);
         
         tabCities = new JTabbedPane();
         tabMain.add("도시", tabCities);
@@ -72,13 +90,13 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         pnAccountingMain.add(tfIncomes, BorderLayout.SOUTH);
         
         JPanel pnColTop, pnColBottom;
-        pnColTop = new JPanel();
+        pnColTop    = new JPanel();
         pnColBottom = new JPanel();
         pnColTop.setLayout(new BorderLayout());
-        pnColBottom.setLayout(new FlowLayout(FlowLayout.LEFT));
+        pnColBottom.setLayout(new BorderLayout());
         
-        add(pnColTop   , BorderLayout.NORTH);
-        add(pnColBottom, BorderLayout.SOUTH);
+        pnCenter.add(pnColTop   , BorderLayout.NORTH);
+        pnCenter.add(pnColBottom, BorderLayout.SOUTH);
         
         pnColonyBasics = new JPanel();
         pnColonyBasics.setLayout(new BorderLayout());
@@ -123,15 +141,22 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         pnTopDetail.setLayout(new BorderLayout());
         pnTopSouth.add(pnTopDetail, BorderLayout.CENTER);
         
-        ta = new JTextArea();
-        ta.setEditable(false);
-        pnTopDetail.add(ta, BorderLayout.CENTER);
+        taStatus = new JTextArea();
+        taStatus.setEditable(false);
+        pnTopDetail.add(taStatus, BorderLayout.CENTER);
         
         toolbar = new JToolBar();
         pnTopDetail.add(toolbar, BorderLayout.SOUTH);
         
+        JPanel pnLog = new JPanel();
+        pnLog.setLayout(new BorderLayout());
+        splits.setBottomComponent(pnLog);
+        
+        taLog = new JLogArea();
+        pnLog.add(taLog, BorderLayout.CENTER);
+        
         pnHoldings = new JPanel();
-        pnTopDetail.add(toolbar, BorderLayout.NORTH);
+        pnLog.add(new JScrollPane(pnHoldings), BorderLayout.EAST);
     }
     
     @Override
@@ -141,6 +166,7 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
             c.dispose();
         }
         pnCities.clear();
+        taLog.dispose();
         removeAll();
     }
 
@@ -158,7 +184,7 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         if(colony == null) {
             tfColonyName.setText("");
             tfColonyTime.setText("");
-            ta.setText("");
+            taStatus.setText("");
             return;
         }
         
@@ -185,7 +211,7 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         
         tfColonyName.setText(colony.getName());
         tfColonyTime.setText(colony.getDateString());
-        ta.setText(colony.getStatusString(superInstance));
+        taStatus.setText(colony.getStatusString(superInstance));
         
         for(CityPanel c : pnCities) {
             c.refresh(cycle, c.getCity(), colony, superInstance);
@@ -299,5 +325,27 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
             }
             idx++;
         }
+    }
+    
+    /** 컨텐츠 영역과 로그 사이의 분할바 위치 조정 */
+    public void setDividerLocation(double loc) {
+        splits.setDividerLocation(loc);
+        flagSplitLocated = true;
+    }
+    
+    /** 최초 1회 컨텐츠 영역과 로그 사이의 분할바 위치 적절히 조정 */
+    public void setDividerLocationOnlyFirst() {
+        if(flagSplitLocated) return;
+        setDividerLocation(0.7);
+    }
+    
+    /** 정착지에서 발생하는 로그 */
+    public void log(String msg) {
+        if(taLog != null) taLog.log(msg);
+    }
+    
+    /** 정착지에서 발생하는 로그 리셋 */
+    public void clearLog() {
+        if(taLog != null) taLog.clear();
     }
 }

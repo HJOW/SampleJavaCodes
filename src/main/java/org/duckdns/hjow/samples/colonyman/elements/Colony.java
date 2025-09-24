@@ -25,6 +25,7 @@ import org.duckdns.hjow.samples.colonyman.elements.research.ResearchManager;
 import org.duckdns.hjow.samples.colonyman.events.InfluenzaEvent;
 import org.duckdns.hjow.samples.colonyman.events.TimeEvent;
 
+/** 정착지 구현 클래스 */
 public class Colony implements ColonyElements {
     private static final long serialVersionUID = -3144963237818493111L;
     protected volatile long key = ColonyManager.generateKey();

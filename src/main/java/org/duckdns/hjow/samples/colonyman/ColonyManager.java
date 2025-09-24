@@ -408,6 +408,10 @@ public class ColonyManager implements GUIProgram {
         menuActionThrPlay.setEnabled(true);
         
         setEditable(true);
+        
+        for(ColonyPanel pns : pnColonies) {
+            pns.setDividerLocationOnlyFirst();
+        }
     }
     
     /** 메인 쓰레드 구동 중인지 확인하여, 미구동 중인 경우 구동 시작 */
@@ -910,6 +914,7 @@ public class ColonyManager implements GUIProgram {
         
         if(colPn == null) {
             colPn = new ColonyPanel(col, this);
+            if(isVisible()) colPn.setDividerLocationOnlyFirst();
             pnColonies.add(colPn);
         }
         
