@@ -34,6 +34,16 @@ public abstract class State implements ColonyElements {
     public void setHp(int h) {
         this.hp = h;
     }
+    
+    @Override
+    public short getDefenceType() {
+        return 0;
+    }
+
+    @Override
+    public int getDefencePoint() {
+        return 0;
+    }
 
     @Override
     public void addHp(int amount) {

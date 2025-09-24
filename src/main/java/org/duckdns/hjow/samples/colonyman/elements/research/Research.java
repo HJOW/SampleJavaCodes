@@ -43,6 +43,16 @@ public abstract class Research implements ColonyElements {
 
     @Override
     public void addHp(int amount) { }
+    
+    @Override
+    public short getDefenceType() {
+        return 0;
+    }
+
+    @Override
+    public int getDefencePoint() {
+        return 0;
+    }
 
     public long getProgress() {
         return progress;

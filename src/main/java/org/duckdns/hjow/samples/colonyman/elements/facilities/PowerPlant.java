@@ -7,6 +7,7 @@ import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 
 public abstract class PowerPlant extends DefaultFacility {
+    private static final long serialVersionUID = -7738915080952447743L;
     protected String name = getDefaultNamePrefix() + "_" + ColonyManager.generateNaturalNumber();
     protected int capacity = getDefaultCapacity();
 

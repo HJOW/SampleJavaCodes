@@ -151,6 +151,16 @@ public class Citizen implements ColonyElements {
         if(happy <    0) happy =   0;
         if(happy >  100) happy = 100;
     }
+    
+    @Override
+    public short getDefenceType() {
+        return ColonyManager.DEFENCETYPE_SMALL;
+    }
+
+    @Override
+    public int getDefencePoint() {
+        return 0;
+    }
 
     @Override
     public int getHp() {

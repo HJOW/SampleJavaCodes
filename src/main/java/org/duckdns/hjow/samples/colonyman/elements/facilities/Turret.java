@@ -4,15 +4,17 @@ import java.util.List;
 
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.elements.AttackableObject;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.research.BasicBuildingTech;
 import org.duckdns.hjow.samples.colonyman.elements.research.MilitaryTech;
 import org.duckdns.hjow.samples.colonyman.elements.research.Research;
 
-public class Turret extends DefaultFacility {
+public class Turret extends DefaultFacility implements AttackableObject {
     private static final long serialVersionUID = -8553101924279880106L;
     protected String name = "터렛_" + ColonyManager.generateNaturalNumber();
     
@@ -29,42 +31,53 @@ public class Turret extends DefaultFacility {
         this.name = name;
     }
     
-    protected int getAttackCount() {
+    @Override
+    public int getAttackCount() {
         return 1;
     }
     
-    protected int getDamage() {
+    @Override
+    public int getDamage() {
         return 1;
     }
     
-    protected int getAttackCycle() {
+    @Override
+    public int getAttackCycle() {
         return 10;
     }
+    
+    /** 대미지 처리 후 추가 작업 (상태를 부여한다거나 등등) 이 메소드에서 구현 */
+    protected void processAfterAttack(int cycle, ColonyElements element, int finalDamage) { }
     
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
         super.oneSecond(cycle, city, colony, efficiency100);
         
-        int serviceLeft = getAttackCount();
-        int damages = getDamage();
+        int castLeft    = getAttackCount();
+        int damages     = getDamage();
+        int naturalized = damages;
         
         if(cycle % getAttackCycle() == 0) {
             List<Enemy> enemies = city.getEnemies();
             for(Enemy e : enemies) {
                 if(e.getHp() >= 1) {
-                    e.addHp(damages * (-1));
-                    serviceLeft--;
-                    if(serviceLeft <= 0) break;
+                    naturalized = ColonyManager.naturalizeDamage(this, e, damages);
+                    e.addHp(naturalized * (-1));
+                    processAfterAttack(cycle, e, naturalized);
+                    castLeft--;
+                    if(castLeft <= 0) break;
                 }
             }
             
-            if(serviceLeft >= 1) {
+            if(castLeft >= 1) {
                 enemies = colony.getEnemies();
                 for(Enemy e : enemies) {
                     if(e.getHp() >= 1) {
-                        e.addHp(damages * (-1));
-                        serviceLeft--;
-                        if(serviceLeft <= 0) break;
+                        naturalized = ColonyManager.naturalizeDamage(this, e, damages);
+                        e.addHp(naturalized * (-1));
+                        processAfterAttack(cycle, e, naturalized);
+                        castLeft--;
+                        if(castLeft <= 0) break;
                     }
                 }
             }
@@ -101,6 +114,11 @@ public class Turret extends DefaultFacility {
     @Override
     public int getWorkerCapacity() {
         return 2;
+    }
+    
+    @Override
+    public short getAttackType() {
+        return 0;
     }
     
     @Override

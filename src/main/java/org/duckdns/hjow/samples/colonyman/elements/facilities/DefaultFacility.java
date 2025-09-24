@@ -50,6 +50,16 @@ public abstract class DefaultFacility implements Facility {
     }
     
     @Override
+    public short getDefenceType() {
+        return ColonyManager.DEFENCETYPE_BUILDING;
+    }
+
+    @Override
+    public int getDefencePoint() {
+        return 1;
+    }
+    
+    @Override
     public long getKey() {
         return key;
     }

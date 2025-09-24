@@ -43,9 +43,11 @@ import javax.swing.UIManager;
 
 import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
+import org.duckdns.hjow.samples.colonyman.elements.AttackableObject;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.CityPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.util.ResourceUtil;
 import org.duckdns.hjow.samples.util.UIUtil;
@@ -393,27 +395,37 @@ public class ColonyManager implements GUIProgram {
 
     @Override
     public void onAfterOpened(SampleJavaCodes superInstance) {
+        btnThrPlay.setEnabled(false);
+        menuActionThrPlay.setEnabled(false);
+        
+        threadPaused = true;
+        reserveSaving  = false;
+        
+        assureMainThreadRunning();
+        
+        btnThrPlay.setText("시뮬레이션 시작");
+        btnThrPlay.setEnabled(true);
+        menuActionThrPlay.setEnabled(true);
+        
+        setEditable(true);
+    }
+    
+    /** 메인 쓰레드 구동 중인지 확인하여, 미구동 중인 경우 구동 시작 */
+    public void assureMainThreadRunning() {
+        if(thread == null || (! threadSwitch)) turnOnMainThread();
+    }
+    
+    /** 메인 쓰레드 실행 */
+    protected void turnOnMainThread() {
+        if(thread != null) {
+            thread.interrupt();
+            try { Thread.sleep(1000L); } catch(InterruptedException ex) { ex.printStackTrace(); }
+        }
         thread = new Thread(new Runnable() {    
             @Override
             public void run() {
                 while(threadSwitch) {
-                    threadShutdown = false;
-                    
-                    // 쓰레드에서 수행할 실질 작업 수행
-                    try { if(! threadPaused) { bCheckerPauseCompleted = false; oneSecond(); } } catch(Exception ex) { ex.printStackTrace(); }
-                    
-                    // 일시정지 후 쓰레드가 실제 정지 중인지 판단하는 플래그
-                    if(threadPaused) bCheckerPauseCompleted = true;
-                    else bCheckerPauseCompleted = false;
-                    
-                    // 쓰레드 Sleep
-                    try { Thread.sleep(cycleGap); } catch(InterruptedException e) { threadSwitch = false; break; }
-                    
-                    // 저장 요청 수행
-                    if(reserveSaving) { try { saveColonies(); } catch(Exception ex) { ex.printStackTrace(); } reserveSaving = false; }
-                    
-                    threadShutdown = false;
-                    progThreadStatus.setIndeterminate(! threadPaused);
+                    if(! onMainThread()) break;
                 }
                 threadShutdown = true;
                 progThreadStatus.setIndeterminate(false);
@@ -422,15 +434,32 @@ public class ColonyManager implements GUIProgram {
             }
         });
         threadSwitch   = true;
-        threadPaused   = true;
         threadShutdown = false;
-        reserveSaving  = false;
         flagSaveBeforeClose = true;
-        btnThrPlay.setText("시뮬레이션 시작");
-        btnThrPlay.setEnabled(true);
-        menuActionThrPlay.setEnabled(true);
         thread.start();
-        setEditable(true);
+    }
+    
+    /** 메인 쓰레드 동작 */
+    protected boolean onMainThread() {
+        threadShutdown = false;
+        
+        // 쓰레드에서 수행할 실질 작업 수행
+        try { if(! threadPaused) { bCheckerPauseCompleted = false; oneSecond(); } } catch(Exception ex) { ex.printStackTrace(); }
+        
+        // 일시정지 후 쓰레드가 실제 정지 중인지 판단하는 플래그
+        if(threadPaused) bCheckerPauseCompleted = true;
+        else bCheckerPauseCompleted = false;
+        
+        // 쓰레드 Sleep
+        try { Thread.sleep(cycleGap); } catch(InterruptedException e) { threadSwitch = false; return false; }
+        
+        // 저장 요청 수행
+        if(reserveSaving) { try { saveColonies(); } catch(Exception ex) { ex.printStackTrace(); } reserveSaving = false; }
+        
+        threadShutdown = false;
+        progThreadStatus.setIndeterminate(! threadPaused);
+        
+        return true;
     }
     
     /** 정착지 하나를 별도 파일로 저장 요청 시 호출됨 */
@@ -860,6 +889,7 @@ public class ColonyManager implements GUIProgram {
     
     /** 정착지 화면 내용 갱신 */
     public void refreshColonyContent() {
+        assureMainThreadRunning();
         refreshArenaPanel(0);
     }
     
@@ -915,14 +945,71 @@ public class ColonyManager implements GUIProgram {
         return null;
     }
     
+    /** 각 요소들을 위한 고유키 생성 (절대 0이 나오지 않음) */
     public static long generateKey() {
         Random rd = new Random();
         long key = rd.nextLong();
-        while(key == 0L) key = rd.nextLong();
+        while(key == 0L) { key = rd.nextLong(); }
         return key;
     }
     
+    /** 각 요소들의 고유 이름을 위한 자연수 반환 */
     public static int generateNaturalNumber() {
         return Math.abs(new Random().nextInt());
     }
+    
+    /** 공격자의 대미지에 추가 연산 (랜덤성 부여, 속성 및 방어력, 상태 적용) */
+    public static int naturalizeDamage(AttackableObject attacker, ColonyElements target, int damage) {
+        if(damage < 0) return damage; // 대미지가 음수인 경우 그대로 반환
+        double correctRate = 1.0; // 명중률
+        int    defType = target.getDefenceType();
+        int    atkType = attacker.getAttackType();
+        
+        // 속성 적용
+        if(defType == DEFENCETYPE_SMALL) {
+            if(atkType == ATTACKTYPE_THICK_BULLET ) { damage = (int) Math.round( damage / 2.0 ); correctRate = correctRate * 0.75; }
+            if(atkType == ATTACKTYPE_THICK_MISSILE) { damage = (int) Math.round( damage / 2.0 ); }
+            if(atkType == ATTACKTYPE_THICK_RAY    ) { correctRate = correctRate * 0.75; }
+            if(atkType == ATTACKTYPE_THICK_ENERGY ) { correctRate = correctRate * 0.25; }
+        }
+        
+        if(defType == DEFENCETYPE_BUILDING) {
+            if(atkType >= 1 && atkType <= 9) damage = (int) Math.round( damage / 2.0 );
+        }
+        
+        // 랜덤성 적용
+        //    랜덤값 생성
+        double naturalRandom = Math.round(damage * 0.2);
+        naturalRandom = ((naturalRandom / 2.0) * Math.random()) * 2.0;
+        naturalRandom = naturalRandom - (naturalRandom / 2.0); // 반수는 음수로 가도록
+        
+        //    속성에 따라 랜덤값 추가 변동
+        if(atkType == ATTACKTYPE_THICK_MISSILE) naturalRandom = naturalRandom * 2;
+        if(atkType == ATTACKTYPE_THICK_ENERGY && defType == DEFENCETYPE_SMALL) naturalRandom = naturalRandom * 4;
+        if(atkType == ATTACKTYPE_THIN_ENERGY  && defType == DEFENCETYPE_SMALL) naturalRandom = naturalRandom * 2;
+        
+        //     랜덤값 대미지에 적용
+        damage = damage + (int) Math.round(naturalRandom);
+        
+        // 방어력 적용
+        damage = damage - target.getDefencePoint();
+        if(damage < 1) damage = 1;
+        
+        // 명중률 적용
+        if(Math.random() > correctRate) return 0;
+        return damage;
+    }
+    
+    public static final short ATTACKTYPE_NORMAL = 0;
+    public static final short ATTACKTYPE_THIN_BULLET = 1;
+    public static final short ATTACKTYPE_THIN_RAY    = 2;
+    public static final short ATTACKTYPE_THIN_ENERGY = 3;
+    public static final short ATTACKTYPE_THICK_BULLET  = 11;
+    public static final short ATTACKTYPE_THICK_RAY     = 12;
+    public static final short ATTACKTYPE_THICK_ENERGY  = 13;
+    public static final short ATTACKTYPE_THICK_MISSILE = 14;
+    public static final short DEFENCETYPE_NORMAL   = 0;
+    public static final short DEFENCETYPE_SMALL    = 1;
+    public static final short DEFENCETYPE_BUILDING = 9;
+    
 }

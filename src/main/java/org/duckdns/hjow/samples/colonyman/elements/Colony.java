@@ -274,13 +274,35 @@ public class Colony implements ColonyElements {
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100) { // parameters are null
         int idx;
         
+        // 체력이 없는 도시 삭제
+        idx = 0;
+        while(idx < getCities().size()) {
+            City cityOne = getCities().get(idx);
+            if(cityOne.getHp() <= 0) {
+                getCities().remove(idx);
+                continue;
+            }
+            idx++;
+        }
+        
+        // 체력이 없는 적 삭제
+        idx = 0;
+        while(idx < getEnemies().size()) {
+            Enemy en = getEnemies().get(idx);
+            if(en.getHp() <= 0) {
+                getEnemies().remove(idx);
+                continue;
+            }
+            idx++;
+        }
+        
         // 도시별 사이클 처리
-        for(City c : cities) {
+        for(City c : getCities()) {
             c.oneSecond(cycle, c, this, 100);
         }
         
         // 적 사이클 처리
-        for(Enemy e : enemies) {
+        for(Enemy e : getEnemies()) {
             e.oneSecond(cycle, city, colony, efficiency100);
         }
         
@@ -360,6 +382,16 @@ public class Colony implements ColonyElements {
     @Override
     public int getMaxHp() {
         return 1000000;
+    }
+    
+    @Override
+    public short getDefenceType() {
+        return ColonyManager.DEFENCETYPE_BUILDING;
+    }
+
+    @Override
+    public int getDefencePoint() {
+        return 9;
     }
     
     public int getAccountingPeriod() {

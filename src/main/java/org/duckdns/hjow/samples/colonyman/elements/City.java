@@ -112,12 +112,27 @@ public class City implements ColonyElements {
         if(hp <   0) hp = 0;
     }
 
+    @Override
     public int getHp() {
         return hp;
     }
+    
+    @Override
     public void setHp(int hp) {
         this.hp = hp;
-        if(this.hp > getMaxHp()) this.hp = getMaxHp();
+        int mx = getMaxHp();
+        if(hp >= mx) hp = mx;
+        if(hp <   0) hp = 0;
+    }
+    
+    @Override
+    public short getDefenceType() {
+        return ColonyManager.DEFENCETYPE_BUILDING;
+    }
+
+    @Override
+    public int getDefencePoint() {
+        return 9;
     }
     
     public int getSpaces() {
@@ -187,17 +202,17 @@ public class City implements ColonyElements {
             f.oneSecond(cycle, this, colony, efficiency);
         }
         
+        // 적 사이클 처리
+        for(Enemy e : getEnemies()) {
+            e.oneSecond(cycle, city, colony, efficiency100);
+        }
+        
         // 사망 개체 제거
         removeDeads(colony);
         
         // 거주자 및 일자리 할당
         allocateHome(colony);
         allocateWorkers(colony);
-        
-        // 적 처리
-        for(Enemy e : getEnemies()) {
-            e.oneSecond(cycle, city, colony, efficiency100);
-        }
         
         // 예약 작업 처리
         for(HoldingJob h : getHoldings()) {
@@ -296,15 +311,15 @@ public class City implements ColonyElements {
         return power;
     }
     
-    /** HP가 0인 시민과 시설 제거 */
+    /** HP가 0인 시민과 시설, 적 제거 */
     public void removeDeads(Colony col) {
         int idx = 0;
         
         // 시민
-        while(idx < citizens.size()) {
-            Citizen c = citizens.get(idx);
+        while(idx < getCitizens().size()) {
+            Citizen c = getCitizens().get(idx);
             if(c.getHp() <= 0) {
-                citizens.remove(idx);
+                getCitizens().remove(idx);
                 continue;
             }
             idx++;
@@ -312,24 +327,35 @@ public class City implements ColonyElements {
         
         // 시설
         idx = 0;
-        while(idx < facility.size()) {
-            Facility f = facility.get(idx);
+        while(idx < getFacility().size()) {
+            Facility f = getFacility().get(idx);
             if(f.getHp() <= 0) {
                 // 일하는 중인 시민 구직자 만들기
                 long facKey = f.getKey();
-                for(Citizen c : citizens) {
+                for(Citizen c : getCitizens()) {
                     if(c.getWorkingFacility() == facKey) c.setWorkingFacility(0L);
                 }
                 
                 if(f instanceof Home) {
                     // 살던 시민 노숙자 만들기
-                    for(Citizen c : citizens) {
+                    for(Citizen c : getCitizens()) {
                         if(c.getLivingHome() == facKey) c.setLivingHome(0L);
                     }
                 }
                 
                 // 시설 제거
-                facility.remove(idx);
+                getFacility().remove(idx);
+                continue;
+            }
+            idx++;
+        }
+        
+        // 적
+        idx = 0;
+        while(idx < getEnemies().size()) {
+            Enemy en = getEnemies().get(idx);
+            if(en.getHp() <= 0) {
+                getEnemies().remove(idx);
                 continue;
             }
             idx++;
@@ -641,6 +667,10 @@ public class City implements ColonyElements {
         for(HoldingJob h : holdings) { list.add(h.toJson()); }
         json.put("holdings", list);
         
+        list = new JsonArray();
+        for(Enemy h : enemies) { list.add(h.toJson()); }
+        json.put("enemies", list);
+        
         return json;
     }
     
@@ -695,6 +725,22 @@ public class City implements ColonyElements {
                         HoldingJob h = new HoldingJob();
                         h.fromJson((JsonObject) o);
                         holdings.add(h);
+                    } catch(Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+        
+        list = (JsonArray) json.get("enemies");
+        enemies.clear();
+        if(list != null) {
+            for(Object o : list) {
+                if(o instanceof String) o = JsonObject.parseJson(o.toString());
+                if(o instanceof JsonObject) {
+                    try {
+                        Enemy en = Enemy.createEnemyFromJson((JsonObject) o);
+                        enemies.add(en);
                     } catch(Exception ex) {
                         ex.printStackTrace();
                     }
