@@ -22,6 +22,8 @@ import java.io.FileFilter;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
@@ -41,11 +43,14 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.commons.util.FileUtil;
 import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.CityPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyGroup;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.util.ResourceUtil;
 import org.duckdns.hjow.samples.util.UIUtil;
@@ -72,7 +77,7 @@ public class ColonyManager implements GUIProgram {
     protected transient List<ColonyPanel> pnColonies = new Vector<ColonyPanel>();
     
     protected transient JProgressBar progThreadStatus;
-    protected transient JFileChooser fileChooser;
+    protected transient JFileChooser fileChooser, backupChooser;
     protected transient javax.swing.filechooser.FileFilter filterCol, filterColGz;
     
     protected transient JMenuBar menuBar;
@@ -165,6 +170,25 @@ public class ColonyManager implements GUIProgram {
             };
             fileChooser.addChoosableFileFilter(filterCol);
             fileChooser.addChoosableFileFilter(filterColGz);
+        }
+
+        if(backupChooser == null) {
+            backupChooser = new JFileChooser();
+            backupChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            backupChooser.setMultiSelectionEnabled(false);
+            backupChooser.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
+                @Override
+                public String getDescription() {
+                    return "정착지 백업 파일 (*.colbak)";
+                }
+                
+                @Override
+                public boolean accept(File f) {
+                    if(f == null) return false;
+                    if(f.isDirectory()) return false;
+                    return f.getName().toLowerCase().endsWith(".colbak");
+                }
+            });
         }
         
         JPanel pnMainCard1, pnMainCard2;
@@ -319,10 +343,28 @@ public class ColonyManager implements GUIProgram {
         });
         
         menuFile.addSeparator();
-        
-        menuItem = new JMenuItem("정착지 모두 포기");
+
+        menuItem = new JMenuItem("백업");
         menuFile.add(menuItem);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F3, KeyEvent.ALT_MASK));
+        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_MASK));
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onBackupRequested();
+            }
+        });
+        
+        menuItem = new JMenuItem("복원");
+        menuFile.add(menuItem);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onRestoreRequested();
+            }
+        });
+        
+        menuItem = new JMenuItem("정착지 모두 포기 (초기화)");
+        menuFile.add(menuItem);
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -420,6 +462,54 @@ public class ColonyManager implements GUIProgram {
             File f = fileChooser.getSelectedFile();
             loadColony(f, true);
             refreshColonyList();
+        }
+    }
+
+    /** 정착지 전체 백업 요청 시 호출됨 */
+    protected void onBackupRequested() {
+        String groupName = JOptionPane.showInputDialog(getDialog(), "백업의 이름을 입력하십시오. (빈 내용 입력 시 취소됩니다.)");
+        if(groupName == null) return;
+
+        groupName = groupName.trim();
+        if(groupName.equals("")) return;
+
+        ColonyGroup groups = new ColonyGroup();
+        groups.getColonies().addAll(colonies);
+        groups.setName(groupName);
+
+        File fileSel;
+        int sel = backupChooser.showSaveDialog(getDialog());
+        if(sel == JFileChooser.APPROVE_OPTION) {
+            try {
+                fileSel = backupChooser.getSelectedFile();
+                FileUtil.writeString(fileSel, "UTF-8", groups.toJson().toJSON(), GZIPOutputStream.class); 
+            } catch(Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(getDialog(), "오류 : " + ex.getMessage());
+            }
+        }
+    }
+
+    /** 정착지 복원 요청 시 호출됨 */
+    protected void onRestoreRequested() {
+        int sel = backupChooser.showOpenDialog(getDialog());
+        if(sel != JFileChooser.APPROVE_OPTION) return;
+
+        try {
+            File fileSel = backupChooser.getSelectedFile();
+            String contents = FileUtil.readString(fileSel, "UTF-8", GZIPInputStream.class);
+
+            ColonyGroup group = new ColonyGroup();
+            group.fromJson((JsonObject) JsonObject.parseJson(contents));
+
+            sel = JOptionPane.showConfirmDialog(getDialog(), "백업명 : " + group.getName() + "\n현재의 정착지들을 모두 포기하고, 백업에서 복원하시겠습니까?", "안내", JOptionPane.YES_NO_OPTION);
+            if(sel != JOptionPane.YES_OPTION) return;
+
+            colonies.clear();
+            colonies.addAll(group.getColonies());
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(getDialog(), "오류 : " + ex.getMessage());
         }
     }
     
