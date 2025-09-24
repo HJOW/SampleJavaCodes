@@ -20,6 +20,7 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
     protected long citizenKey = 0L;
     protected String targetName;
     
+    protected transient JPanel pnImage;
     protected transient JProgressBar progHp;
     protected transient JButton btnToggle;
     protected transient JTextField tfName;
@@ -44,8 +45,10 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
         JPanel pnNorth, pnCenter;
         pnNorth  = new JPanel();
         pnCenter = new JPanel();
+        pnImage  = new JPanel();
         pnNorth.setLayout(new BorderLayout());
         pnCenter.setLayout(new BorderLayout());
+        pnImage.setLayout(new BorderLayout());
         
         add(pnNorth , BorderLayout.NORTH);
         add(pnCenter, BorderLayout.CENTER);
@@ -82,6 +85,7 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
         ta = new JTextArea();
         ta.setEditable(false);
         pnCenter.add(new JScrollPane(ta), BorderLayout.CENTER);
+        pnCenter.add(pnImage, BorderLayout.WEST);
         
         pnCenter.setVisible(false);
         btnToggle.addActionListener(new ActionListener() {

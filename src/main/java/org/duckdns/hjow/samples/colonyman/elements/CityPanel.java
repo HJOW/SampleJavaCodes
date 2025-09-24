@@ -35,19 +35,21 @@ import org.duckdns.hjow.samples.colonyman.elements.facilities.SupportGUIFacility
 
 public class CityPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = 3475480727850203183L;
-    protected ColonyManager colonyManager;
-    protected City city;
-    protected JProgressBar progHp;
-    protected JTextArea ta;
-    protected JTextField tfName, tfSearchCitizen, tfSearchFacility;
-    protected JPanel pnGrid, pnCitizens, pnFacilities, pnHoldings;
-    protected JToolBar toolbarCity;
-    protected JButton btnNewFac;
-    protected JSplitPane splits;
-    protected GridBagLayout layoutFacility, layoutCitizen;
-    protected NewFacilityManager dialogNewFac;
-    protected List<FacilityPanel> facilityPns = new Vector<FacilityPanel>();
-    protected List<CitizenPanel>  citizenPns  = new Vector<CitizenPanel>();
+    protected transient ColonyManager colonyManager;
+    protected transient City city;
+    protected transient JProgressBar progHp;
+    protected transient JTextArea ta;
+    protected transient JTextField tfName, tfSearchCitizen, tfSearchFacility;
+    protected transient JPanel pnGrid, pnCitizens, pnFacilities, pnHoldings;
+    protected transient JToolBar toolbarCity;
+    protected transient JButton btnNewFac;
+    protected transient JSplitPane splits;
+    protected transient GridBagLayout layoutFacility, layoutCitizen;
+    protected transient NewFacilityManager dialogNewFac;
+    protected transient List<FacilityPanel> facilityPns = new Vector<FacilityPanel>();
+    protected transient List<CitizenPanel>  citizenPns  = new Vector<CitizenPanel>();
+    
+    protected transient boolean flagSplitMoved = false;
     
     public CityPanel() {
         
@@ -148,7 +150,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         pnFacilities.setLayout(layoutFacility);
         pnCitizens.setLayout(layoutCitizen);
         
-        pnFacRoot.add(new JScrollPane(pnFacilities), BorderLayout.CENTER);
+        pnFacRoot.add(new JScrollPane(pnFacilities, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
         pnCitiRoot.add(new JScrollPane(pnCitizens), BorderLayout.CENTER);
         
         tab.add("시설", pnFacRoot);
@@ -261,7 +263,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             }
         }
         
-        columns = (int) Math.ceil((superInstance.getDialogWidth() - 200.0) / 600.0);
+        columns = (int) Math.ceil((superInstance.getDialogWidth() - 200.0) / 700.0);
         if(columns <= 0) columns = 1;
         
         idx = 0;
@@ -393,7 +395,10 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         ta.setText(city.getStatusString(colony, superInstance));
         
         // 가로 경계선 위치 조절
-        splits.setDividerLocation(0.3);
+        if(superInstance.isVisible()) {
+            if(! flagSplitMoved) splits.setDividerLocation(0.3);
+            flagSplitMoved = true;
+        }
         
         // 이 도시 HP가 0이면 전부 비활성화
         if(city.getHp() <= 0) {

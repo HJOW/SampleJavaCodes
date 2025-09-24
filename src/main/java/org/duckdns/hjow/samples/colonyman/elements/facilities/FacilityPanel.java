@@ -33,7 +33,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = -6078767714905474678L;
     
     protected transient JProgressBar progHp;
-    protected transient JPanel pnUp, pnCenter, pnDown;
+    protected transient JPanel pnUp, pnCenter, pnDown, pnImage;
     protected transient JButton btnToggle, btnDestroy;
     protected transient JTextField tfName;
     protected transient JTextArea ta;
@@ -100,7 +100,11 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         
         btnToggle = new JButton("▼");
         pnCtrls.add(btnToggle);
-        
+
+        pnImage = new JPanel();
+        pnCenter.add(pnImage, BorderLayout.WEST);
+        pnImage.setLayout(new BorderLayout());
+
         ta = new JTextArea();
         ta.setEditable(false);
         pnCenter.add(new JScrollPane(ta), BorderLayout.CENTER);

@@ -556,6 +556,11 @@ public class ColonyManager implements GUIProgram {
         onAfterOpened(superInstance);
     }
 
+    public boolean isVisible() {
+        if(dialog == null) return false;
+        return dialog.isVisible();
+    }
+
     @Override
     public boolean isHidden() {
         return false;
