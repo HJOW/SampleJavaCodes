@@ -22,7 +22,7 @@ public class AESEncryptor implements CypherModule {
     }
     
     protected SecretKeySpec prepareKey(String key) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-    	MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
         byte[] digested = digest.digest(key.getBytes("UTF-8"));
         String dgKey = Base64.getEncoder().encodeToString(digested);
         digested = null;
@@ -49,22 +49,22 @@ public class AESEncryptor implements CypherModule {
         return Base64.getEncoder().encodeToString(ciphered);
     }
 
-	@Override
-	public byte[] convert(byte[] before, String key, Properties prop) throws Exception {
+    @Override
+    public byte[] convert(byte[] before, String key, Properties prop) throws Exception {
         SecretKeySpec scKeySpec = prepareKey(key);
         
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, scKeySpec);
         return cipher.doFinal(before); 
-	}
+    }
 
-	@Override
-	public void convert(InputStream inputs, OutputStream outputs, String key) throws Exception {
+    @Override
+    public void convert(InputStream inputs, OutputStream outputs, String key) throws Exception {
         convert(inputs, outputs, key, null);
-	}
-	
-	@Override
-	public void convert(InputStream inputs, OutputStream outputs, String key, ProcessingStream streamEvent) throws Exception {
+    }
+    
+    @Override
+    public void convert(InputStream inputs, OutputStream outputs, String key, ProcessingStream streamEvent) throws Exception {
         SecretKeySpec scKeySpec = prepareKey(key);
         
         Cipher cipher = Cipher.getInstance("AES");
@@ -74,19 +74,19 @@ public class AESEncryptor implements CypherModule {
         byte[] buffer2;
         int read;
         while(true) {
-        	read = inputs.read(buffer1, 0, buffer1.length);
-        	if(read < 0) break;
-        	if(streamEvent != null) streamEvent.processing(buffer1, read);
-        	buffer2 = cipher.update(buffer1, 0, read);
-        	if(buffer2 != null) outputs.write(buffer2);
+            read = inputs.read(buffer1, 0, buffer1.length);
+            if(read < 0) break;
+            if(streamEvent != null) streamEvent.processing(buffer1, read);
+            buffer2 = cipher.update(buffer1, 0, read);
+            if(buffer2 != null) outputs.write(buffer2);
         }
         buffer2 = cipher.doFinal();
         if(buffer2 != null) outputs.write(buffer2);
         outputs.flush();
-	}
+    }
 
-	@Override
-	public boolean supportStreamConvertion() {
-		return true;
-	}
+    @Override
+    public boolean supportStreamConvertion() {
+        return true;
+    }
 }

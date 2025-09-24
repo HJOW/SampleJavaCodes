@@ -211,11 +211,11 @@ public abstract class DefaultFacility implements Facility {
 
     @Override
     public BigInteger getCheckerValue() {
-    	BigInteger res = new BigInteger(String.valueOf(getKey()));
-    	for(int idx=0; idx<getType().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getType().charAt(idx)))); }
-    	for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
-    	res = res.add(new BigInteger(String.valueOf(getHp())));
-    	for(State st : getStates()) { res = res.add(st.getCheckerValue()); }
-    	return res;
+        BigInteger res = new BigInteger(String.valueOf(getKey()));
+        for(int idx=0; idx<getType().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getType().charAt(idx)))); }
+        for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
+        res = res.add(new BigInteger(String.valueOf(getHp())));
+        for(State st : getStates()) { res = res.add(st.getCheckerValue()); }
+        return res;
     }
 }

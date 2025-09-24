@@ -6,7 +6,7 @@ import java.math.BigInteger;
 import org.duckdns.hjow.commons.json.JsonObject;
 
 public interface ColonyElements extends Serializable {
-	/** 이 객체의 고유 ID 값 반환. 0이 될 수 없음. */
+    /** 이 객체의 고유 ID 값 반환. 0이 될 수 없음. */
     public long getKey();
     
     /** 이 객체의 이름 반환. */

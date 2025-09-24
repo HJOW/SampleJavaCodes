@@ -26,17 +26,17 @@ public class AESDecryptor extends AESEncryptor {
         return new String(ciphered, "UTF-8");
     }
 
-	@Override
-	public byte[] convert(byte[] before, String key, Properties prop) throws Exception {
+    @Override
+    public byte[] convert(byte[] before, String key, Properties prop) throws Exception {
         SecretKeySpec scKeySpec = prepareKey(key);
         
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.DECRYPT_MODE, scKeySpec);
         return cipher.doFinal(before);
-	}
+    }
 
-	@Override
-	public void convert(InputStream inputs, OutputStream outputs, String key) throws Exception {
+    @Override
+    public void convert(InputStream inputs, OutputStream outputs, String key) throws Exception {
         SecretKeySpec scKeySpec = prepareKey(key);
         
         Cipher cipher = Cipher.getInstance("AES");
@@ -46,13 +46,13 @@ public class AESDecryptor extends AESEncryptor {
         byte[] buffer2;
         int read;
         while(true) {
-        	read = inputs.read(buffer1, 0, buffer1.length);
-        	if(read < 0) break;
-        	buffer2 = cipher.update(buffer1, 0, read);
-        	if(buffer2 != null) outputs.write(buffer2);
+            read = inputs.read(buffer1, 0, buffer1.length);
+            if(read < 0) break;
+            buffer2 = cipher.update(buffer1, 0, read);
+            if(buffer2 != null) outputs.write(buffer2);
         }
         buffer2 = cipher.doFinal();
         if(buffer2 != null) outputs.write(buffer2);
         outputs.flush();
-	}
+    }
 }

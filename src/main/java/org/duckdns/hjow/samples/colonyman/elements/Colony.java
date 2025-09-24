@@ -44,8 +44,8 @@ public class Colony implements ColonyElements {
     protected transient boolean checked = false;
     
     public Colony() {
-    	checked = true;
-    	resetResearches();
+        checked = true;
+        resetResearches();
     }
     
     public Colony(File f) throws Exception {
@@ -496,21 +496,21 @@ public class Colony implements ColonyElements {
         }
         
         if(json.get("checker") != null) {
-        	BigInteger checker = new BigInteger(json.get("checker").toString());
-        	checked = (checker.equals(getCheckerValue()));
+            BigInteger checker = new BigInteger(json.get("checker").toString());
+            checked = (checker.equals(getCheckerValue()));
         } else {
-        	checked = false;
+            checked = false;
         }
     }
     
     @Override
     public BigInteger getCheckerValue() {
-    	BigInteger res = new BigInteger(String.valueOf(getKey()));
-    	for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
-    	res = res.add(new BigInteger(String.valueOf(getHp())));
-    	for(City c : getCities()) { res = res.add(c.getCheckerValue()); }
-    	
-    	return res;
+        BigInteger res = new BigInteger(String.valueOf(getKey()));
+        for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
+        res = res.add(new BigInteger(String.valueOf(getHp())));
+        for(City c : getCities()) { res = res.add(c.getCheckerValue()); }
+        
+        return res;
     }
 
     /** 파일로 저장 */

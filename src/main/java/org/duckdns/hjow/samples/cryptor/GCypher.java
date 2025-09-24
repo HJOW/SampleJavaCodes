@@ -68,21 +68,21 @@ public class GCypher implements GUIProgram {
     public void init(SampleJavaCodes superInstance) {
         if(dialog != null) dispose();
         
-    	properties.putAll(ResourceUtil.loadPropResource("/bundled.properties"));
-    	properties.putAll(ResourceUtil.loadPropResource("/config.properties"));
-    	
-    	UIUtil.applyLookAndFeel(properties);
+        properties.putAll(ResourceUtil.loadPropResource("/bundled.properties"));
+        properties.putAll(ResourceUtil.loadPropResource("/config.properties"));
+        
+        UIUtil.applyLookAndFeel(properties);
         
         dialog = new JDialog();
         dialog.setSize(500, 300);
         dialog.setTitle("GCypher");
         dialog.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         dialog.addWindowListener(new WindowAdapter() {
-        	@Override
-        	public void windowClosing(WindowEvent e) {
-        		exit();
-        	}
-		});
+            @Override
+            public void windowClosing(WindowEvent e) {
+                exit();
+            }
+        });
         dialog.setIconImage(UIUtil.iconToImage(GUISampleJavaCodes.getDefaultIcon()));
         UIUtil.center(dialog);
         
@@ -156,32 +156,32 @@ public class GCypher implements GUIProgram {
         JMenuItem menuFileConv = new JMenuItem("GCypher File Converter");
         menuFileConv.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_MASK));
         menuFile.add(menuFileConv);
-        menuFileConv.addActionListener(new ActionListener() {	
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						fileCypher.open();
-					}
-				});
-			}
-		});
+        menuFileConv.addActionListener(new ActionListener() {    
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        fileCypher.open();
+                    }
+                });
+            }
+        });
         
         JMenuItem menuFileHash = new JMenuItem("GCypher File Hash");
         menuFileHash.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK));
         menuFile.add(menuFileHash);
-        menuFileHash.addActionListener(new ActionListener() {	
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						fileHash.open();
-					}
-				});
-			}
-		});
+        menuFileHash.addActionListener(new ActionListener() {    
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        fileHash.open();
+                    }
+                });
+            }
+        });
         
         menuFile.addSeparator();
         
@@ -200,7 +200,7 @@ public class GCypher implements GUIProgram {
     }
     /** UI 상에서 동작 버튼이 클릭되었을 때 호출됩니다. */
     protected void act() {
-    	after.setText("");
+        after.setText("");
         String moduleName = (String) cbModule.getSelectedItem();
         CypherModule module = ModuleLoader.get(moduleName);
         
@@ -224,7 +224,7 @@ public class GCypher implements GUIProgram {
     @Override
     public void open(SampleJavaCodes superInstance) {
         if(dialog == null) init(superInstance);
-    	dialog.setVisible(true);
+        dialog.setVisible(true);
         splitPane.setDividerLocation(0.5);
     }
     /**  프로그램 종료 */

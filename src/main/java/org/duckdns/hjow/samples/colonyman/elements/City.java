@@ -735,14 +735,14 @@ public class City implements ColonyElements {
     
     @Override
     public BigInteger getCheckerValue() {
-    	BigInteger res = new BigInteger(String.valueOf(getKey()));
-    	for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
-    	res = res.add(new BigInteger(String.valueOf(getHp())));
-    	for(Facility   f : getFacility()) { res = res.add(f.getCheckerValue()); }
-    	for(Citizen    c : getCitizens()) { res = res.add(c.getCheckerValue()); }
-    	for(Enemy      e : getEnemies())  { res = res.add(e.getCheckerValue()); }
-    	for(HoldingJob h : getHoldings()) { res = res.add(h.getCheckerValue()); }
-    	
-    	return res;
+        BigInteger res = new BigInteger(String.valueOf(getKey()));
+        for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
+        res = res.add(new BigInteger(String.valueOf(getHp())));
+        for(Facility   f : getFacility()) { res = res.add(f.getCheckerValue()); }
+        for(Citizen    c : getCitizens()) { res = res.add(c.getCheckerValue()); }
+        for(Enemy      e : getEnemies())  { res = res.add(e.getCheckerValue()); }
+        for(HoldingJob h : getHoldings()) { res = res.add(h.getCheckerValue()); }
+        
+        return res;
     }
 }

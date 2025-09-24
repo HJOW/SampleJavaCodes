@@ -109,11 +109,11 @@ public class HoldingJob implements Serializable {
     }
     
     public BigInteger getCheckerValue() {
-    	BigInteger res = new BigInteger(String.valueOf(getKey()));
-    	res = res.add(new BigInteger(String.valueOf(getCycleLeft())));
-    	for(int idx=0; idx<getCommand().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getCommand().charAt(idx)))); }
-    	for(int idx=0; idx<getCommandTitle().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getCommandTitle().charAt(idx)))); }
-    	for(int idx=0; idx<getParameter().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getParameter().charAt(idx)))); }
-    	return res;
+        BigInteger res = new BigInteger(String.valueOf(getKey()));
+        res = res.add(new BigInteger(String.valueOf(getCycleLeft())));
+        for(int idx=0; idx<getCommand().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getCommand().charAt(idx)))); }
+        for(int idx=0; idx<getCommandTitle().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getCommandTitle().charAt(idx)))); }
+        for(int idx=0; idx<getParameter().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getParameter().charAt(idx)))); }
+        return res;
     }
 }

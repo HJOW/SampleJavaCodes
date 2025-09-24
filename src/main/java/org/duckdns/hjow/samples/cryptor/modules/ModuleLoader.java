@@ -41,8 +41,8 @@ public class ModuleLoader {
     }
     
     static {
-    	loadResource("/cypher/bundled.txt");
-    	loadResource("/cypher/list.txt");
+        loadResource("/cypher/bundled.txt");
+        loadResource("/cypher/list.txt");
     }
     
     private static void loadResource(String resourceName) {

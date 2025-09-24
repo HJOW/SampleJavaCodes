@@ -131,14 +131,14 @@ public abstract class Research implements ColonyElements {
     
     @Override
     public BigInteger getCheckerValue() {
-    	BigInteger res = new BigInteger(String.valueOf(getKey()));
-    	String type = getClass().getSimpleName();
-    	for(int idx=0; idx<type.length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) type.charAt(idx)))); }
-    	for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
-    	res = res.add(new BigInteger(String.valueOf(getLevel())));
-    	res = res.add(new BigInteger(String.valueOf(getProgress())));
-    	
-    	return res;
+        BigInteger res = new BigInteger(String.valueOf(getKey()));
+        String type = getClass().getSimpleName();
+        for(int idx=0; idx<type.length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) type.charAt(idx)))); }
+        for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
+        res = res.add(new BigInteger(String.valueOf(getLevel())));
+        res = res.add(new BigInteger(String.valueOf(getProgress())));
+        
+        return res;
     }
     
     @Override

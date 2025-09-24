@@ -299,10 +299,10 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             }
             
             if(colNo < columns) {
-            	while(colNo < columns) { // 남은 빈 공간 채우기
-            		pnEmpty = new JPanel();
-            		
-            		gridBagConst = new GridBagConstraints();
+                while(colNo < columns) { // 남은 빈 공간 채우기
+                    pnEmpty = new JPanel();
+                    
+                    gridBagConst = new GridBagConstraints();
                     gridBagConst.gridx = colNo; colNo++;
                     gridBagConst.gridy = rowNo;
                     gridBagConst.gridwidth = 1;
@@ -310,9 +310,9 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
                     gridBagConst.weightx = 1.0;  // fill 옵션으로 가로 채우기가 안되면 이 옵션이 필요함.
                     gridBagConst.fill = GridBagConstraints.HORIZONTAL;
                     gridBagConst.anchor = GridBagConstraints.NORTH;
-            		
-            		pnFacilities.add(pnEmpty, gridBagConst);
-            	}
+                    
+                    pnFacilities.add(pnEmpty, gridBagConst);
+                }
             }
             colNo = 0;
             rowNo++;
