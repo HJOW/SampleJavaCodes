@@ -1,6 +1,7 @@
 package org.duckdns.hjow.samples.util;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -115,7 +116,34 @@ public class StringTable implements Serializable {
 	/** 해당 이름의 스트링 테이블 하나를 반환 */
 	public static StringTable get(String name) { return stringTables.get(name); }
 	/** 스트링 테이블 등록 */
-	public static void register(StringTable table) { stringTables.put(table.getName(), table); }
+	public static StringTable register(StringTable table) { stringTables.put(table.getName(), table); return table; }
+	/** 파일에서 스트링 테이블 불러와 등록 */
+	public static StringTable register(File file) {
+		StringTable table = new StringTable(file);
+		stringTables.put(table.getName(), table);
+		return table;
+	}
+	/** 디렉토리에서 스트링 테이블 모두 불러와 등록, 확장자가 xml 또는 properties 여야 함 */
+	public static void registerDirectory(File dir) {
+		File[] lists = dir.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				if(pathname.isDirectory()) return false;
+				String name = pathname.getName().toLowerCase().trim();
+				return name.endsWith(".xml") || name.endsWith(".properties");
+			}
+		});
+		
+		for(File f : lists) {
+			register(f);
+		}
+	}
+	/** 리소스에서 스트링 테이블 불러와 등록 */
+	public static StringTable registerResource(String resourceName, Class<?> sameResourcePathClass) {
+		StringTable table = new StringTable(resourceName, sameResourcePathClass);
+		stringTables.put(table.getName(), table);
+		return table;
+	}
 	/** 스트링 테이블 이름 지정해서 바로 번역 */
 	public static String t(String name, String originals) {
 		StringTable obj = get(name);
