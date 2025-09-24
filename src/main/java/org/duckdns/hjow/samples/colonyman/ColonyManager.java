@@ -298,7 +298,7 @@ public class ColonyManager implements GUIProgram {
         menuFile = new JMenu("파일");
         menuBar.add(menuFile);
         
-        menuItem = new JMenuItem("다른 이름으로 저장");
+        menuItem = new JMenuItem("다른 이름으로 이 정착지 저장");
         menuFile.add(menuItem);
         menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK));
         menuItem.addActionListener(new ActionListener() {
@@ -314,7 +314,7 @@ public class ColonyManager implements GUIProgram {
         menuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				onSaveRequested();
+				onLoadRequested();
 			}
 		});
         
