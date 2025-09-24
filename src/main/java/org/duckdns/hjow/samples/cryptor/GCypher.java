@@ -32,7 +32,7 @@ import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
 import org.duckdns.hjow.samples.cryptor.modules.CypherModule;
 import org.duckdns.hjow.samples.cryptor.modules.ModuleLoader;
-import org.duckdns.hjow.samples.interfaces.Disposeable;
+import org.duckdns.hjow.commons.core.Disposeable;
 import org.duckdns.hjow.samples.util.ResourceUtil;
 import org.duckdns.hjow.samples.util.UIUtil;
 

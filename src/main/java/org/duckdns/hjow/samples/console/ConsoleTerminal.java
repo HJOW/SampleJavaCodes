@@ -3,7 +3,7 @@ package org.duckdns.hjow.samples.console;
 import java.util.List;
 
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
-import org.duckdns.hjow.samples.interfaces.Disposeable;
+import org.duckdns.hjow.commons.core.Disposeable;
 
 /** 콘솔 모드로 메뉴를 띄우고 입력을 받는 도구 */
 public class ConsoleTerminal implements Disposeable {

@@ -44,9 +44,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
+import org.duckdns.hjow.commons.ui.JLogArea;
 import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
-import org.duckdns.hjow.samples.uicomponent.JLogArea;
 import org.duckdns.hjow.samples.util.UIUtil;
 
 /** GUI 기반 Image2Base64 툴 */

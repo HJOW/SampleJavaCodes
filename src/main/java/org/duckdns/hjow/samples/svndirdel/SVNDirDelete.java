@@ -25,7 +25,7 @@ import javax.swing.UIManager;
 import org.duckdns.hjow.samples.base.GUISampleJavaCodes;
 import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
-import org.duckdns.hjow.samples.uicomponent.JLogArea;
+import org.duckdns.hjow.commons.ui.JLogArea;
 import org.duckdns.hjow.samples.util.UIUtil;
 
 public class SVNDirDelete implements GUIProgram {

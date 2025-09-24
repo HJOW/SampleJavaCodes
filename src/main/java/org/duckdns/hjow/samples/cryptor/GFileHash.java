@@ -25,7 +25,7 @@ import javax.swing.SwingUtilities;
 
 import org.duckdns.hjow.samples.cryptor.modules.CypherModule;
 import org.duckdns.hjow.samples.cryptor.modules.Digest;
-import org.duckdns.hjow.samples.interfaces.Disposeable;
+import org.duckdns.hjow.commons.core.Disposeable;
 import org.duckdns.hjow.samples.interfaces.ProcessingStream;
 import org.duckdns.hjow.samples.util.LongCounter;
 import org.duckdns.hjow.samples.util.UIUtil;

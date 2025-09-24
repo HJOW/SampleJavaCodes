@@ -21,11 +21,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.duckdns.hjow.commons.core.Disposeable;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.commons.util.FileUtil;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyBackup;
-import org.duckdns.hjow.samples.interfaces.Disposeable;
 import org.duckdns.hjow.samples.util.UIUtil;
 
 public class BackupManager implements Disposeable {

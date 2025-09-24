@@ -30,7 +30,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.duckdns.hjow.samples.scripts.ScriptBase;
 import org.duckdns.hjow.samples.scripts.ScriptObject;
-import org.duckdns.hjow.samples.uicomponent.JLogArea;
+import org.duckdns.hjow.commons.ui.JLogArea;
 import org.duckdns.hjow.samples.util.UIUtil;
 
 public class GUISampleJavaCodes extends SampleJavaCodes {

@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.InputStreamReader;
 
-import org.duckdns.hjow.samples.interfaces.Disposeable;
+import org.duckdns.hjow.commons.core.Disposeable;
 
 /** 콘솔 스트림. 콘솔 모드로 실행 시 이 객체는 최초 초기화 후, 프로그램 종료될 때까지 유지되어야 함. */
 public class ConsoleStream implements Closeable, Disposeable {
