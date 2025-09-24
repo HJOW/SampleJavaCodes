@@ -11,6 +11,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Facility;
 import org.duckdns.hjow.samples.colonyman.elements.states.State;
 
@@ -108,15 +109,15 @@ public abstract class DefaultFacility implements Facility {
     }
     
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
+    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
         // State 영향력 동작
         for(State st : getStates()) {
-            st.oneSecond(cycle, this, city, colony);
+            st.oneSecond(cycle, this, city, colony, colPanel);
         }
         
         // State 수명 동작
         for(State st : getStates()) {
-            st.oneSecond(cycle, city, colony, efficiency100);
+            st.oneSecond(cycle, city, colony, efficiency100, colPanel);
         }
         
         // 수명 다된 state 제거

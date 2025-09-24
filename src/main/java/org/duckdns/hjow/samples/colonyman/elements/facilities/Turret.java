@@ -9,6 +9,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.research.BasicBuildingTech;
 import org.duckdns.hjow.samples.colonyman.elements.research.MilitaryTech;
@@ -50,8 +51,8 @@ public class Turret extends DefaultFacility implements AttackableObject {
     protected void processAfterAttack(int cycle, ColonyElements element, int finalDamage) { }
     
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
-        super.oneSecond(cycle, city, colony, efficiency100);
+    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
+        super.oneSecond(cycle, city, colony, efficiency100, colPanel);
         
         int castLeft    = getAttackCount();
         int damages     = getDamage();

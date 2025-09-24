@@ -166,7 +166,8 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
             c.dispose();
         }
         pnCities.clear();
-        taLog.dispose();
+        
+        if(taLog != null) taLog.dispose();
         removeAll();
     }
 

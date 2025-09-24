@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 
 /** 랜덤 발생 이벤트 공통 부분을 정의하는 상위 클래스 */
 public abstract class TimeEvent implements Serializable {
@@ -23,7 +24,12 @@ public abstract class TimeEvent implements Serializable {
     public abstract double getOccurRate(ColonyElements target, Colony col, City city);
     
     /** 이벤트 처리 */
-    public abstract void onEventOccured(ColonyElements target, Colony col, City city);
+    public void onEventOccured(ColonyElements target, Colony col, City city, ColonyPanel colPanel) {
+        colPanel.log(getTitle() + " 발생 !");
+    }
+    
+    /** 이벤트 명칭 반환 */
+    public abstract String getTitle();
     
     public static final short EVENTSIZE_COLONY   = 9;
     public static final short EVENTSIZE_CITY     = 8;

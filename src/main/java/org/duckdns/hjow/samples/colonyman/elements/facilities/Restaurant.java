@@ -5,6 +5,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 
 public class Restaurant extends DefaultFacility implements ServiceFacility {
     private static final long serialVersionUID = -7371044845340026748L;
@@ -43,8 +44,8 @@ public class Restaurant extends DefaultFacility implements ServiceFacility {
     }
 
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
-        super.oneSecond(cycle, city, colony, efficiency100);
+    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
+        super.oneSecond(cycle, city, colony, efficiency100, colPanel);
         
         double efficiencyRate = efficiency100 / 100.0;
         double additionalRate = additionalComportGradeRate(city, colony);

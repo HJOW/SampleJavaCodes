@@ -59,7 +59,14 @@ public class JLogArea extends JScrollPane implements Disposeable {
         list.clear();
         counts = 0;
         ta.setText("");
-        ta.setCaretPosition(ta.getDocument().getLength() - 1);
+        setCaretLastPosition();
+    }
+    
+    /** 스크롤을 마지막 위치로 이동 */
+    public void setCaretLastPosition() {
+        int loc = ta.getDocument().getLength() - 1;
+        if(loc < 0) loc = 0;
+        ta.setCaretPosition(loc);
     }
     
     /** 줄 자동띄움 사용여부 지정 */
@@ -75,7 +82,7 @@ public class JLogArea extends JScrollPane implements Disposeable {
         if(counts == 0) ta.append(msg);
         else ta.append("\n" + msg);
         
-        ta.setCaretPosition(ta.getDocument().getLength() - 1);
+        setCaretLastPosition();
     }
     
     /** 로그 메시지를 문자열 리스트로 반환 (setText 또는 clear 시 삭제되므로 유의 !) */

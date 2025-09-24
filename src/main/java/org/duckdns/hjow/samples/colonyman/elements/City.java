@@ -154,7 +154,7 @@ public class City implements ColonyElements {
         return max;
     }
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100) { // city should be a self
+    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) { // city should be a self
         int idx;
         
         // 출산율 및 이주 계산
@@ -201,12 +201,17 @@ public class City implements ColonyElements {
             }
             
             // 시설 효과 처리
-            f.oneSecond(cycle, this, colony, efficiency);
+            f.oneSecond(cycle, this, colony, efficiency, colPanel);
+        }
+        
+        // 시민 처리
+        for(Citizen ct : getCitizens()) {
+            ct.oneSecond(cycle, city, colony, efficiency100, colPanel);
         }
         
         // 적 사이클 처리
         for(Enemy e : getEnemies()) {
-            e.oneSecond(cycle, city, colony, efficiency100);
+            e.oneSecond(cycle, city, colony, efficiency100, colPanel);
         }
         
         // 사망 개체 제거
@@ -254,12 +259,12 @@ public class City implements ColonyElements {
             
             if(ev.getEventSize() == TimeEvent.EVENTSIZE_CITY) {
                 if(cycle % ev.getOccurCycle(colony, this) == 0) {
-                    if(Math.random() <= ev.getOccurRate(this, colony, this)) ev.onEventOccured(this, colony, this);
+                    if(Math.random() <= ev.getOccurRate(this, colony, this)) ev.onEventOccured(this, colony, this, colPanel);
                 }
             } else if(ev.getEventSize() == TimeEvent.EVENTSIZE_FACILITY) {
                 for(Facility fac : getFacility()) {
                     if(cycle % ev.getOccurCycle(colony, this) == 0) {
-                        if(Math.random() <= ev.getOccurRate(fac, colony, this)) ev.onEventOccured(fac, colony, this);
+                        if(Math.random() <= ev.getOccurRate(fac, colony, this)) ev.onEventOccured(fac, colony, this, colPanel);
                     }
                 }
             }

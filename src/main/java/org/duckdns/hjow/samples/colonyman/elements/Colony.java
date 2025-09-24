@@ -35,9 +35,11 @@ public class Colony implements ColonyElements {
     protected List<HoldingJob> holdings   = new Vector<HoldingJob>();
     protected List<Research>   researches = new Vector<Research>();
     protected String name = getDefaultNamePrefix() + "_" + ColonyManager.generateNaturalNumber();
-    protected int  hp    = getMaxHp();
-    protected long money = 1000000L;
-    protected long tech  = 0L;
+    protected int  difficulty = 0;
+    protected int  hp         = getMaxHp();
+    protected long money      = 1000000L;
+    protected long tech       = 0L;
+    
     
     protected volatile BigInteger time = new BigInteger("0");
     
@@ -149,6 +151,14 @@ public class Colony implements ColonyElements {
 
     public void setHp(int hp) {
         this.hp = hp;
+    }
+
+    public int getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
     }
 
     public long getMoney() {
@@ -279,7 +289,7 @@ public class Colony implements ColonyElements {
     }
 
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100) { // parameters are null
+    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) { // parameters are null
         int idx;
         
         // 체력이 없는 도시 삭제
@@ -306,12 +316,12 @@ public class Colony implements ColonyElements {
         
         // 도시별 사이클 처리
         for(City c : getCities()) {
-            c.oneSecond(cycle, c, this, 100);
+            c.oneSecond(cycle, c, this, 100, colPanel);
         }
         
         // 적 사이클 처리
         for(Enemy e : getEnemies()) {
-            e.oneSecond(cycle, city, colony, efficiency100);
+            e.oneSecond(cycle, city, colony, efficiency100, colPanel);
         }
         
         // 예약 작업 처리
@@ -339,7 +349,7 @@ public class Colony implements ColonyElements {
             
             if(ev.getEventSize() == TimeEvent.EVENTSIZE_COLONY) {
                 if(cycle % ev.getOccurCycle(this, city) == 0) {
-                    if(Math.random() <= ev.getOccurRate(this, this, city)) ev.onEventOccured(this, this, city);
+                    if(Math.random() <= ev.getOccurRate(this, this, city)) ev.onEventOccured(this, this, city, colPanel);
                 }
             }
         }
@@ -443,6 +453,7 @@ public class Colony implements ColonyElements {
         json.put("name", getName());
         json.put("key", new Long(getKey()));
         json.put("hp", new Long(getHp()));
+        json.put("difficulty", new Integer(getDifficulty()));
         json.put("money", new Long(getMoney()));
         json.put("tech", new Long(getTech()));
         json.put("time", getTime().toString());
@@ -472,10 +483,11 @@ public class Colony implements ColonyElements {
         if(! "Colony".equals(json.get("type"))) throw new RuntimeException("This object is not Colony type.");
         setName(json.get("name").toString());
         key = Long.parseLong(json.get("key").toString());
-        try { setHp(Integer.parseInt(json.get("hp").toString()));     } catch(Exception ex) { ex.printStackTrace(); hp    = 10; }
-        try { setMoney(Long.parseLong(json.get("money").toString())); } catch(Exception ex) { ex.printStackTrace(); money = 0; }
-        try { setTech(Long.parseLong(json.get("tech").toString())); } catch(Exception ex) { ex.printStackTrace(); tech = 0; }
-        try { setTime(new BigInteger(json.get("time").toString()));   } catch(Exception ex) { ex.printStackTrace(); time  = BigInteger.ZERO; }
+        try { setHp(Integer.parseInt(json.get("hp").toString()));                     } catch(Exception ex) { ex.printStackTrace(); hp         = 10;              }
+        try { setDifficulty(Integer.parseInt(json.get("difficulty").toString()));     } catch(Exception ex) { ex.printStackTrace(); difficulty = 0;               }
+        try { setMoney(Long.parseLong(json.get("money").toString()));                 } catch(Exception ex) { ex.printStackTrace(); money      = 0;               }
+        try { setTech(Long.parseLong(json.get("tech").toString()));                   } catch(Exception ex) { ex.printStackTrace(); tech       = 0;               }
+        try { setTime(new BigInteger(json.get("time").toString()));                   } catch(Exception ex) { ex.printStackTrace(); time       = BigInteger.ZERO; }
         
         JsonArray list = (JsonArray) json.get("cities");
         cities.clear();

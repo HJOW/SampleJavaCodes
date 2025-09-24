@@ -870,7 +870,7 @@ public class ColonyManager implements GUIProgram {
         Colony col = getSelectedColony();
         if(col == null) return;
         
-        try { col.oneSecond(cycle, null, col, 100); } catch(Exception ex) { ex.printStackTrace(); }
+        try { col.oneSecond(cycle, null, col, 100, getColonyPanel(col)); } catch(Exception ex) { ex.printStackTrace(); }
         try {
             SwingUtilities.invokeLater(new Runnable() { 
                 @Override
@@ -905,13 +905,7 @@ public class ColonyManager implements GUIProgram {
             return;
         }
         
-        ColonyPanel colPn = null;
-        for(ColonyPanel cp : pnColonies) {
-            if(cp.getColony().getKey() == col.getKey()) {
-                colPn = cp; break;
-            }
-        }
-        
+        ColonyPanel colPn = getColonyPanel(col);
         if(colPn == null) {
             colPn = new ColonyPanel(col, this);
             if(isVisible()) colPn.setDividerLocationOnlyFirst();
@@ -927,15 +921,20 @@ public class ColonyManager implements GUIProgram {
         colPn.refresh(cycle, null, col, this);
     }
     
+    /** 해당 정착지를 출력하는 영역 반환 */
+    public ColonyPanel getColonyPanel(Colony col) {
+        for(ColonyPanel cp : pnColonies) {
+            if(cp.getColony().getKey() == col.getKey()) {
+                return cp;
+            }
+        }
+        return null;
+    }
+    
     /** 해당 도시를 출력하는 도시 영역 반환 */
     public CityPanel getCityPanel(City city) {
         Colony col = getSelectedColony();
-        ColonyPanel colPn = null;
-        for(ColonyPanel cp : pnColonies) {
-            if(cp.getColony().getKey() == col.getKey()) {
-                colPn = cp; break;
-            }
-        }
+        ColonyPanel colPn = getColonyPanel(col);
         if(colPn == null) return null;
         return colPn.getCityPanel(city);
     }

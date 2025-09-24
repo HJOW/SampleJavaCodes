@@ -31,7 +31,7 @@ public interface ColonyElements extends Serializable {
     public int getDefencePoint();
     
     /** 쓰레드 1 사이클 당 1회 호출됨 */
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100);
+    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel);
     
     /** JSON 데이터로부터 객체 데이터를 불러옮 */
     public void fromJson(JsonObject json);

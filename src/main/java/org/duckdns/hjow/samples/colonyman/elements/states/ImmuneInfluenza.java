@@ -4,6 +4,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 
 public class ImmuneInfluenza extends State {
     private static final long serialVersionUID = 8482202600166530470L;
@@ -29,7 +30,7 @@ public class ImmuneInfluenza extends State {
     }
 
     @Override
-    public void oneSecond(int cycle, ColonyElements hosts, City city, Colony colony) {
+    public void oneSecond(int cycle, ColonyElements hosts, City city, Colony colony, ColonyPanel colPanel) {
         if(! (hosts instanceof Citizen)) { setHp(0); return; }
         Citizen ct = (Citizen) hosts;
         

@@ -7,6 +7,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 
 public abstract class Research implements ColonyElements {
     private static final long serialVersionUID = -3391024381630960804L;
@@ -115,7 +116,7 @@ public abstract class Research implements ColonyElements {
     public double getMaxProgressIncreaseRate() { return 1.5;  }
     
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100) { }
+    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) { }
     
     /** 연구 시작 가능여부 반환 (선행 연구 완료여부만 체크) */
     public abstract boolean isResearchAvail(Colony col);

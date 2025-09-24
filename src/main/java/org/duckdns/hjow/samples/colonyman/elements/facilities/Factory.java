@@ -5,6 +5,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 
 public class Factory extends DefaultFacility {
     private static final long serialVersionUID = 8465140770981665970L;
@@ -62,8 +63,8 @@ public class Factory extends DefaultFacility {
     }
     
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
-        super.oneSecond(cycle, city, colony, efficiency100);
+    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
+        super.oneSecond(cycle, city, colony, efficiency100, colPanel);
         
         // 공장 업무 처리
         int increases = getCapacity();

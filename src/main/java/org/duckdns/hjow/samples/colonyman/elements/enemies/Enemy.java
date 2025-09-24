@@ -11,6 +11,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Facility;
 import org.duckdns.hjow.samples.colonyman.elements.states.State;
 
@@ -86,7 +87,7 @@ public abstract class Enemy implements ColonyElements, AttackableObject {
     protected void processAfterAttack(int cycle, ColonyElements element, int finalDamage) { }
 
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
+    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
         
         // 공격 처리
         int castLeft    = getAttackCount();

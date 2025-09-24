@@ -8,6 +8,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 
 /** 시민, 혹은 시설의 상태 하나를 지칭하는 객체를 위한 클래스 */
 public abstract class State implements ColonyElements {
@@ -61,7 +62,7 @@ public abstract class State implements ColonyElements {
     }
 
     @Override
-    public final void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
+    public final void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
         // 이 메소드는 수정하거나 오버라이드하지 말 것 !
         
         if(lefts < Long.MAX_VALUE) lefts--;
@@ -74,7 +75,7 @@ public abstract class State implements ColonyElements {
     public abstract long getDefaultLefts();
     
     /** 1 사이클마다 쓰레드에서 호출됨. */
-    public abstract void oneSecond(int cycle, ColonyElements hosts, City city, Colony colony);
+    public abstract void oneSecond(int cycle, ColonyElements hosts, City city, Colony colony, ColonyPanel colPanel);
 
     @Override
     public void fromJson(JsonObject json) {

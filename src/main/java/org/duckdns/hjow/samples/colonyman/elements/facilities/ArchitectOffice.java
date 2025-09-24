@@ -5,6 +5,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Facility;
 
 public class ArchitectOffice extends DefaultFacility {
@@ -62,8 +63,8 @@ public class ArchitectOffice extends DefaultFacility {
     }
     
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100) {
-        super.oneSecond(cycle, city, colony, efficiency100);
+    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
+        super.oneSecond(cycle, city, colony, efficiency100, colPanel);
         
         // 업무 처리
         double healRate = 0.5;

@@ -4,6 +4,7 @@ import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.colonyman.elements.states.Influenza;
 
 public class InfluenzaEvent extends TimeEvent {
@@ -30,11 +31,17 @@ public class InfluenzaEvent extends TimeEvent {
     }
 
     @Override
-    public void onEventOccured(ColonyElements target, Colony col, City city) {
+    public void onEventOccured(ColonyElements target, Colony col, City city, ColonyPanel colPanel) {
+        colPanel.log("전염병이 창궐이 감지되었습니다.");
         for(Citizen ct : city.getCitizens()) {
             Influenza vs = new Influenza();
             ct.getStates().add(vs);
         }
+    }
+
+    @Override
+    public String getTitle() {
+        return "전염병 - 독감";
     }
     
 }
