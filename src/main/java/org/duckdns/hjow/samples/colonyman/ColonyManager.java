@@ -22,8 +22,6 @@ import java.io.FileFilter;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
@@ -43,14 +41,11 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import org.duckdns.hjow.commons.json.JsonObject;
-import org.duckdns.hjow.commons.util.FileUtil;
 import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.CityPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
-import org.duckdns.hjow.samples.colonyman.elements.ColonyGroup;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.util.ResourceUtil;
 import org.duckdns.hjow.samples.util.UIUtil;
@@ -60,6 +55,7 @@ public class ColonyManager implements GUIProgram {
     protected transient SampleJavaCodes superInstance;
     protected transient Thread thread;
     protected transient volatile boolean threadSwitch, threadPaused, threadShutdown, reserveSaving;
+    protected transient volatile boolean bCheckerPauseCompleted = false;
     
     protected transient JDialog dialog;
     protected transient JPanel pnMain;
@@ -77,12 +73,14 @@ public class ColonyManager implements GUIProgram {
     protected transient List<ColonyPanel> pnColonies = new Vector<ColonyPanel>();
     
     protected transient JProgressBar progThreadStatus;
-    protected transient JFileChooser fileChooser, backupChooser;
+    protected transient JFileChooser fileChooser;
     protected transient javax.swing.filechooser.FileFilter filterCol, filterColGz;
+    
+    protected transient BackupManager backupManager;
     
     protected transient JMenuBar menuBar;
     protected transient JMenu menuFile, menuAction;
-    protected transient JMenuItem menuActionThrPlay;
+    protected transient JMenuItem menuActionThrPlay, menuFileSave, menuFileLoad, menuFileBackup, menuFileRestore, menuFileReset;
     
     protected transient boolean flagSaveBeforeClose = true;
     
@@ -171,25 +169,6 @@ public class ColonyManager implements GUIProgram {
             fileChooser.addChoosableFileFilter(filterCol);
             fileChooser.addChoosableFileFilter(filterColGz);
         }
-
-        if(backupChooser == null) {
-            backupChooser = new JFileChooser();
-            backupChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            backupChooser.setMultiSelectionEnabled(false);
-            backupChooser.addChoosableFileFilter(new javax.swing.filechooser.FileFilter() {
-                @Override
-                public String getDescription() {
-                    return "정착지 백업 파일 (*.colbak)";
-                }
-                
-                @Override
-                public boolean accept(File f) {
-                    if(f == null) return false;
-                    if(f.isDirectory()) return false;
-                    return f.getName().toLowerCase().endsWith(".colbak");
-                }
-            });
-        }
         
         JPanel pnMainCard1, pnMainCard2;
         pnMain      = new JPanel();
@@ -257,8 +236,8 @@ public class ColonyManager implements GUIProgram {
 
         Vector<String> strSpeeds = new Vector<String>();
         strSpeeds.add("×1");
-        strSpeeds.add("×2");
         strSpeeds.add("×4");
+        strSpeeds.add("×8");
         JComboBox<String> cbxSpeed = new JComboBox<String>(strSpeeds);
         cbxSpeed.setSelectedIndex(0);
         toolbarNorth.add(cbxSpeed);
@@ -271,8 +250,8 @@ public class ColonyManager implements GUIProgram {
                 if(sel > 2) sel = 2;
                 
                 if(sel == 0) cycleGap = 990L;
-                else if(sel == 1) cycleGap = 490L;
-                else if(sel == 2) cycleGap = 240L;
+                else if(sel == 1) cycleGap = 240L;
+                else if(sel == 2) cycleGap = 120L;
             }
         });
         
@@ -322,20 +301,20 @@ public class ColonyManager implements GUIProgram {
         menuFile = new JMenu("파일");
         menuBar.add(menuFile);
         
-        menuItem = new JMenuItem("다른 이름으로 이 정착지 저장");
-        menuFile.add(menuItem);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK));
-        menuItem.addActionListener(new ActionListener() {
+        menuFileSave = new JMenuItem("다른 이름으로 이 정착지 저장");
+        menuFile.add(menuFileSave);
+        menuFileSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK));
+        menuFileSave.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 onSaveRequested();
             }
         });
         
-        menuItem = new JMenuItem("외부 정착지 파일 불러오기");
-        menuFile.add(menuItem);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_MASK));
-        menuItem.addActionListener(new ActionListener() {
+        menuFileLoad = new JMenuItem("외부 정착지 파일 불러오기");
+        menuFile.add(menuFileLoad);
+        menuFileLoad.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_MASK));
+        menuFileLoad.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 onLoadRequested();
@@ -344,28 +323,28 @@ public class ColonyManager implements GUIProgram {
         
         menuFile.addSeparator();
 
-        menuItem = new JMenuItem("백업");
-        menuFile.add(menuItem);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_MASK));
-        menuItem.addActionListener(new ActionListener() {
+        menuFileBackup = new JMenuItem("백업");
+        menuFile.add(menuFileBackup);
+        menuFileBackup.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_MASK));
+        menuFileBackup.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 onBackupRequested();
             }
         });
         
-        menuItem = new JMenuItem("복원");
-        menuFile.add(menuItem);
-        menuItem.addActionListener(new ActionListener() {
+        menuFileRestore = new JMenuItem("복원");
+        menuFile.add(menuFileRestore);
+        menuFileRestore.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 onRestoreRequested();
             }
         });
         
-        menuItem = new JMenuItem("정착지 모두 포기 (초기화)");
-        menuFile.add(menuItem);
-        menuItem.addActionListener(new ActionListener() {
+        menuFileReset = new JMenuItem("정착지 모두 포기 (초기화)");
+        menuFile.add(menuFileReset);
+        menuFileReset.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 onResetAllRequested();
@@ -398,6 +377,8 @@ public class ColonyManager implements GUIProgram {
             }
         });
         
+        backupManager = new BackupManager(this);
+        
         refreshColonyContent();
         cardMain.show(pnMain, "C2");
     }
@@ -418,8 +399,17 @@ public class ColonyManager implements GUIProgram {
                 while(threadSwitch) {
                     threadShutdown = false;
                     
-                    try { if(! threadPaused) oneSecond(); } catch(Exception ex) { ex.printStackTrace(); }
+                    // 쓰레드에서 수행할 실질 작업 수행
+                    try { if(! threadPaused) { bCheckerPauseCompleted = false; oneSecond(); } } catch(Exception ex) { ex.printStackTrace(); }
+                    
+                    // 일시정지 후 쓰레드가 실제 정지 중인지 판단하는 플래그
+                    if(threadPaused) bCheckerPauseCompleted = true;
+                    else bCheckerPauseCompleted = false;
+                    
+                    // 쓰레드 Sleep
                     try { Thread.sleep(cycleGap); } catch(InterruptedException e) { threadSwitch = false; break; }
+                    
+                    // 저장 요청 수행
                     if(reserveSaving) { try { saveColonies(); } catch(Exception ex) { ex.printStackTrace(); } reserveSaving = false; }
                     
                     threadShutdown = false;
@@ -467,50 +457,12 @@ public class ColonyManager implements GUIProgram {
 
     /** 정착지 전체 백업 요청 시 호출됨 */
     protected void onBackupRequested() {
-        String groupName = JOptionPane.showInputDialog(getDialog(), "백업의 이름을 입력하십시오. (빈 내용 입력 시 취소됩니다.)");
-        if(groupName == null) return;
-
-        groupName = groupName.trim();
-        if(groupName.equals("")) return;
-
-        ColonyGroup groups = new ColonyGroup();
-        groups.getColonies().addAll(colonies);
-        groups.setName(groupName);
-
-        File fileSel;
-        int sel = backupChooser.showSaveDialog(getDialog());
-        if(sel == JFileChooser.APPROVE_OPTION) {
-            try {
-                fileSel = backupChooser.getSelectedFile();
-                FileUtil.writeString(fileSel, "UTF-8", groups.toJson().toJSON(), GZIPOutputStream.class); 
-            } catch(Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(getDialog(), "오류 : " + ex.getMessage());
-            }
-        }
+        backupManager.openSave(colonies);
     }
 
     /** 정착지 복원 요청 시 호출됨 */
     protected void onRestoreRequested() {
-        int sel = backupChooser.showOpenDialog(getDialog());
-        if(sel != JFileChooser.APPROVE_OPTION) return;
-
-        try {
-            File fileSel = backupChooser.getSelectedFile();
-            String contents = FileUtil.readString(fileSel, "UTF-8", GZIPInputStream.class);
-
-            ColonyGroup group = new ColonyGroup();
-            group.fromJson((JsonObject) JsonObject.parseJson(contents));
-
-            sel = JOptionPane.showConfirmDialog(getDialog(), "백업명 : " + group.getName() + "\n현재의 정착지들을 모두 포기하고, 백업에서 복원하시겠습니까?", "안내", JOptionPane.YES_NO_OPTION);
-            if(sel != JOptionPane.YES_OPTION) return;
-
-            colonies.clear();
-            colonies.addAll(group.getColonies());
-        } catch(Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(getDialog(), "오류 : " + ex.getMessage());
-        }
+        backupManager.openLoad();
     }
     
     /** 정착지 세이브 모두 초기화 요청 시 호출됨 */
@@ -528,6 +480,14 @@ public class ColonyManager implements GUIProgram {
                 }
             }).start();
         }
+    }
+    
+    /** 백업 복원 받기 */
+    public void applyRestore(List<Colony> colonies, BackupManager backupMan) {
+        if(backupManager != backupMan) return;
+        this.colonies.clear();
+        this.colonies.addAll(colonies);
+        refreshColonyContent();
     }
     
     /** 정착지 세이브 파일 필터 생성 */
@@ -694,6 +654,9 @@ public class ColonyManager implements GUIProgram {
         
         if(dialog != null && closeDialog) dialog.setVisible(false);
         dialog = null;
+        
+        if(backupManager != null) backupManager.dispose();
+        backupManager = null;
     }
     
     public void disposeContents() {
@@ -803,28 +766,70 @@ public class ColonyManager implements GUIProgram {
     
     public void pauseSimulation() {
         threadPaused = true;
+        
+        btnThrPlay.setEnabled(false);
+        menuActionThrPlay.setEnabled(false);
+        
         btnThrPlay.setText("시뮬레이션 시작");
         menuActionThrPlay.setText("시뮬레이션 시작");
         btnSaveAs.setEnabled(true);
         btnLoadAs.setEnabled(true);
         cbxColony.setEnabled(true);
+        menuFileLoad.setEnabled(true);
+        menuFileSave.setEnabled(true);
+        menuFileBackup.setEnabled(true);
+        menuFileRestore.setEnabled(true);
+        menuFileReset.setEnabled(true);
+        
         for(ColonyPanel c : pnColonies) {
             Colony col = c.getColony();
             if(col == null) return;
             if(col.getHp() <= 0) return;
             c.setEditable(true); 
         }
+        
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try { Thread.sleep(500L); } catch(InterruptedException ex) { ex.printStackTrace(); }
+                btnThrPlay.setEnabled(true);
+                menuActionThrPlay.setEnabled(true);
+            }
+        }).start();
     }
     
     public void resumeSimulation() {
         threadPaused = false;
         reserveSaving = true;
+        
+        btnThrPlay.setEnabled(false);
+        menuActionThrPlay.setEnabled(false);
+        if(backupManager != null) backupManager.close();
+        
+        // 쓰레드가 완전히 종료될 때까지 대기
+        try {
+            int prefInfLoop = 10;
+            while(! bCheckerPauseCompleted) {
+                Thread.sleep(1000L);
+                prefInfLoop--;
+                if(prefInfLoop <= 0) break;
+            }
+        } catch(InterruptedException ex) { ex.printStackTrace(); }
+        
         btnThrPlay.setText("시뮬레이션 정지");
         menuActionThrPlay.setText("시뮬레이션 정지");
         btnSaveAs.setEnabled(false);
         btnLoadAs.setEnabled(false);
         cbxColony.setEnabled(false);
+        menuFileLoad.setEnabled(false);
+        menuFileSave.setEnabled(false);
+        menuFileBackup.setEnabled(false);
+        menuFileRestore.setEnabled(false);
+        menuFileReset.setEnabled(false);
         for(ColonyPanel c : pnColonies) { c.setEditable(false); }
+        
+        btnThrPlay.setEnabled(true);
+        menuActionThrPlay.setEnabled(true);
     }
     
     /** 쓰레드에서 1 사이클 당 1회 호출됨 */

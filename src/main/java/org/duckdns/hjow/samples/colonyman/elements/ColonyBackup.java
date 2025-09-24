@@ -1,15 +1,17 @@
 package org.duckdns.hjow.samples.colonyman.elements;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 
-public class ColonyGroup {
+public class ColonyBackup {
     protected List<Colony> colonies = new Vector<Colony>();
     protected String name, description;
-    public ColonyGroup() { }
+    protected long created = 0L;
+    public ColonyBackup() { }
     
     public void fromJson(JsonObject json) {
         setName(json.get("name").toString());
@@ -68,5 +70,21 @@ public class ColonyGroup {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public long getCreated() {
+        return created;
+    }
+
+    public void setCreated(long created) {
+        this.created = created;
+    }
+    
+    public Date getCreatedDate() {
+        return new Date(getCreated());
+    }
+    
+    public void setCreated(Date created) {
+        this.created = created.getTime();
     }
 }
