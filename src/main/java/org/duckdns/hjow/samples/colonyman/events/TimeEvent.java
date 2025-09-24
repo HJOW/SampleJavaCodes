@@ -16,6 +16,9 @@ public abstract class TimeEvent implements Serializable {
     /** 이벤트 발생 타이밍 사이클 (이 때 이벤트 발생률에 따라 발생) */
     public abstract int    getOccurCycle(Colony col, City city);
     
+    /** 이벤트가 발생할 최소 타이밍 (이 이상 시간이 지나야 발생) */
+    public abstract long   getOccurMinimumTime(Colony col);
+    
     /** 이벤트 발생률 */
     public abstract double getOccurRate(ColonyElements target, Colony col, City city);
     

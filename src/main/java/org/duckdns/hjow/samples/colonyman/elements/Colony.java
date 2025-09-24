@@ -22,6 +22,7 @@ import org.duckdns.hjow.samples.colonyman.elements.facilities.ResidenceModule;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Restaurant;
 import org.duckdns.hjow.samples.colonyman.elements.research.Research;
 import org.duckdns.hjow.samples.colonyman.elements.research.ResearchManager;
+import org.duckdns.hjow.samples.colonyman.events.InfluenzaEvent;
 import org.duckdns.hjow.samples.colonyman.events.TimeEvent;
 
 public class Colony implements ColonyElements {
@@ -32,7 +33,7 @@ public class Colony implements ColonyElements {
     protected List<Enemy>      enemies    = new Vector<Enemy>();
     protected List<HoldingJob> holdings   = new Vector<HoldingJob>();
     protected List<Research>   researches = new Vector<Research>();
-    protected String name = "정착지_" + ColonyManager.generateNaturalNumber();
+    protected String name = getDefaultNamePrefix() + "_" + ColonyManager.generateNaturalNumber();
     protected int  hp    = getMaxHp();
     protected long money = 1000000L;
     protected long tech  = 0L;
@@ -64,6 +65,11 @@ public class Colony implements ColonyElements {
         
         JsonObject objJson = (JsonObject) JsonObject.parseJson(strJson);
         fromJson(objJson);
+    }
+    
+    /** 기본 이름 앞부분 */
+    protected String getDefaultNamePrefix() {
+        return "정착지";
     }
 
     @Override
@@ -328,6 +334,8 @@ public class Colony implements ColonyElements {
         
         // 이벤트 처리
         for(TimeEvent ev : getEvents()) {
+            if(time.compareTo(new BigInteger("" + ev.getOccurMinimumTime(this))) < 0) continue;
+            
             if(ev.getEventSize() == TimeEvent.EVENTSIZE_COLONY) {
                 if(cycle % ev.getOccurCycle(this, city) == 0) {
                     if(Math.random() <= ev.getOccurRate(this, this, city)) ev.onEventOccured(this, this, city);
@@ -570,7 +578,7 @@ public class Colony implements ColonyElements {
     public List<TimeEvent> getEvents() {
         List<TimeEvent> events = new Vector<TimeEvent>();
         
-        // TODO
+        events.add(new InfluenzaEvent());
         
         return events;
     }

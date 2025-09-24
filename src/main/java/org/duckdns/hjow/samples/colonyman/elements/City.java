@@ -249,6 +249,8 @@ public class City implements ColonyElements {
         
         // 이벤트 처리
         for(TimeEvent ev : colony.getEvents()) {
+            if(colony.getTime().compareTo(new BigInteger("" + ev.getOccurMinimumTime(colony))) < 0) continue;
+            
             if(ev.getEventSize() == TimeEvent.EVENTSIZE_CITY) {
                 if(cycle % ev.getOccurCycle(colony, this) == 0) {
                     if(Math.random() <= ev.getOccurRate(this, colony, this)) ev.onEventOccured(this, colony, this);
