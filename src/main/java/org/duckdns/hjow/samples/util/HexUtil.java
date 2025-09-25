@@ -1,25 +1,26 @@
 package org.duckdns.hjow.samples.util;
 
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 
 public class HexUtil {
-    private static final byte[] PRESETS = "0123456789ABCDEF".getBytes(StandardCharsets.US_ASCII);
-    
     public static String encode(byte[] originalBinaries) {
-        byte[] hexes = new byte[originalBinaries.length * 2];
-        
-        for (int j = 0; j < originalBinaries.length; j++) {
-            int v = originalBinaries[j] & 0xFF;
-            hexes[j * 2] = PRESETS[v >>> 4];
-            hexes[j * 2 + 1] = PRESETS[v & 0x0F];
+        StringBuilder res = new StringBuilder("");
+        for(byte b : originalBinaries) {
+            res = res.append(String.format("%02x", b & 0xff));
         }
-        
-        return new String(hexes, StandardCharsets.UTF_8);
+        return res.toString().trim();
     }
     
     public static byte[] decode(String hexString) {
-        return new BigInteger(hexString, 16).toByteArray();
+        if(hexString.length() % 2 != 0) hexString = "0" + hexString;
+        byte[] res = new byte[hexString.length() / 2];
+        for(int idx=0; idx<hexString.length(); idx+= 2) {
+            String byteStr = hexString.substring(idx, idx + 2);
+            int byteVal = Integer.parseInt(byteStr, 16);
+            res[idx/2] = (byte) byteVal;
+        }
+        
+        return res;
     }
     
     public static String encodeString(String originalStr) {
