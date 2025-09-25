@@ -19,6 +19,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
@@ -516,11 +517,39 @@ public class ColonyManager implements GUIProgram {
     }
     
     /** 백업 복원 받기 */
-    public void applyRestore(List<Colony> colonies, BackupManager backupMan) {
+    public void applyRestore(List<Colony> colonies, BackupManager backupMan, boolean concat) {
         if(backupManager != backupMan) return;
-        this.colonies.clear();
-        this.colonies.addAll(colonies);
-        refreshColonyContent();
+        
+        if(concat) {
+            List<Colony> temp = new ArrayList<Colony>();
+            temp.addAll(this.colonies);
+            
+            this.colonies.clear();
+            
+            for(Colony c : temp) {
+                boolean dupl = false;
+                for(Colony alreadyIn : this.colonies) {
+                    if(c.getKey() == alreadyIn.getKey()) { dupl = true; break; }
+                }
+                if(dupl) continue;
+                this.colonies.add(c);
+            }
+            
+            for(Colony c : colonies) {
+                boolean dupl = false;
+                for(Colony alreadyIn : this.colonies) {
+                    if(c.getKey() == alreadyIn.getKey()) { dupl = true; break; }
+                }
+                if(dupl) continue;
+                this.colonies.add(c);
+            }
+        } else {
+            this.colonies.clear();
+            this.colonies.addAll(colonies);
+        }
+        
+        
+        refreshColonyList();
     }
     
     /** 정착지 세이브 파일 필터 생성 */
@@ -596,7 +625,12 @@ public class ColonyManager implements GUIProgram {
     
     /** 해당 정착지를 별도 파일로 저장 */
     public void saveColony(Colony c, File f, boolean alert) {
-        try { c.save(f); } catch(Exception ex) { ex.printStackTrace(); if(alert) alert("오류 : " + ex.getMessage()); }
+        try { 
+            String nameLower = f.getName().toLowerCase().trim();
+            if(! ( nameLower.endsWith(".colony") || nameLower.endsWith(".colgz") )) f = new File(f.getAbsolutePath() + ".colony");
+            
+            c.save(f); 
+        } catch(Exception ex) { ex.printStackTrace(); if(alert) alert("오류 : " + ex.getMessage()); }
     }
     
     /** 새 정착지 생성 */

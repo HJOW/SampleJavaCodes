@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,10 +14,13 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -30,22 +35,27 @@ import org.duckdns.hjow.samples.util.UIUtil;
 
 public class BackupManager implements Disposeable {
     protected JDialog dialog;
+    protected JPanel pnSecurity;
     protected JTextField tfName, tfFile;
-    protected JTextArea  ta;
-    protected JButton    btnSave, btnClose, btnSelFile;
+    protected JLabel lbPassword;
+    protected JCheckBox chkUseEnc;
+    protected JPasswordField tfPassword;
+    protected JTextArea  ta, taDet;
+    protected JButton    btnAccept, btnConcat, btnClose, btnSelFile;
     protected JProgressBar prog;
     protected JFileChooser backupChooser;
     
     protected transient boolean saveMode = true;
     protected transient ColonyManager superInstance = null;
     protected transient List<Colony> colonies = new ArrayList<Colony>();
+    protected transient String security = "";
     
     public BackupManager(ColonyManager superInstance) {
         this.superInstance = superInstance;
         
         dialog = new JDialog(superInstance.getDialog());
         dialog.setTitle("백업");
-        dialog.setSize(400, 300);
+        dialog.setSize(500, 300);
         UIUtil.center(dialog);
         dialog.setLayout(new BorderLayout());
         
@@ -73,19 +83,47 @@ public class BackupManager implements Disposeable {
         ta.setLineWrap(true);
         pnCenter.add(new JScrollPane(ta, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
         
+        JPanel pnCenterDown = new JPanel();
+        pnCenterDown.setLayout(new BorderLayout());
+        pnCenter.add(pnCenterDown, BorderLayout.SOUTH);
+        
+        taDet = new JTextArea();
+        taDet.setLineWrap(true);
+        taDet.setEditable(false);
+        pnCenterDown.add(taDet, BorderLayout.CENTER);
+        
+        pnSecurity = new JPanel();
+        pnSecurity.setLayout(new FlowLayout(FlowLayout.LEFT));
+        pnCenterDown.add(pnSecurity, BorderLayout.SOUTH);
+        
+        chkUseEnc = new JCheckBox("암호화");
+        pnSecurity.add(chkUseEnc);
+        
+        lbPassword = new JLabel("암호");
+        pnSecurity.add(lbPassword);
+        
+        tfPassword = new JPasswordField(10);
+        pnSecurity.add(tfPassword);
+        
+        pnSecurity.setVisible(false);
+        
         JPanel pnCtrl = new JPanel();
         pnCtrl.setLayout(new FlowLayout(FlowLayout.RIGHT));
         pnDown.add(pnCtrl, BorderLayout.CENTER);
         
-        tfFile = new JTextField(15);
+        tfFile = new JTextField(20);
         btnSelFile = new JButton("...");
-        btnSave = new JButton("저장");
+        btnAccept = new JButton("저장");
+        btnConcat = new JButton("복원 (병합)");
         btnClose = new JButton("취소");
         
         pnCtrl.add(tfFile);
         pnCtrl.add(btnSelFile);
-        pnCtrl.add(btnSave);
+        pnCtrl.add(btnAccept);
+        pnCtrl.add(btnConcat);
         pnCtrl.add(btnClose);
+        
+        btnConcat.setVisible(false);
         
         btnSelFile.addActionListener(new ActionListener() {    
             @Override
@@ -103,17 +141,38 @@ public class BackupManager implements Disposeable {
             }
         });
         
-        btnSave.addActionListener(new ActionListener() {   
+        btnAccept.addActionListener(new ActionListener() {   
             @Override
             public void actionPerformed(ActionEvent e) {
                 new Thread(new Runnable() {   
                     @Override
                     public void run() {
-                        if(saveMode) onSaveRequested();
-                        else         onLoadCompleteRequested();
+                        if(saveMode) { try { onSaveRequested();         } catch(Exception ex) { ex.printStackTrace(); JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage()); } }
+                        else         { try { onLoadCompleteRequested(); } catch(Exception ex) { ex.printStackTrace(); JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage()); } }
                         prog.setIndeterminate(false);
                     }
                 }).start(); 
+            }
+        });
+        
+        btnConcat.addActionListener(new ActionListener() {   
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Thread(new Runnable() {   
+                    @Override
+                    public void run() {
+                        try { onLoadConcatRequested(); } catch(Exception ex) { ex.printStackTrace(); JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage()); }
+                        prog.setIndeterminate(false);
+                    }
+                }).start();
+            }
+        });
+        
+        chkUseEnc.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(chkUseEnc.isSelected()) tfPassword.setEditable(true);
+                else                       tfPassword.setEditable(false);
             }
         });
         
@@ -143,15 +202,25 @@ public class BackupManager implements Disposeable {
         this.colonies.clear();
         this.colonies.addAll(colonies);
         
+        chkUseEnc.setSelected(false);
         tfFile.setText("");
         tfFile.setEditable(false);
+        tfPassword.setText("");
+        tfPassword.setEditable(true);
         btnSelFile.setVisible(false);
-        btnSave.setText("복원");
+        btnConcat.setVisible(true);
+        lbPassword.setVisible(true);
+        pnSecurity.setVisible(false);
+        chkUseEnc.setVisible(false);
+        taDet.setVisible(true);
+        btnAccept.setText("복원 (대체)");
         tfName.setText("");
         ta.setText("");
         tfName.setEditable(false);
         ta.setEditable(false);
+        dialog.setTitle("복원");
         saveMode = false;
+        security = "";
         
         int sel = backupChooser.showOpenDialog(dialog);
         if(sel != JFileChooser.APPROVE_OPTION) { dialog.setVisible(false); return; }
@@ -159,15 +228,17 @@ public class BackupManager implements Disposeable {
         File file = backupChooser.getSelectedFile();
         tfFile.setText(file.getAbsolutePath());
         
+        dialog.setTitle("복원 - " + file.getName());
+        
         prog.setIndeterminate(true);
-        btnSave.setEnabled(false);
+        btnAccept.setEnabled(false);
         
         new Thread(new Runnable() {
             @Override
             public void run() {
                 onLoadRequested();
                 prog.setIndeterminate(false);
-                btnSave.setEnabled(true);
+                btnAccept.setEnabled(true);
             }
         }).start();
         
@@ -178,15 +249,25 @@ public class BackupManager implements Disposeable {
         this.colonies.clear();
         this.colonies.addAll(colonies);
         
+        chkUseEnc.setSelected(false);
         tfFile.setText("");
         tfFile.setEditable(true);
+        tfPassword.setText("");
+        tfPassword.setEditable(false);
         btnSelFile.setVisible(true);
-        btnSave.setText("저장");
+        btnConcat.setVisible(false);
+        taDet.setVisible(false);
+        lbPassword.setVisible(false);
+        pnSecurity.setVisible(true);
+        chkUseEnc.setVisible(true);
+        btnAccept.setText("저장");
         tfName.setEditable(true);
         ta.setEditable(true);
         tfName.setText("이 곳에 백업의 이름을 입력해 주세요.");
         ta.setText("이 곳에 백업의 설명을 입력해 주세요.");
+        dialog.setTitle("백업");
         saveMode = true;
+        security = "";
         
         dialog.setVisible(true);
         tfName.requestFocus();
@@ -201,6 +282,7 @@ public class BackupManager implements Disposeable {
         if(dialog != null) dialog.setVisible(false);
         if(tfName != null) tfName.setText("");
         if(ta     != null) ta.setText("");
+        if(taDet  != null) taDet.setText("");
         colonies.clear();
         superInstance = null;
     }
@@ -217,9 +299,20 @@ public class BackupManager implements Disposeable {
         bak.getColonies().addAll(colonies);
         bak.setCreated(new Date(System.currentTimeMillis()));
         
+        JsonObject json;
+        String password = null;
+        
+        if(chkUseEnc.isSelected()) password = new String(tfPassword.getPassword());
+        
         try {
+            String lower = strFile.toLowerCase();
+            if(! lower.endsWith(".colbak")) strFile += ".colbak";
+            
+            if(password != null) json = bak.toJson("AES", password);
+            else                 json = bak.toJson();
+            
             File file = new File(strFile);
-            FileUtil.writeString(file, "UTF-8", bak.toJson().toJSON(), GZIPOutputStream.class);
+            FileUtil.writeString(file, "UTF-8", json.toJSON(), GZIPOutputStream.class);
             
             dialog.setVisible(false);
             colonies.clear();
@@ -244,13 +337,26 @@ public class BackupManager implements Disposeable {
             JsonObject json = (JsonObject) JsonObject.parseJson(strJson);
             strJson = null;
             
+            Exception exc = null;
+            
             ColonyBackup bak = new ColonyBackup();
-            bak.fromJson(json);
+            try { bak.fromJson(json); } catch(Exception ex) { ex.printStackTrace(); exc = ex; }
+            security = json.get("security").toString().trim();
             json = null;
             
-            colonies.addAll(bak.getColonies());
+            if(security.equalsIgnoreCase("AES")) {
+                colonies.clear();
+                pnSecurity.setVisible(true);
+                chkUseEnc.setVisible(false);
+                tfPassword.setEditable(true);
+            } else {
+                if(exc != null) throw new RuntimeException(exc.getMessage(), exc);
+                colonies.addAll(bak.getColonies());
+            }
+            
             tfName.setText(bak.getName());
             ta.setText(bak.getDescription());
+            taDet.setText("저장일시 : " + new Date(bak.getCreated()));
         } catch(Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage());
@@ -263,9 +369,40 @@ public class BackupManager implements Disposeable {
         if(sel != JOptionPane.YES_OPTION) return;
         
         prog.setIndeterminate(true);
+        handleSecurityOnLoading();
         
-        superInstance.applyRestore(colonies, this);
+        superInstance.applyRestore(colonies, this, false);
         dialog.setVisible(false);
         colonies.clear();
+    }
+    
+    protected void onLoadConcatRequested() {
+        int sel = JOptionPane.showConfirmDialog(dialog, "이 백업을 복원하시겠습니까?\n기존 정착지들과 더불어 백업된 정착지들이 추가됩니다.\n단, 고유 키가 중복되는 정착지는 사라질 수 있습니다 !", "확인", JOptionPane.YES_NO_OPTION);
+        if(sel != JOptionPane.YES_OPTION) return;
+        
+        prog.setIndeterminate(true);
+        handleSecurityOnLoading();
+        
+        superInstance.applyRestore(colonies, this, true);
+        dialog.setVisible(false);
+        colonies.clear();
+    }
+    
+    protected void handleSecurityOnLoading() {
+        if(security.equalsIgnoreCase("AES")) { // 암호화된 경우 다시 불러와야 함
+            try {
+                File file = new File(tfFile.getText());
+                String strJson = FileUtil.readString(file, "UTF-8", GZIPInputStream.class);
+                JsonObject json = (JsonObject) JsonObject.parseJson(strJson);
+                strJson = null;
+                
+                ColonyBackup bak = new ColonyBackup();
+                bak.fromJson(json, new String(tfPassword.getPassword()));
+                
+                colonies = bak.getColonies();
+            } catch(Exception ex) {
+                throw new RuntimeException(ex.getMessage(), ex);
+            }
+        }
     }
 }
