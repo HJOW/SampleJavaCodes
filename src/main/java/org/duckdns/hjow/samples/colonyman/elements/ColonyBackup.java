@@ -11,7 +11,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
-import org.duckdns.hjow.samples.util.HexUtil;
+import org.duckdns.hjow.commons.util.HexUtil;
 
 public class ColonyBackup {
     protected List<Colony> colonies = new Vector<Colony>();
