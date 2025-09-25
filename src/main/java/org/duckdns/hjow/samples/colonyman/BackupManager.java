@@ -144,12 +144,19 @@ public class BackupManager implements Disposeable {
         btnAccept.addActionListener(new ActionListener() {   
             @Override
             public void actionPerformed(ActionEvent e) {
+                boolean enBtnAccept = btnAccept.isEnabled();
+                boolean enBtnConcat = btnConcat.isEnabled();
+                btnAccept.setEnabled(false);
+                btnConcat.setEnabled(false);
+                
                 new Thread(new Runnable() {   
                     @Override
                     public void run() {
                         if(saveMode) { try { onSaveRequested();         } catch(Exception ex) { ex.printStackTrace(); JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage()); } }
                         else         { try { onLoadCompleteRequested(); } catch(Exception ex) { ex.printStackTrace(); JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage()); } }
                         prog.setIndeterminate(false);
+                        btnAccept.setEnabled(enBtnAccept);
+                        btnConcat.setEnabled(enBtnConcat);
                     }
                 }).start(); 
             }
@@ -158,11 +165,18 @@ public class BackupManager implements Disposeable {
         btnConcat.addActionListener(new ActionListener() {   
             @Override
             public void actionPerformed(ActionEvent e) {
+                boolean enBtnAccept = btnAccept.isEnabled();
+                boolean enBtnConcat = btnConcat.isEnabled();
+                btnAccept.setEnabled(false);
+                btnConcat.setEnabled(false);
+                
                 new Thread(new Runnable() {   
                     @Override
                     public void run() {
                         try { onLoadConcatRequested(); } catch(Exception ex) { ex.printStackTrace(); JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage()); }
                         prog.setIndeterminate(false);
+                        btnAccept.setEnabled(enBtnAccept);
+                        btnConcat.setEnabled(enBtnConcat);
                     }
                 }).start();
             }
