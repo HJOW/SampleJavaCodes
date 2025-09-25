@@ -19,6 +19,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -53,6 +55,7 @@ import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.util.ResourceUtil;
 import org.duckdns.hjow.samples.util.UIUtil;
 
+/** Colonization 프로그램 */
 public class ColonyManager implements GUIProgram {
     private static final long serialVersionUID = -5740844908011980260L;
     protected transient SampleJavaCodes superInstance;
@@ -70,7 +73,7 @@ public class ColonyManager implements GUIProgram {
     protected transient volatile int cycle = 0;
     protected transient volatile long cycleGap = 990L;
     
-    protected transient JPanel pnCols;
+    protected transient JPanel pnCols, pnNoColonies;
     protected transient ColonyPanel cpNow;
     protected transient JComboBox<Colony> cbxColony;
     protected transient List<ColonyPanel> pnColonies = new Vector<ColonyPanel>();
@@ -83,7 +86,7 @@ public class ColonyManager implements GUIProgram {
     
     protected transient JMenuBar menuBar;
     protected transient JMenu menuFile, menuAction;
-    protected transient JMenuItem menuActionThrPlay, menuFileSave, menuFileLoad, menuFileBackup, menuFileRestore, menuFileReset;
+    protected transient JMenuItem menuActionThrPlay, menuFileSave, menuFileLoad, menuFileBackup, menuFileRestore, menuFileReset, menuFileNew, menuFileDel;
     
     protected transient boolean flagSaveBeforeClose = true;
     
@@ -236,6 +239,20 @@ public class ColonyManager implements GUIProgram {
         
         cbxColony  = new JComboBox<Colony>();
         toolbarNorth.add(cbxColony);
+        
+        cbxColony.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                cardMain.show(pnMain, "C2");
+                SwingUtilities.invokeLater(new Runnable() {   
+                    @Override
+                    public void run() {
+                        refreshColonyContent();
+                        cardMain.show(pnMain, "C1");
+                    }
+                });
+            }
+        });
 
         Vector<String> strSpeeds = new Vector<String>();
         strSpeeds.add("×1");
@@ -271,30 +288,48 @@ public class ColonyManager implements GUIProgram {
         progThreadStatus = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
         toolbarNorth.add(progThreadStatus);
         
-        pnCols  = new JPanel();
+        pnCols       = new JPanel();
+        pnNoColonies = new JPanel();
+        
         JPanel pnArena = new JPanel();
         JPanel pnCtrl  = new JPanel();
         
         pnArena.setLayout( new BorderLayout());
         pnCtrl.setLayout( new BorderLayout());
         pnCols.setLayout( new BorderLayout());
+        pnNoColonies.setLayout( new BorderLayout());
         pnCenter.add(pnArena, BorderLayout.CENTER);
         
         pnArena.add(pnCols, BorderLayout.CENTER);
         pnArena.add(pnCtrl , BorderLayout.NORTH);
         
-        cbxColony.addItemListener(new ItemListener() {
+        pnNoColonies.add(new JPanel(), BorderLayout.NORTH);
+        pnNoColonies.add(new JPanel(), BorderLayout.SOUTH);
+        pnNoColonies.add(new JPanel(), BorderLayout.EAST);
+        pnNoColonies.add(new JPanel(), BorderLayout.WEST);
+        
+        JPanel pnNoColMain = new JPanel();
+        pnNoColMain.setLayout(new BorderLayout());
+        pnNoColonies.add(pnNoColMain, BorderLayout.CENTER);
+        
+        JPanel pnNoColCenter, pnNoColSouth;
+        pnNoColCenter = new JPanel();
+        pnNoColSouth  = new JPanel();
+        pnNoColCenter.setLayout(new FlowLayout(FlowLayout.CENTER));
+        pnNoColSouth.setLayout( new FlowLayout(FlowLayout.CENTER));
+        pnNoColMain.add(pnNoColCenter, BorderLayout.CENTER);
+        pnNoColMain.add(pnNoColSouth , BorderLayout.SOUTH);
+        
+        JButton btnNewCol = new JButton("새 정착지");
+        btnNewCol.addActionListener(new ActionListener() {
             @Override
-            public void itemStateChanged(ItemEvent e) {
-                selectedColony = cbxColony.getSelectedIndex();
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshColonyContent();
-                    }
-                });
+            public void actionPerformed(ActionEvent e) {
+                cardMain.show(pnMain, "C2");
+                onNewRequested();
+                cardMain.show(pnMain, "C1");
             }
         });
+        pnNoColCenter.add(btnNewCol);
         
         menuBar = new JMenuBar();
         dialog.setJMenuBar(menuBar);
@@ -303,6 +338,26 @@ public class ColonyManager implements GUIProgram {
         
         menuFile = new JMenu("파일");
         menuBar.add(menuFile);
+        
+        menuFileNew = new JMenuItem("새 정착지 생성");
+        menuFile.add(menuFileNew);
+        menuFileNew.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onNewRequested();
+            }
+        });
+        
+        menuFileDel = new JMenuItem("이 정착지 삭제");
+        menuFile.add(menuFileDel);
+        menuFileDel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onDeleteThisRequested();
+            }
+        });
+        
+        menuFile.addSeparator();
         
         menuFileSave = new JMenuItem("다른 이름으로 이 정착지 저장");
         menuFile.add(menuFileSave);
@@ -467,6 +522,57 @@ public class ColonyManager implements GUIProgram {
         return true;
     }
     
+    /** 정착지 생성 요청 시 호출됨 */
+    protected void onNewRequested() {
+        Colony newCol = newColony();
+        cbxColony.setSelectedItem(newCol);
+        
+        cardMain.show(pnMain, "C2");
+        SwingUtilities.invokeLater(new Runnable() {   
+            @Override
+            public void run() {
+                refreshColonyContent();
+                cardMain.show(pnMain, "C1");
+            }
+        });
+        
+    }
+    
+    /** 현재의 정착지 삭제 요청 시 호출됨 */
+    protected void onDeleteThisRequested() {
+        Colony col = getColony();
+        int sel = JOptionPane.showConfirmDialog(getDialog(), "정착지 " + col.getName() + "을/를 포기하시겠습니까?", "확인", JOptionPane.YES_NO_OPTION);
+        if(sel != JOptionPane.YES_OPTION) return;
+        
+        cardMain.show(pnMain, "C2");
+        
+        // 리스트에서 삭제
+        int idx = 0;
+        while(idx < colonies.size()) {
+            if(colonies.get(idx).getKey() == col.getKey()) {
+                colonies.remove(idx);
+            }
+            idx++;
+        }
+        
+        // 파일도 삭제
+        File root = getColonySaveRootDirectory();
+        File[] lists = root.listFiles(getColonyFileFilter());
+        for(File f : lists) {
+            try {
+                Colony temp = new Colony(f);
+                if(temp.getKey() == col.getKey()) f.delete();
+            } catch(Exception ex) {} // 오류 건너뛰기
+        }
+        
+        // 정착지 목록이 비어 있으면 생성
+        if(colonies.isEmpty()) newColony();
+        
+        // 새로 고침
+        refreshColonyList();
+        cardMain.show(pnMain, "C1");
+    }
+    
     /** 정착지 하나를 별도 파일로 저장 요청 시 호출됨 */
     protected void onSaveRequested() {
         Colony c = getSelectedColony();
@@ -520,7 +626,17 @@ public class ColonyManager implements GUIProgram {
     public void applyRestore(List<Colony> colonies, BackupManager backupMan, boolean concat) {
         if(backupManager != backupMan) return;
         
-        if(concat) {
+        cardMain.show(pnMain, "C2");
+        
+        // 파일 다 지워야 함
+        File root = getColonySaveRootDirectory();
+        File[] lists = root.listFiles(getColonyFileFilter());
+        for(File f : lists) {
+            f.delete();
+        }
+        
+        // 복원 처리
+        if(concat) { // 병합
             List<Colony> temp = new ArrayList<Colony>();
             temp.addAll(this.colonies);
             
@@ -543,13 +659,15 @@ public class ColonyManager implements GUIProgram {
                 if(dupl) continue;
                 this.colonies.add(c);
             }
-        } else {
+        } else { // 대체
             this.colonies.clear();
             this.colonies.addAll(colonies);
         }
         
+        reserveSaving = true; // 저장 예약
+        refreshColonyList();  // 목록 갱신
         
-        refreshColonyList();
+        cardMain.show(pnMain, "C1");
     }
     
     /** 정착지 세이브 파일 필터 생성 */
@@ -614,12 +732,46 @@ public class ColonyManager implements GUIProgram {
     /** 정착지들을 기본 경로에 저장 */
     public void saveColonies() {
         File root = ResourceUtil.getHomeDir("samplejavacodes", "colony");
+        
+        // 백업 준비
+        SimpleDateFormat format8 = new SimpleDateFormat("yyyyMMdd");
+        int no = 1;
+        String date8 = format8.format(new Date(System.currentTimeMillis()));
+        String dirName = "backup" + date8 + "_" + no;
+        
+        // 백업 디렉토리 생성
+        File dir = new File(root.getAbsolutePath() + File.separator + dirName);
+        while(dir.exists()) {
+            no++;
+            dirName = "backup" + date8 + "_" + no;
+            dir = new File(root.getAbsolutePath() + File.separator + dirName);
+        }
+        dir.mkdirs();
+        
+        // 백업
+        File[] lists = root.listFiles(getColonyFileFilter());
+        for(File f : lists) {
+            File newPath = new File(dir.getAbsolutePath() + File.separator + f.getName());
+            f.renameTo(newPath); // 파일 이동
+        }
+        
+        // 저장
         for(Colony c : colonies) {
             String name = c.getOriginalFileName();
             if(name == null) name = "col_" + c.getKey() + ".colony";
             
             File colFile = new File(root.getAbsolutePath() + File.separator + name);
             saveColony(c, colFile, false);
+        }
+        
+        // 임시 백업 삭제
+        if(dir.exists()) {
+            lists = dir.listFiles();
+            for(File f : lists) {
+                if(f.isDirectory()) continue;
+                f.delete();
+            }
+            if(dir.listFiles().length <= 0) dir.delete();
         }
     }
     
@@ -630,16 +782,18 @@ public class ColonyManager implements GUIProgram {
             if(! ( nameLower.endsWith(".colony") || nameLower.endsWith(".colgz") )) f = new File(f.getAbsolutePath() + ".colony");
             
             c.save(f); 
-        } catch(Exception ex) { ex.printStackTrace(); if(alert) alert("오류 : " + ex.getMessage()); }
+        } catch(Exception ex) { ex.printStackTrace(); if(alert) { alert("오류 : " + ex.getMessage()); } else { throw new RuntimeException(ex.getMessage()); } }
     }
     
     /** 새 정착지 생성 */
-    public void newColony() {
+    public Colony newColony() {
         Colony newCol = new Colony();
         newCol.newCity();
         
         colonies.add(newCol);
         refreshColonyList();
+        
+        return newCol;
     }
     
     /** 정착지 추가 */
@@ -847,6 +1001,8 @@ public class ColonyManager implements GUIProgram {
         menuFileBackup.setEnabled(true);
         menuFileRestore.setEnabled(true);
         menuFileReset.setEnabled(true);
+        menuFileDel.setEnabled(true);
+        menuFileNew.setEnabled(true);
         
         for(ColonyPanel c : pnColonies) {
             Colony col = c.getColony();
@@ -893,6 +1049,8 @@ public class ColonyManager implements GUIProgram {
         menuFileBackup.setEnabled(false);
         menuFileRestore.setEnabled(false);
         menuFileReset.setEnabled(false);
+        menuFileDel.setEnabled(false);
+        menuFileNew.setEnabled(false);
         for(ColonyPanel c : pnColonies) { c.setEditable(false); }
         
         btnThrPlay.setEnabled(true);
@@ -927,6 +1085,7 @@ public class ColonyManager implements GUIProgram {
     
     /** 정착지 화면 내용 갱신 */
     public void refreshColonyContent() {
+        selectedColony = cbxColony.getSelectedIndex();
         assureMainThreadRunning();
         refreshArenaPanel(0);
     }
@@ -936,6 +1095,7 @@ public class ColonyManager implements GUIProgram {
         Colony col = getSelectedColony();
         if(col == null) {
             pnCols.removeAll();
+            pnCols.add(pnNoColonies, BorderLayout.CENTER);
             return;
         }
         
