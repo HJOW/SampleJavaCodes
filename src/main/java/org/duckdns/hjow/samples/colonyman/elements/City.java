@@ -31,6 +31,7 @@ public class City implements ColonyElements {
     protected List<HoldingJob> holdings = new Vector<HoldingJob>();
     protected int hp = getMaxHp();
     protected int spaces = 30 + ((int) ( 30 * Math.random() ));
+    protected int tax = 10;
     
     public City() {
         
@@ -153,6 +154,14 @@ public class City implements ColonyElements {
         }
         return max;
     }
+    public int getTax() {
+        return tax;
+    }
+
+    public void setTax(int tax) {
+        this.tax = tax;
+    }
+
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) { // city should be a self
         int idx;
@@ -650,7 +659,7 @@ public class City implements ColonyElements {
     
     /** 이주율 (탈출) 적용 */
     public void processMoveOutChance(int cycle, Colony col, int efficiency100) {
-        if(cycle % 60 == 0) {
+        if(cycle % 600 == 0) {
             if(getCitizenCount() >= 1) {
                 int idx = 0;
                 List<Citizen> citizens = getCitizens();
@@ -677,6 +686,7 @@ public class City implements ColonyElements {
         json.put("name", getName());
         json.put("key", new Long(getKey()));
         json.put("hp", new Long(getHp()));
+        json.put("tax", new Integer(getTax()));
         json.put("spaces", new Integer(getSpaces()));
         
         JsonArray list = new JsonArray();
@@ -704,6 +714,7 @@ public class City implements ColonyElements {
         setName(json.get("name").toString());
         key = Long.parseLong(json.get("key").toString());
         setHp(Integer.parseInt(json.get("hp").toString()));
+        setTax(Integer.parseInt(json.get("tax").toString()));
         setSpaces(Integer.parseInt(json.get("spaces").toString()));
         
         JsonArray list = (JsonArray) json.get("facilities");

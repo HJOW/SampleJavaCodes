@@ -44,7 +44,7 @@ public class Turret extends DefaultFacility implements AttackableObject {
     
     @Override
     public int getAttackCycle() {
-        return 10;
+        return 100;
     }
     
     /** 대미지 처리 후 추가 작업 (상태를 부여한다거나 등등) 이 메소드에서 구현 */

@@ -82,6 +82,11 @@ public class ResearchCenter extends DefaultFacility {
         return null;
     }
     
+    /** 테크 포인트 증가 사이클 */
+    protected int getTechPointIncreaseCycle() {
+        return 100;
+    }
+    
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
         super.oneSecond(cycle, city, colony, efficiency100, colPanel);
@@ -91,7 +96,7 @@ public class ResearchCenter extends DefaultFacility {
         increases = (int) (increases * ( efficiency100 / 100.0 ));
         
         // 테크 수치 올리기
-        if(cycle % 10 == 0) colony.setTech(colony.getTech() + increases);
+        if(cycle % getTechPointIncreaseCycle() == 0) colony.setTech(colony.getTech() + increases);
         
         // 진행 중인 연구 처리
         if(getResearchKey() != 0L) {

@@ -94,32 +94,48 @@ public class Arcade extends DefaultFacility implements ServiceFacility {
     public double additionalComportGradeRate(City city, Colony colony) {
         return 0.0;
     }
-
+    
+    /** 수익 발생 주기 */
+    protected int getProfitCycle() {
+        return 600;
+    }
+    
+    @Override
+    public long usingFee() {
+        return 2L;
+    }
+    
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
         super.oneSecond(cycle, city, colony, efficiency100, colPanel);
         
-        double efficiencyRate = efficiency100 / 100.0;
-        double additionalRate = additionalComportGradeRate(city, colony);
-        if(additionalRate < 0.0) additionalRate = 0.0;
-        if(additionalRate != 0.0) {
-            efficiencyRate = efficiencyRate + ((1.0 - efficiencyRate) * additionalRate);
-        }
-        if(efficiencyRate > 1.0) efficiencyRate = 1.0;
-        
-        int compGrade = getComportGrade();
-        compGrade = (int) Math.round(compGrade * efficiencyRate);
-        
-        int servicingCount = 0;
-        for(Citizen c : city.getCitizens()) {
-            if(c.getHappy() >= 100) continue;
-            if(c.getMoney() < 2) continue;
+        if(cycle % getProfitCycle() == 0) {
+            double efficiencyRate = efficiency100 / 100.0;
+            double additionalRate = additionalComportGradeRate(city, colony);
+            if(additionalRate < 0.0) additionalRate = 0.0;
+            if(additionalRate != 0.0) {
+                efficiencyRate = efficiencyRate + ((1.0 - efficiencyRate) * additionalRate);
+            }
+            if(efficiencyRate > 1.0) efficiencyRate = 1.0;
             
-            servicingCount++;
-            c.setHappy(c.getHappy() + 5 + (compGrade / 2));
-            c.setMoney(c.getMoney() - 2);
+            int compGrade = getComportGrade();
+            compGrade = (int) Math.round(compGrade * efficiencyRate);
             
-            if(servicingCount >= getCapacity()) break;
+            int servicingCount = 0;
+            for(Citizen c : city.getCitizens()) {
+                if(c.getHappy() >= 100) continue;
+                if(c.getMoney() < usingFee()) continue;
+                
+                long fee = usingFee();
+                long tax = getTax(city, colony);
+                
+                servicingCount++;
+                c.setHappy(c.getHappy() + 5 + (compGrade / 2));
+                c.setMoney(c.getMoney() - fee - tax);
+                colony.modifyingMoney(tax, city, colony, "세금 - " + getFacilityTitle());
+                
+                if(servicingCount >= getCapacity()) break;
+            }
         }
     }
 

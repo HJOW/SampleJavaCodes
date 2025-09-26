@@ -1,6 +1,8 @@
 package org.duckdns.hjow.samples.colonyman.elements.facilities;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -106,6 +108,22 @@ public abstract class DefaultFacility implements Facility {
     @Override
     public int increasingCityMaxHP() {
         return 0;
+    }
+    
+    /** 사용료 */
+    public long usingFee() { return 0; }
+    
+    /** 세금 */
+    protected long getTax(City city, Colony colony) {
+        double rate = 0.0;
+        if(city.getTax() >= 1) {
+            rate = city.getTax() / 100.0;
+        }
+        
+        BigDecimal res = new BigDecimal(String.valueOf(usingFee()));
+        res = res.setScale(50, RoundingMode.FLOOR);
+        res = res.multiply(new BigDecimal(String.valueOf(rate)));
+        return res.longValue();
     }
     
     @Override

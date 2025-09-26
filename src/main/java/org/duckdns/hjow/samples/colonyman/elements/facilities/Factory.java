@@ -62,15 +62,22 @@ public class Factory extends DefaultFacility {
         return name;
     }
     
+    /** 수익 발생 주기 */
+    protected int getProfitCycle() {
+        return 600;
+    }
+    
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
         super.oneSecond(cycle, city, colony, efficiency100, colPanel);
         
         // 공장 업무 처리
-        int increases = getCapacity();
-        increases = (int) (increases * ( efficiency100 / 100.0 ));
-        
-        colony.modifyingMoney(increases, city, this, "work");
+        if(cycle % getProfitCycle() == 0) {
+            int increases = getCapacity();
+            increases = (int) (increases * ( efficiency100 / 100.0 ));
+            
+            colony.modifyingMoney(increases, city, this, "work");
+        }
     }
     
     @Override

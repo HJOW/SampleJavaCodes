@@ -71,7 +71,7 @@ public class ColonyManager implements GUIProgram {
     protected transient Vector<Colony> colonies = new Vector<Colony>();
     protected transient volatile int selectedColony = -1;
     protected transient volatile int cycle = 0;
-    protected transient volatile long cycleGap = 990L;
+    protected transient volatile long cycleGap = 99L;
     
     protected transient JPanel pnCols, pnNoColonies;
     protected transient ColonyPanel cpNow;
@@ -270,9 +270,9 @@ public class ColonyManager implements GUIProgram {
                 if(sel < 0) sel = 0;
                 if(sel > 2) sel = 2;
                 
-                if(sel == 0) cycleGap = 990L;
-                else if(sel == 1) cycleGap = 240L;
-                else if(sel == 2) cycleGap = 120L;
+                if(sel == 0) cycleGap = 99L;
+                else if(sel == 1) cycleGap = 24L;
+                else if(sel == 2) cycleGap = 12L;
             }
         });
         
@@ -1088,7 +1088,7 @@ public class ColonyManager implements GUIProgram {
         } catch(Exception ex) { ex.printStackTrace(); }
         
         cycle++;
-        if(cycle >= 10000000) cycle = 0;
+        if(cycle >= Integer.MAX_VALUE - 10) cycle = 0;
     }
     
     /** 화면 새로고침 예약 */

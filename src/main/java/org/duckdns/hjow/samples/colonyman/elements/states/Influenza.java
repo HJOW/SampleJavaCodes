@@ -87,7 +87,7 @@ public class Influenza extends State {
         }
         
         //    도시 내 시민
-        if(cycle % 10 == 0) {
+        if(cycle % 100 == 0) {
             for(Citizen others : city.getCitizens()) {
                 if(hosts.getKey() == others.getKey()) continue; // 나 자신은 제외
                 if(others.getWorkingFacility() == ct.getWorkingFacility()) continue; // 동일직장 제외 (위에서 이미 했으므로)
@@ -108,12 +108,12 @@ public class Influenza extends State {
         }
         
         // 자연치유 확률 적용
-        if(cycle % 10 == 0) {
+        if(cycle % 100 == 0) {
             if(Math.random() >= naturalCuredRate()) addHp(-1);
         }
         
         // 이 전염병의 증상 구현
-        if(cycle % 10 == 0) {
+        if(cycle % 100 == 0) {
             if(ct.getHp() > 1                   ) ct.addHp(-1);
             else if(Math.random() >= deathRate()) ct.addHp(-1);
         }

@@ -42,39 +42,55 @@ public class Restaurant extends DefaultFacility implements ServiceFacility {
     public double additionalComportGradeRate(City city, Colony colony) {
         return 0.0;
     }
+    
+    /** 행사 주기 */
+    protected int getProfitCycle() {
+        return 60;
+    }
+    
+    @Override
+    public long usingFee() {
+        return 5L;
+    }
 
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
         super.oneSecond(cycle, city, colony, efficiency100, colPanel);
         
-        double efficiencyRate = efficiency100 / 100.0;
-        double additionalRate = additionalComportGradeRate(city, colony);
-        if(additionalRate < 0.0) additionalRate = 0.0;
-        if(additionalRate != 0.0) {
-            efficiencyRate = efficiencyRate + ((1.0 - efficiencyRate) * additionalRate);
-        }
-        if(efficiencyRate > 1.0) efficiencyRate = 1.0;
-        
-        int solvingHunger = 50;
-        solvingHunger = (int) Math.round(solvingHunger * efficiencyRate);
-        
-        int compGrade = getComportGrade();
-        compGrade = (int) Math.round(compGrade * efficiencyRate);
-        
-        int servicingCount = 0;
-        for(Citizen c : city.getCitizens()) {
-            if(c.getHunger() >= 100) continue;
-            if(c.getMoney() < 5) continue;
-            
-            servicingCount++;
-            c.setMoney(c.getMoney() - 5);
-            c.setHunger(c.getHunger() + solvingHunger);
-            
-            if(compGrade >= 2) {
-                c.setHappy(c.getHappy() + (compGrade / 2));
+        if(cycle % getProfitCycle() == 0) {
+            double efficiencyRate = efficiency100 / 100.0;
+            double additionalRate = additionalComportGradeRate(city, colony);
+            if(additionalRate < 0.0) additionalRate = 0.0;
+            if(additionalRate != 0.0) {
+                efficiencyRate = efficiencyRate + ((1.0 - efficiencyRate) * additionalRate);
             }
+            if(efficiencyRate > 1.0) efficiencyRate = 1.0;
             
-            if(servicingCount >= getCapacity()) break;
+            int solvingHunger = 50;
+            solvingHunger = (int) Math.round(solvingHunger * efficiencyRate);
+            
+            int compGrade = getComportGrade();
+            compGrade = (int) Math.round(compGrade * efficiencyRate);
+            
+            int servicingCount = 0;
+            for(Citizen c : city.getCitizens()) {
+                if(c.getHunger() >= 80) continue;
+                if(c.getMoney() < usingFee()) continue;
+                
+                long fee = usingFee();
+                long tax = getTax(city, colony);
+                
+                servicingCount++;
+                c.setMoney(c.getMoney() - fee - tax);
+                c.setHunger(c.getHunger() + solvingHunger);
+                colony.modifyingMoney(tax, city, colony, "세금 - " + getFacilityTitle());
+                
+                if(compGrade >= 2) {
+                    c.setHappy(c.getHappy() + (compGrade / 2));
+                }
+                
+                if(servicingCount >= getCapacity()) break;
+            }
         }
     }
 

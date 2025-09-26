@@ -98,7 +98,7 @@ public abstract class Residence extends DefaultFacility implements Home {
         if(efficiencyRate > 1.0) efficiencyRate = 1.0;
         
         if(efficiencyRate < 0.1) {
-            if(cycle % 600 == 0) {
+            if(cycle % 6000 == 0) {
                 for(Citizen c : getCitizens(city, colony)) {
                     c.addHp(-1);
                 }
@@ -108,7 +108,7 @@ public abstract class Residence extends DefaultFacility implements Home {
             if(compGrade >= 10) cycleComport -= 10;
             else                cycleComport -= compGrade;
             
-            if(cycle % (cycleComport * 60) == 0) {
+            if(cycle % (cycleComport * 600) == 0) {
                 for(Citizen c : getCitizens(city, colony)) {
                     c.addHappy(1);
                 }

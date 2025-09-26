@@ -74,7 +74,7 @@ public class Citizen implements ColonyElements {
         boolean harm = false;
         int std;
         
-        std = 10;
+        std = 100;
         if(cycle % std == 0) {
             if(livingHome < 0L) { // 집이 없으면
                 happy--;
@@ -83,7 +83,7 @@ public class Citizen implements ColonyElements {
             }
         }
         
-        std = 100;
+        std = 1000;
         if(cycle % std == 0) {
             hunger--;
         }
@@ -92,18 +92,18 @@ public class Citizen implements ColonyElements {
         }
         
         if(hunger <= 0) {
-            std = 5;
+            std = 50;
             if(cycle % std == 0) {
                 hp--;
                 if(efficiency100 < 50) hp--;
                 harm = true;
             }
         } else if(hunger >= 50) {
-            std = 50;
+            std = 500;
             if(cycle % std == 0 && hp < getMaxHp()) hp++;
         }
         
-        std = 10000 / ( (101 - efficiency100) < 1 ? 1 : (101 - efficiency100) );
+        std = 100000 / ( (101 - efficiency100) < 1 ? 1 : (101 - efficiency100) );
         if(cycle % std == 0) {
             happy--;
             if(happy <    0) happy =   0;

@@ -190,7 +190,7 @@ public class Colony implements ColonyElements {
     }
     
     public String getDateString() {
-        BigInteger originals = new BigInteger(getTime().toByteArray());
+        BigInteger originals = new BigInteger(getTime().toByteArray()).divide(BigInteger.TEN);
         BigInteger minutes, seconds, hour, date, month, year;
         minutes = new BigInteger(BigInteger.ZERO.toByteArray());
         seconds = new BigInteger(originals.toByteArray());
@@ -426,7 +426,7 @@ public class Colony implements ColonyElements {
     }
     
     public int getAccountingPeriod() {
-        return 60;
+        return 600;
     }
     
     public String getStatusString(ColonyManager superInstance) {

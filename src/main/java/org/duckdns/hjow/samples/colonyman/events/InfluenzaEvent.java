@@ -25,7 +25,7 @@ public class InfluenzaEvent extends TimeEvent {
 
     @Override
     public long getOccurMinimumTime(Colony col) {
-        return 100000;
+        return 1000L * 60 * 60 * 24;
     }
 
     @Override

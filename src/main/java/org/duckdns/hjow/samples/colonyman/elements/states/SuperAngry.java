@@ -37,7 +37,7 @@ public class SuperAngry extends State {
         if(! (hosts instanceof Citizen)) return;
         Citizen ct = (Citizen) hosts;
         
-        if(cycle % 10 == 0) {
+        if(cycle % 100 == 0) {
             // 도시 내 랜덤한 시설에 대미지
             List<Facility> facList = city.getFacility();
             int selection = (int) (Math.random() * facList.size());
