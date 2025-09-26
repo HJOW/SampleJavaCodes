@@ -61,6 +61,7 @@ public class NewFacilityManager extends JDialog {
         
         setSize(400, 300);
         setLayout(new BorderLayout());
+        setTitle("새 시설 건설");
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -185,9 +186,9 @@ public class NewFacilityManager extends JDialog {
             avail = false;
         }
         
-        appends = "비용 : " + info.getPrice();
-        appends = "기술 : " + info.getTech();
-        appends = "소요 : " + info.getBuildingCycle();
+        appends = appends + "\n" + "비용 : " + info.getPrice();
+        appends = appends + "\n" + "기술 : " + info.getTech();
+        appends = appends + "\n" + "소요 : " + info.getBuildingCycle();
         
         ta.setText(new String(prepends + "\n\n" + info.getDescription() + "\n\n" + appends).trim());
         btnOk.setEnabled(avail);

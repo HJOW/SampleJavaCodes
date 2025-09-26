@@ -143,6 +143,11 @@ public abstract class Research implements ColonyElements {
     /** 연구 이름 반환 */
     public abstract String  getTitle();
     
+    /** 이 연구의 설명 반환 */
+    public String getDescription() {
+        return getTitle();
+    }
+    
     @Override
     public void fromJson(JsonObject json) {
         key = Long.parseLong(json.get("key").toString());

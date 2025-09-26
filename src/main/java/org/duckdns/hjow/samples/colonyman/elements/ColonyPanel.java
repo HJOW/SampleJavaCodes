@@ -3,6 +3,8 @@ package org.duckdns.hjow.samples.colonyman.elements;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigInteger;
@@ -23,6 +25,8 @@ import javax.swing.table.DefaultTableModel;
 import org.duckdns.hjow.commons.ui.JLogArea;
 import org.duckdns.hjow.samples.colonyman.AccountingData;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.elements.research.Research;
+import org.duckdns.hjow.samples.colonyman.elements.research.ResearchPanel;
 
 /** 정착지 정보 출력 및 컨트롤을 담당하는 UI 컴포넌트 */
 public class ColonyPanel extends JPanel implements ColonyElementPanel {
@@ -31,7 +35,7 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
     protected Colony colony;
     
     protected transient List<CityPanel> pnCities = new Vector<CityPanel>();
-    protected transient JPanel pnColonyBasics, pnAccountingMain, pnHoldings;
+    protected transient JPanel pnColonyBasics, pnAccountingMain, pnHoldings, pnResearches;
     protected transient DefaultTableModel tableAccounting;
     protected transient JSplitPane splits;
     protected transient JTabbedPane tabMain, tabCities;
@@ -77,6 +81,9 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         tabCities = new JTabbedPane();
         tabMain.add("도시", tabCities);
         
+        pnResearches = new JPanel();
+        tabMain.add("연구", pnResearches);
+        
         pnAccountingMain = new JPanel();
         tabMain.add("예산", pnAccountingMain);
         
@@ -91,6 +98,8 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         pnAccountingMain.setLayout(new BorderLayout());
         pnAccountingMain.add(new JScrollPane(new JTable(tableAccounting)), BorderLayout.CENTER);
         pnAccountingMain.add(tfIncomes, BorderLayout.SOUTH);
+        
+        pnResearches.setLayout(new GridBagLayout());
         
         JPanel pnColTop, pnColBottom;
         pnColTop    = new JPanel();
@@ -229,6 +238,36 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         }
         
         pnHoldings.removeAll();
+        pnResearches.removeAll();
+        GridBagConstraints gridBagConst;
+        int rowNo = 0;
+        for(Research r : colony.getResearches()) {
+            if(r.getLevel() <= 0 && r.getProgress() <= 0) continue;
+            
+            ResearchPanel pnRes = new ResearchPanel(r);
+            
+            gridBagConst = new GridBagConstraints();
+            gridBagConst.gridx = 0;
+            gridBagConst.gridy = rowNo; rowNo++;
+            gridBagConst.gridwidth = 1;
+            gridBagConst.gridheight = 1;
+            gridBagConst.weightx = 1.0;  // fill 옵션으로 가로 채우기가 안되면 이 옵션이 필요함.
+            gridBagConst.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConst.anchor = GridBagConstraints.NORTH;
+            
+            pnResearches.add(pnRes, gridBagConst);
+            pnRes.refresh(cycle, city, colony);
+        }
+        
+        gridBagConst = new GridBagConstraints();
+        gridBagConst.gridx = 0;
+        gridBagConst.gridy = rowNo; rowNo++;
+        gridBagConst.gridwidth = 1;
+        gridBagConst.gridheight = 1;
+        gridBagConst.weightx = 1.0;
+        gridBagConst.weighty = 1.0;
+        gridBagConst.fill = GridBagConstraints.BOTH;
+        pnResearches.add(new JPanel(), gridBagConst);
         
         refreshAccoutingTable();
         setEditable(flagEditable);
