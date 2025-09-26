@@ -163,7 +163,7 @@ public class City implements ColonyElements {
     }
 
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) { // city should be a self
+    public void oneCycle(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) { // city should be a self
         int idx;
         
         // 출산율 및 이주 계산
@@ -210,17 +210,17 @@ public class City implements ColonyElements {
             }
             
             // 시설 효과 처리
-            f.oneSecond(cycle, this, colony, efficiency, colPanel);
+            f.oneCycle(cycle, this, colony, efficiency, colPanel);
         }
         
         // 시민 처리
         for(Citizen ct : getCitizens()) {
-            ct.oneSecond(cycle, city, colony, efficiency100, colPanel);
+            ct.oneCycle(cycle, city, colony, efficiency100, colPanel);
         }
         
         // 적 사이클 처리
         for(Enemy e : getEnemies()) {
-            e.oneSecond(cycle, city, colony, efficiency100, colPanel);
+            e.oneCycle(cycle, city, colony, efficiency100, colPanel);
         }
         
         // 사망 개체 제거

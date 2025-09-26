@@ -87,7 +87,7 @@ public abstract class Enemy implements ColonyElements, AttackableObject {
     protected void processAfterAttack(int cycle, ColonyElements element, int finalDamage) { }
 
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
+    public void oneCycle(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
         
         // 공격 처리
         int castLeft    = getAttackCount();

@@ -51,8 +51,8 @@ public class Turret extends DefaultFacility implements AttackableObject {
     protected void processAfterAttack(int cycle, ColonyElements element, int finalDamage) { }
     
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
-        super.oneSecond(cycle, city, colony, efficiency100, colPanel);
+    public void oneCycle(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
+        super.oneCycle(cycle, city, colony, efficiency100, colPanel);
         
         int castLeft    = getAttackCount();
         int damages     = getDamage();

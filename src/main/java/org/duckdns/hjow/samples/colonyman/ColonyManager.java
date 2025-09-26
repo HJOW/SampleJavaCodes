@@ -506,7 +506,7 @@ public class ColonyManager implements GUIProgram {
         threadShutdown = false;
         
         // 쓰레드에서 수행할 실질 작업 수행
-        try { if(! threadPaused) { bCheckerPauseCompleted = false; oneSecond(); } } catch(Exception ex) { ex.printStackTrace(); }
+        try { if(! threadPaused) { bCheckerPauseCompleted = false; oneCycle(); } } catch(Exception ex) { ex.printStackTrace(); }
         
         // 일시정지 후 쓰레드가 실제 정지 중인지 판단하는 플래그
         if(threadPaused) bCheckerPauseCompleted = true;
@@ -1073,11 +1073,11 @@ public class ColonyManager implements GUIProgram {
     }
     
     /** 쓰레드에서 1 사이클 당 1회 호출됨 */
-    public void oneSecond() {
+    public void oneCycle() {
         Colony col = getSelectedColony();
         if(col == null) return;
         
-        try { col.oneSecond(cycle, null, col, 100, getColonyPanel(col)); } catch(Exception ex) { ex.printStackTrace(); }
+        try { col.oneCycle(cycle, null, col, 100, getColonyPanel(col)); } catch(Exception ex) { ex.printStackTrace(); }
         try {
             SwingUtilities.invokeLater(new Runnable() { 
                 @Override

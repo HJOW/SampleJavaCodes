@@ -290,7 +290,7 @@ public class Colony implements ColonyElements {
     }
 
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) { // parameters are null
+    public void oneCycle(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) { // parameters are null
         int idx;
         
         // 체력이 없는 도시 삭제
@@ -317,12 +317,12 @@ public class Colony implements ColonyElements {
         
         // 도시별 사이클 처리
         for(City c : getCities()) {
-            c.oneSecond(cycle, c, this, 100, colPanel);
+            c.oneCycle(cycle, c, this, 100, colPanel);
         }
         
         // 적 사이클 처리
         for(Enemy e : getEnemies()) {
-            e.oneSecond(cycle, city, colony, efficiency100, colPanel);
+            e.oneCycle(cycle, city, colony, efficiency100, colPanel);
         }
         
         // 예약 작업 처리

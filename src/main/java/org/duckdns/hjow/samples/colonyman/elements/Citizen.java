@@ -67,7 +67,7 @@ public class Citizen implements ColonyElements {
     }
 
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
+    public void oneCycle(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
         if(hp < 0) hp = 0;
         if(hp <= 0) return;
         
@@ -118,12 +118,12 @@ public class Citizen implements ColonyElements {
         
         // State 영향력 동작
         for(State st : getStates()) {
-            st.oneSecond(cycle, this, city, colony, colPanel);
+            st.oneCycle(cycle, this, city, colony, colPanel);
         }
         
         // State 수명 동작
         for(State st : getStates()) {
-            st.oneSecond(cycle, city, colony, efficiency100, colPanel);
+            st.oneCycle(cycle, city, colony, efficiency100, colPanel);
         }
         
         // 수명 다된 state 제거

@@ -63,8 +63,8 @@ public class ArchitectOffice extends DefaultFacility {
     }
     
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
-        super.oneSecond(cycle, city, colony, efficiency100, colPanel);
+    public void oneCycle(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
+        super.oneCycle(cycle, city, colony, efficiency100, colPanel);
         
         // 업무 처리
         double healRate = 0.5;

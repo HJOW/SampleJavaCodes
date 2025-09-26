@@ -62,7 +62,7 @@ public abstract class State implements ColonyElements {
     }
 
     @Override
-    public final void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
+    public final void oneCycle(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
         // 이 메소드는 수정하거나 오버라이드하지 말 것 !
         
         if(lefts < Long.MAX_VALUE) lefts--;
@@ -75,7 +75,7 @@ public abstract class State implements ColonyElements {
     public abstract long getDefaultLefts();
     
     /** 1 사이클마다 쓰레드에서 호출됨. */
-    public abstract void oneSecond(int cycle, ColonyElements hosts, City city, Colony colony, ColonyPanel colPanel);
+    public abstract void oneCycle(int cycle, ColonyElements hosts, City city, Colony colony, ColonyPanel colPanel);
 
     @Override
     public void fromJson(JsonObject json) {

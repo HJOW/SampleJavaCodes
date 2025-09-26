@@ -97,8 +97,8 @@ public abstract class PowerPlant extends DefaultFacility {
     }
 
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
-        super.oneSecond(cycle, city, colony, efficiency100, colPanel);
+    public void oneCycle(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
+        super.oneCycle(cycle, city, colony, efficiency100, colPanel);
         
         // Do nothing on PowerStation (implemented on City class)
     }

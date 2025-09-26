@@ -30,7 +30,7 @@ public class ImmuneInfluenza extends State {
     }
 
     @Override
-    public void oneSecond(int cycle, ColonyElements hosts, City city, Colony colony, ColonyPanel colPanel) {
+    public void oneCycle(int cycle, ColonyElements hosts, City city, Colony colony, ColonyPanel colPanel) {
         if(! (hosts instanceof Citizen)) { setHp(0); return; }
         Citizen ct = (Citizen) hosts;
         

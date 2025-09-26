@@ -88,8 +88,8 @@ public class ResearchCenter extends DefaultFacility {
     }
     
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
-        super.oneSecond(cycle, city, colony, efficiency100, colPanel);
+    public void oneCycle(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
+        super.oneCycle(cycle, city, colony, efficiency100, colPanel);
         
         // 업무 처리
         int increases = 10;
@@ -103,7 +103,7 @@ public class ResearchCenter extends DefaultFacility {
             Research research = getResearch(colony);
             
             if(research != null) {
-                research.oneSecond(cycle, city, colony, efficiency100, colPanel);
+                research.oneCycle(cycle, city, colony, efficiency100, colPanel);
                 
                 increases = 1;
                 double incFloat = (increases * (efficiency100 / 100.0));

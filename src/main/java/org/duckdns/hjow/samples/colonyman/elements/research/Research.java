@@ -136,7 +136,7 @@ public abstract class Research implements ColonyElements {
     public double getMaxProgressIncreaseRate() { return 1.5;  }
     
     @Override
-    public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) { }
+    public void oneCycle(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) { }
     
     /** 연구 시작 가능여부 반환 (선행 연구 완료여부만 체크) */
     public abstract boolean isResearchAvail(Colony col);
