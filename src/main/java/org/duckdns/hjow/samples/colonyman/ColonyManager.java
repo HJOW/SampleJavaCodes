@@ -257,8 +257,8 @@ public class ColonyManager implements GUIProgram {
 
         Vector<String> strSpeeds = new Vector<String>();
         strSpeeds.add("×1");
-        strSpeeds.add("×4");
-        strSpeeds.add("×8");
+        strSpeeds.add("×2");
+        final int speedsCount = strSpeeds.size();
         JComboBox<String> cbxSpeed = new JComboBox<String>(strSpeeds);
         cbxSpeed.setSelectedIndex(0);
         toolbarNorth.add(cbxSpeed);
@@ -267,12 +267,12 @@ public class ColonyManager implements GUIProgram {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 int sel = cbxSpeed.getSelectedIndex();
+                if(sel >= speedsCount) sel = speedsCount -1;
                 if(sel < 0) sel = 0;
-                if(sel > 2) sel = 2;
                 
-                if(sel == 0) cycleGap = 99L;
-                else if(sel == 1) cycleGap = 24L;
-                else if(sel == 2) cycleGap = 12L;
+                if(     sel == 0) cycleGap = 99L;
+                else if(sel == 1) cycleGap = 49L;
+                else cycleGap = 99L;
             }
         });
         

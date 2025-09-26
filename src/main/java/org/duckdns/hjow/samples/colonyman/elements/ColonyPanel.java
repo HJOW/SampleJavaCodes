@@ -322,7 +322,7 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
             
             BigInteger time = data.getTime();
             
-            if(timeStd.compareTo(time) >= 0) {
+            if(timeStd.compareTo(time) <= 0) {
                 rows = new Vector<Object>();
                 
                 rows.add(data.getReason());
@@ -364,8 +364,8 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
                 data.dispose();
                 continue;
             }
-            tfIncomes.setText(String.valueOf(incomes));
         }
+        tfIncomes.setText(String.valueOf(incomes));
         
         // 오래된 회계자료 제거
         int idx = 0;
