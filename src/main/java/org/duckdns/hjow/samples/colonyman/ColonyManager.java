@@ -19,9 +19,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
@@ -33,6 +33,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -72,6 +73,7 @@ public class ColonyManager implements GUIProgram {
     protected transient volatile int selectedColony = -1;
     protected transient volatile int cycle = 0;
     protected transient volatile long cycleGap = 99L;
+    protected transient long cycleRunningTime = 0L;
     
     protected transient JPanel pnCols, pnNoColonies;
     protected transient ColonyPanel cpNow;
@@ -79,6 +81,8 @@ public class ColonyManager implements GUIProgram {
     protected transient List<ColonyPanel> pnColonies = new Vector<ColonyPanel>();
     
     protected transient JProgressBar progThreadStatus;
+    protected transient JLabel lbRunningTime;
+    
     protected transient JFileChooser fileChooser;
     protected transient javax.swing.filechooser.FileFilter filterCol, filterColGz;
     
@@ -288,6 +292,11 @@ public class ColonyManager implements GUIProgram {
         
         progThreadStatus = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
         toolbarNorth.add(progThreadStatus);
+        
+        lbRunningTime = new JLabel();
+        toolbarNorth.add(lbRunningTime);
+        
+        lbRunningTime.setVisible(false);
         
         pnCols       = new JPanel();
         pnNoColonies = new JPanel();
@@ -504,16 +513,10 @@ public class ColonyManager implements GUIProgram {
     /** 메인 쓰레드 동작 */
     protected boolean onMainThread() {
         threadShutdown = false;
+        long elapsed = System.currentTimeMillis();
         
         // 쓰레드에서 수행할 실질 작업 수행
         try { if(! threadPaused) { bCheckerPauseCompleted = false; oneCycle(); } } catch(Exception ex) { ex.printStackTrace(); }
-        
-        // 일시정지 후 쓰레드가 실제 정지 중인지 판단하는 플래그
-        if(threadPaused) bCheckerPauseCompleted = true;
-        else bCheckerPauseCompleted = false;
-        
-        // 쓰레드 Sleep
-        try { Thread.sleep(cycleGap); } catch(InterruptedException e) { threadSwitch = false; return false; }
         
         // 저장 요청 수행
         if(reserveSaving) { try { saveColonies(); } catch(Exception ex) { ex.printStackTrace(); } reserveSaving = false; }
@@ -530,6 +533,16 @@ public class ColonyManager implements GUIProgram {
             } catch(Exception ex) { ex.printStackTrace(); }
             reserveRefresh = false;
         }
+        
+        cycleRunningTime = System.currentTimeMillis() - elapsed;
+        lbRunningTime.setText("  " + String.valueOf(cycleRunningTime) + " ms");
+        
+        // 일시정지 후 쓰레드가 실제 정지 중인지 판단하는 플래그
+        if(threadPaused) bCheckerPauseCompleted = true;
+        else bCheckerPauseCompleted = false;
+        
+        // 쓰레드 Sleep
+        try { Thread.sleep(cycleGap); } catch(InterruptedException e) { threadSwitch = false; return false; }
         
         threadShutdown = false;
         progThreadStatus.setIndeterminate(! threadPaused);
