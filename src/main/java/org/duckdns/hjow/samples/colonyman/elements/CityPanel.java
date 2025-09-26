@@ -50,6 +50,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
     protected transient List<CitizenPanel>  citizenPns  = new Vector<CitizenPanel>();
     
     protected transient boolean flagSplitMoved = false;
+    protected transient boolean flagEditable = true;
     
     public CityPanel() {
         
@@ -404,8 +405,12 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         if(city.getHp() <= 0) {
             setEditable(false);
         } else {
-            // 시설 설치 가능여부 판단
-            btnNewFac.setEnabled(city.getFacility().size() < city.getSpaces());
+            setEditable(flagEditable);
+            
+            if(flagEditable) {
+                // 시설 설치 가능여부 판단
+                btnNewFac.setEnabled(city.getFacility().size() < city.getSpaces());
+            }
         }
     }
     
@@ -470,6 +475,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
     }
     
     public void setEditable(boolean editable) {
+        flagEditable = editable;
         for(FacilityPanel p : facilityPns) {
             if(p.getFacility(city).getHp() <= 0) p.setEditable(false);
             else p.setEditable(editable); 

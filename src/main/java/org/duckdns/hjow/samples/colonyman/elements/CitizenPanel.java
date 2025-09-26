@@ -26,6 +26,8 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
     protected transient JTextField tfName;
     protected transient JTextArea  ta;
     
+    protected transient boolean flagEditable = true;
+    
     public CitizenPanel() {
         super();
     }
@@ -112,6 +114,7 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
 
     @Override
     public void setEditable(boolean editable) {
+        flagEditable = editable;
         tfName.setEditable(editable);
     }
 
@@ -126,6 +129,9 @@ public class CitizenPanel extends JPanel implements ColonyElementPanel {
         
         tfName.setText(c.getName());
         ta.setText(c.getStatusString(city, colony, superInstance));
+        
+        if(c.getHp() <= 0) setEditable(false);
+        else setEditable(flagEditable);
     }
     
     @Override

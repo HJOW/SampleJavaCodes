@@ -27,6 +27,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 /** 정착지 정보 출력 및 컨트롤을 담당하는 UI 컴포넌트 */
 public class ColonyPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = 3851432705333464777L;
+    protected ColonyManager superInstance;
     protected Colony colony;
     
     protected transient List<CityPanel> pnCities = new Vector<CityPanel>();
@@ -41,6 +42,7 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
     protected transient JToolBar toolbar;
     
     protected transient boolean flagSplitLocated = false;
+    protected transient boolean flagEditable = true;
     
     public ColonyPanel() {
         super();
@@ -54,6 +56,7 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
     public void init(Colony colony, ColonyManager superInstance) {
         if(colony != null) dispose();
         this.colony = colony;
+        this.superInstance = superInstance;
         
         setLayout(new BorderLayout());
         
@@ -169,15 +172,22 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         
         if(taLog != null) taLog.dispose();
         removeAll();
+        superInstance = null;
     }
 
     @Override
     public void setEditable(boolean editable) {
+        flagEditable = editable;
         tfColonyName.setEditable(editable);
         for(CityPanel c : pnCities) {
             if(c.getCity().getHp() <= 0) c.setEditable(false);
             else c.setEditable(editable);
         }
+    }
+    
+    /** 화면 새로고침 예약 */
+    public void reserveRefresh() {
+        if(superInstance != null) superInstance.reserveRefresh();
     }
 
     @Override
@@ -221,6 +231,7 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         pnHoldings.removeAll();
         
         refreshAccoutingTable();
+        setEditable(flagEditable);
     }
     
     public CityPanel getCityPanel(City city) {

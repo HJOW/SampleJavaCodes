@@ -60,7 +60,7 @@ public class ColonyManager implements GUIProgram {
     private static final long serialVersionUID = -5740844908011980260L;
     protected transient SampleJavaCodes superInstance;
     protected transient Thread thread;
-    protected transient volatile boolean threadSwitch, threadPaused, threadShutdown, reserveSaving;
+    protected transient volatile boolean threadSwitch, threadPaused, threadShutdown, reserveSaving, reserveRefresh;
     protected transient volatile boolean bCheckerPauseCompleted = false;
     
     protected transient JDialog dialog;
@@ -88,7 +88,7 @@ public class ColonyManager implements GUIProgram {
     protected transient JMenu menuFile, menuAction;
     protected transient JMenuItem menuActionThrPlay, menuFileSave, menuFileLoad, menuFileBackup, menuFileRestore, menuFileReset, menuFileNew, menuFileDel;
     
-    protected transient boolean flagSaveBeforeClose = true;
+    protected transient boolean flagSaveBeforeClose = true; // 종료 시 저장 플래그
     
     public ColonyManager(SampleJavaCodes superInstance) {
         super();
@@ -98,6 +98,7 @@ public class ColonyManager implements GUIProgram {
         threadPaused = true;
         threadShutdown = true;
         reserveSaving = false;
+        reserveRefresh = false;
         
         init(superInstance);
     }
@@ -456,6 +457,7 @@ public class ColonyManager implements GUIProgram {
         
         threadPaused = true;
         reserveSaving  = false;
+        reserveRefresh = false;
         
         assureMainThreadRunning();
         
@@ -515,6 +517,19 @@ public class ColonyManager implements GUIProgram {
         
         // 저장 요청 수행
         if(reserveSaving) { try { saveColonies(); } catch(Exception ex) { ex.printStackTrace(); } reserveSaving = false; }
+        
+        // 리프레시 요청 수행
+        if(reserveRefresh) {
+            try {
+                SwingUtilities.invokeLater(new Runnable() {   
+                    @Override
+                    public void run() {
+                        refreshColonyContent();
+                    }
+                });
+            } catch(Exception ex) { ex.printStackTrace(); }
+            reserveRefresh = false;
+        }
         
         threadShutdown = false;
         progThreadStatus.setIndeterminate(! threadPaused);
@@ -1074,6 +1089,11 @@ public class ColonyManager implements GUIProgram {
         
         cycle++;
         if(cycle >= 10000000) cycle = 0;
+    }
+    
+    /** 화면 새로고침 예약 */
+    public void reserveRefresh() {
+        reserveRefresh = true;
     }
     
     /** 정착지 목록과 화면 내용 갱신 */

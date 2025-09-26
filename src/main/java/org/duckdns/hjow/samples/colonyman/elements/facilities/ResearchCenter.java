@@ -71,6 +71,17 @@ public class ResearchCenter extends DefaultFacility {
         this.researchKey = researchKey;
     }
     
+    /** 진행 중인 연구 반환 */
+    public Research getResearch(Colony colony) {
+        if(getResearchKey() == 0L) return null;
+        for(Research r : colony.getResearches()) {
+            if(r.getKey() == getResearchKey()) {
+                return r;
+            }
+        }
+        return null;
+    }
+    
     @Override
     public void oneSecond(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
         super.oneSecond(cycle, city, colony, efficiency100, colPanel);
@@ -84,13 +95,7 @@ public class ResearchCenter extends DefaultFacility {
         
         // 진행 중인 연구 처리
         if(getResearchKey() != 0L) {
-            Research research = null;
-            for(Research r : colony.getResearches()) {
-                if(r.getKey() == getResearchKey()) {
-                    research = r;
-                    break;
-                }
-            }
+            Research research = getResearch(colony);
             
             if(research != null) {
                 research.oneSecond(cycle, city, colony, efficiency100, colPanel);
@@ -98,13 +103,17 @@ public class ResearchCenter extends DefaultFacility {
                 increases = 1;
                 double incFloat = (increases * (efficiency100 / 100.0));
                 
+                boolean lvUp = false;
                 if(incFloat < 1) {
                     increases = 1;
-                    if(Math.random() >= incFloat) research.increaseProgress(increases);
+                    if(Math.random() >= incFloat) {
+                        lvUp = research.increaseProgress(increases);
+                    }
                 } else {
                     increases = (int) Math.round(incFloat);
-                    research.increaseProgress(increases);
+                    lvUp = research.increaseProgress(increases);
                 }
+                if(lvUp) colPanel.reserveRefresh();
             }
         }
     }

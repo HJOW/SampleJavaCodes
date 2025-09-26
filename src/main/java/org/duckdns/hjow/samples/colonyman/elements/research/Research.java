@@ -1,6 +1,8 @@
 package org.duckdns.hjow.samples.colonyman.elements.research;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
@@ -54,6 +56,21 @@ public abstract class Research implements ColonyElements {
     public int getDefencePoint() {
         return 0;
     }
+    
+    public double getProgressPercents() {
+        return getProgressPercents(true);
+    }
+    
+    public double getProgressPercents(boolean left2FloatPoint) {
+        BigDecimal r = new BigDecimal(String.valueOf(getMaxProgress()));
+        if(r.compareTo(BigDecimal.ZERO) <= 0) return 0.0;
+        
+        BigDecimal p = new BigDecimal(String.valueOf(getProgress()));
+        p = p.multiply(new BigDecimal("100"));
+        r = p.divide(r, 50, BigDecimal.ROUND_HALF_UP);
+        if(left2FloatPoint) r = r.setScale(2, RoundingMode.DOWN);
+        return r.doubleValue();
+    }
 
     public long getProgress() {
         return progress;
@@ -65,14 +82,15 @@ public abstract class Research implements ColonyElements {
         if(this.progress > getMaxProgress()) this.progress = getMaxProgress();
     }
     
-    /** 진행 상태 증가 (레벨업 로직 포함 - adds는 반드시 양수로 입력해야 함) */
-    public void increaseProgress(int adds) {
+    /** 진행 상태 증가 (레벨업 로직 포함 - adds는 반드시 양수로 입력해야 함) 레벨 변동 시 true 리턴 */
+    public boolean increaseProgress(int adds) {
         if(adds < 0) adds = 0;
+        boolean increased = false;
         
         this.progress += adds;
         if(this.progress < 0) this.progress = 0;
-        if(this.progress > getMaxProgress()) this.progress = getMaxProgress();
         while(this.progress >= getMaxProgress()) {
+            increased = true;
             if(getLevel() < getMaxLevel()) {
                 this.progress -= getMaxProgress();
                 if(this.progress < 0) this.progress = 0;
@@ -83,6 +101,8 @@ public abstract class Research implements ColonyElements {
                 break;
             }
         }
+        if(this.progress > getMaxProgress()) this.progress = getMaxProgress();
+        return increased;
     }
     
     public int getLevel() {
@@ -95,7 +115,7 @@ public abstract class Research implements ColonyElements {
     
     /** 도달할 수 있는 최대 레벨 */
     public int getMaxLevel() {
-        return 1;
+        return Integer.MAX_VALUE / 10;
     }
     
     /** 다음 레벨까지 도달하기에 필요한 진행상태(cycle) 필요 요구량 계산 */

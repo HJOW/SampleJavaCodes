@@ -39,6 +39,8 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
     protected transient JTextArea ta;
     protected transient JComboBox<Research> cbxResearch;
     
+    protected transient boolean flagEditable = true;
+    
     protected long facilityKey = 0L;
     protected String targetName;
     
@@ -232,20 +234,8 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
             
         }
         
-        List<Citizen> workers = fac.getWorkingCitizens(city, colony);
-        if(! workers.isEmpty()) {
-            res = res.append("\n").append("재직자...");
-            
-            for(Citizen c : workers) {
-                res = res.append("\n    ").append(c.getName());
-            }
-        } else {
-            res = res.append("\n    ").append("재직 중인 인원이 없습니다.");
-        }
-        
         if(fac instanceof ResearchCenter) {
             ResearchCenter rcenter = (ResearchCenter) fac;
-            long sel = rcenter.getResearchKey();
             
             List<Research> tResearches = colony.getResearches();
             Vector<Research> researches = new Vector<Research>();
@@ -256,20 +246,33 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
             
             cbxResearch.setModel(new DefaultComboBoxModel<Research>(researches));
             
-            boolean selectedRes = false;
-            for(Research r : researches) {
-                if(r.getKey() == sel) {
-                    cbxResearch.setSelectedItem(r);
-                    selectedRes = true;
-                    break;
-                }
-            }
-            if(! selectedRes) {
+            Research research = rcenter.getResearch(colony);
+            if(research != null) {
+                cbxResearch.setSelectedItem(research);
+            } else {
                 if(! researches.isEmpty()) cbxResearch.setSelectedIndex(0);
-                Research r = (Research) cbxResearch.getSelectedItem();
-                if(r == null) rcenter.setResearchKey(0L);
-                else rcenter.setResearchKey(r.getKey());
+                
+                research = (Research) cbxResearch.getSelectedItem();
+                if(research == null) rcenter.setResearchKey(0L);
+                else rcenter.setResearchKey(research.getKey());
             }
+            
+            res = res.append("\n").append("연구 : ");
+            if(research == null) {
+                res = res.append(" -");
+            } else {
+                res = res.append(" ").append(research.getTitle() + " ( " + research.getProgressPercents() + " % )");
+            }
+        }
+        
+        List<Citizen> workers = fac.getWorkingCitizens(city, colony);
+        res = res.append("\n").append("재직자...");
+        if(! workers.isEmpty()) {
+            for(Citizen c : workers) {
+                res = res.append("\n    ").append(c.getName());
+            }
+        } else {
+            res = res.append("\n    ").append("재직 중인 인원이 없습니다.");
         }
         
         List<State> states = fac.getStates();
@@ -284,6 +287,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         ta.setText(res.toString().trim());
         
         if(fac.getHp() <= 0) setEditable(false);
+        else setEditable(flagEditable);
     }
     
     @Override
@@ -295,6 +299,7 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
 
     @Override
     public void setEditable(boolean editable) {
+        flagEditable = editable;
         tfName.setEditable(editable);
         btnDestroy.setEnabled(editable);
         cbxResearch.setEnabled(editable);
