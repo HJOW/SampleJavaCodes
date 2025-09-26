@@ -23,6 +23,7 @@ import org.duckdns.hjow.samples.colonyman.elements.facilities.Restaurant;
 import org.duckdns.hjow.samples.colonyman.elements.research.Research;
 import org.duckdns.hjow.samples.colonyman.elements.research.ResearchManager;
 import org.duckdns.hjow.samples.colonyman.events.InfluenzaEvent;
+import org.duckdns.hjow.samples.colonyman.events.Riot;
 import org.duckdns.hjow.samples.colonyman.events.TimeEvent;
 
 /** 정착지 구현 클래스 */
@@ -592,6 +593,7 @@ public class Colony implements ColonyElements {
         List<TimeEvent> events = new Vector<TimeEvent>();
         
         events.add(new InfluenzaEvent());
+        events.add(new Riot());
         
         return events;
     }

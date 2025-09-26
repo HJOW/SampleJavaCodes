@@ -111,6 +111,7 @@ public abstract class State implements ColonyElements {
     static {
         stateClasses.add(Influenza.class);
         stateClasses.add(ImmuneInfluenza.class);
+        stateClasses.add(SuperAngry.class);
     }
     
     public static State createStateInstance(String type) {
