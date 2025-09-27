@@ -8,6 +8,7 @@ import java.util.Vector;
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.ColonyManagerUI;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
 import org.duckdns.hjow.samples.colonyman.elements.states.State;
 
@@ -416,7 +417,7 @@ public class Citizen implements ColonyElements {
     }
     
     /** 상태 메시지 생성 (UI 내 JTextArea 에 출력됨) */
-    public String getStatusString(City city, Colony colony, ColonyManager superInstance) {
+    public String getStatusString(City city, Colony colony, ColonyManagerUI superInstance) {
         DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
         
         StringBuilder desc = new StringBuilder("");

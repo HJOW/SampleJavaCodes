@@ -13,6 +13,7 @@ import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.commons.util.FileUtil;
 import org.duckdns.hjow.samples.colonyman.AccountingData;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.ColonyManagerUI;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Factory;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
@@ -429,7 +430,7 @@ public class Colony implements ColonyElements {
         return 600;
     }
     
-    public String getStatusString(ColonyManager superInstance) {
+    public String getStatusString(ColonyManagerUI superInstance) {
         DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
         // DecimalFormat formatterRate = new DecimalFormat("##0.00");
         

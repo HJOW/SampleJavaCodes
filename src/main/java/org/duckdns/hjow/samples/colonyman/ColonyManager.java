@@ -57,7 +57,7 @@ import org.duckdns.hjow.samples.util.ResourceUtil;
 import org.duckdns.hjow.samples.util.UIUtil;
 
 /** Colonization 프로그램 */
-public class ColonyManager implements GUIProgram {
+public class ColonyManager implements GUIProgram, ColonyManagerUI {
     private static final long serialVersionUID = -5740844908011980260L;
     protected transient SampleJavaCodes superInstance;
     protected transient Thread thread;
@@ -996,6 +996,7 @@ public class ColonyManager implements GUIProgram {
     }
     
     /** 해당 키를 갖는 정착지 찾아 반환 (목록에 없으면 null 반환) */
+    @Override
     public Colony getColony(long colonyKey) {
         for(Colony c : colonies) {
             if(c.getKey() == colonyKey) return c;
@@ -1167,6 +1168,7 @@ public class ColonyManager implements GUIProgram {
     }
     
     /** 도시가 속한 정착지 찾기 */
+    @Override
     public Colony getColonyFrom(City city) {
         for(Colony c : colonies) {
             for(City ct : c.getCities()) {

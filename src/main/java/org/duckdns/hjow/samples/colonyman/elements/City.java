@@ -13,6 +13,7 @@ import java.util.Vector;
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.ColonyManagerUI;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityManager;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
@@ -785,7 +786,7 @@ public class City implements ColonyElements {
     }
     
     /** 상태 메시지 생성 (UI 내 JTextArea 에 출력됨) */
-    public String getStatusString(Colony col, ColonyManager superInstance) {
+    public String getStatusString(Colony col, ColonyManagerUI superInstance) {
         StringBuilder desc = new StringBuilder("");
         
         DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
@@ -810,7 +811,7 @@ public class City implements ColonyElements {
     }
     
     /** 소속 정착지 찾기 */
-    public Colony getColony(ColonyManager man) {
+    public Colony getColony(ColonyManagerUI man) {
         return man.getColonyFrom(this);
     }
     
