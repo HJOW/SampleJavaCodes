@@ -51,7 +51,7 @@ import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.util.UIUtil;
 
 /** Colonization 프로그램 */
-public class GUIColonyManager extends ColonyManager implements GUIProgram, ColonyManagerUI {
+public class GUIColonyManager extends ColonyManager implements GUIProgram {
     
 	private static final long serialVersionUID = -2483528821790634383L;
 	protected transient JDialog dialog;
