@@ -12,6 +12,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.commons.util.HexUtil;
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
 
 public class ColonyBackup {
     protected List<Colony> colonies = new Vector<Colony>();
@@ -43,7 +44,7 @@ public class ColonyBackup {
                         col.fromJson((JsonObject) o);
                         colonies.add(col);
                     } catch(Exception ex) {
-                        ex.printStackTrace();
+                        ColonyManager.processExceptionOccured(ex, true);
                     }
                 }
             }
@@ -109,7 +110,7 @@ public class ColonyBackup {
                         col.fromJson((JsonObject) o);
                         colonies.add(col);
                     } catch(Exception ex) {
-                        ex.printStackTrace();
+                        ColonyManager.processExceptionOccured(ex, true);
                     }
                 }
             }

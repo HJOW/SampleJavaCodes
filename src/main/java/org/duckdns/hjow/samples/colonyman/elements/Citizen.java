@@ -409,7 +409,7 @@ public class Citizen implements ColonyElements {
                         stateOne.fromJson(jsonObj);
                         states.add(stateOne);
                     } catch(Exception ex) {
-                        ex.printStackTrace();
+                        ColonyManager.processExceptionOccured(ex, false);
                     }
                 }
             }

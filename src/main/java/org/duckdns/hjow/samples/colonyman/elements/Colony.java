@@ -1,8 +1,11 @@
 package org.duckdns.hjow.samples.colonyman.elements;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 import java.util.zip.GZIPInputStream;
@@ -49,6 +52,7 @@ public class Colony implements ColonyElements {
     protected transient List<AccountingData> accountingData = new Vector<AccountingData>();
     
     protected transient boolean checked = false;
+    protected transient LinkedList<String> logs = new LinkedList<String>();
     
     public Colony() {
         checked = true;
@@ -485,11 +489,11 @@ public class Colony implements ColonyElements {
         if(! "Colony".equals(json.get("type"))) throw new RuntimeException("This object is not Colony type.");
         setName(json.get("name").toString());
         key = Long.parseLong(json.get("key").toString());
-        try { setHp(Integer.parseInt(json.get("hp").toString()));                     } catch(Exception ex) { ex.printStackTrace(); hp         = 10;              }
-        try { setDifficulty(Integer.parseInt(json.get("difficulty").toString()));     } catch(Exception ex) { ex.printStackTrace(); difficulty = 0;               }
-        try { setMoney(Long.parseLong(json.get("money").toString()));                 } catch(Exception ex) { ex.printStackTrace(); money      = 0;               }
-        try { setTech(Long.parseLong(json.get("tech").toString()));                   } catch(Exception ex) { ex.printStackTrace(); tech       = 0;               }
-        try { setTime(new BigInteger(json.get("time").toString()));                   } catch(Exception ex) { ex.printStackTrace(); time       = BigInteger.ZERO; }
+        try { setHp(Integer.parseInt(json.get("hp").toString()));                     } catch(Exception ex) { processExceptionOccured(ex, false); hp         = 10;              }
+        try { setDifficulty(Integer.parseInt(json.get("difficulty").toString()));     } catch(Exception ex) { processExceptionOccured(ex, false); difficulty = 0;               }
+        try { setMoney(Long.parseLong(json.get("money").toString()));                 } catch(Exception ex) { processExceptionOccured(ex, false); money      = 0;               }
+        try { setTech(Long.parseLong(json.get("tech").toString()));                   } catch(Exception ex) { processExceptionOccured(ex, false); tech       = 0;               }
+        try { setTime(new BigInteger(json.get("time").toString()));                   } catch(Exception ex) { processExceptionOccured(ex, false); time       = BigInteger.ZERO; }
         
         JsonArray list = (JsonArray) json.get("cities");
         cities.clear();
@@ -501,7 +505,7 @@ public class Colony implements ColonyElements {
                         City city = new City((JsonObject) o);
                         cities.add(city);
                     } catch(Exception ex) {
-                        ex.printStackTrace();
+                        processExceptionOccured(ex, false);
                     }
                 }
             }
@@ -518,7 +522,7 @@ public class Colony implements ColonyElements {
                         h.fromJson((JsonObject) o);
                         holdings.add(h);
                     } catch(Exception ex) {
-                        ex.printStackTrace();
+                        processExceptionOccured(ex, false);
                     }
                 }
             }
@@ -535,7 +539,7 @@ public class Colony implements ColonyElements {
                         d.fromJson((JsonObject) o);
                         accountingData.add(d);
                     } catch(Exception ex) {
-                        ex.printStackTrace();
+                        processExceptionOccured(ex, false);
                     }
                 }
             }
@@ -555,7 +559,7 @@ public class Colony implements ColonyElements {
                             }
                         }
                     } catch(Exception ex) {
-                        ex.printStackTrace();
+                        processExceptionOccured(ex, false);
                     }
                 }
             }
@@ -597,5 +601,35 @@ public class Colony implements ColonyElements {
         events.add(new Riot());
         
         return events;
+    }
+
+    /** 쌓인 로그 리스트 객체 그대로 반환 */
+    public LinkedList<String> getLogList() {
+        return logs;
+    }
+
+    /** 로그 출력 */
+    public void log(String msg) {
+        logs.add(msg);
+        System.out.println(msg);
+    }
+
+    /** 오류 발생 시 처리 */
+    public void processExceptionOccured(Throwable tx, boolean isSerious) {
+        if(tx instanceof RuntimeException) {
+            Throwable caused = tx.getCause();
+            if(caused != null) tx = caused;
+        }
+
+        String msg = "오류 - " + tx.getMessage();
+        ByteArrayOutputStream byteCollector = new ByteArrayOutputStream();
+        if(isSerious) {
+            PrintStream ps = new PrintStream(byteCollector);
+            tx.printStackTrace(ps);
+            ps.close();
+
+            msg = msg + "\n" + new String(byteCollector.toByteArray());
+        }
+        log(msg);
     }
 }

@@ -17,8 +17,10 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +32,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -444,6 +447,20 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
                 toggleSimulationRunning();
             }
         });
+
+        menuAction.addSeparator();
+
+        menuItem = new JCheckBoxMenuItem("디버그 모드");
+        menuAction.add(menuItem);
+        menuItem.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                flagDebugMode = ((JCheckBoxMenuItem)e.getSource()).isSelected();
+                lbRunningTime.setVisible(isDebugModeEnabled());
+            }
+        });
+        ((JCheckBoxMenuItem)menuItem).setSelected(isDebugModeEnabled());
+
         
         backupManager = new BackupManager(this);
         
@@ -490,7 +507,7 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
     protected void turnOnMainThread() {
         if(thread != null) {
             thread.interrupt();
-            try { Thread.sleep(1000L); } catch(InterruptedException ex) { ex.printStackTrace(); }
+            try { Thread.sleep(1000L); } catch(InterruptedException ex) { processExceptionOccured(ex, false); }
         }
         thread = new Thread(new Runnable() {    
             @Override
@@ -514,12 +531,13 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
     protected boolean onMainThread() {
         threadShutdown = false;
         long elapsed = System.currentTimeMillis();
+        long gap = cycleGap;
         
         // 쓰레드에서 수행할 실질 작업 수행
-        try { if(! threadPaused) { bCheckerPauseCompleted = false; oneCycle(); } } catch(Exception ex) { ex.printStackTrace(); }
+        try { if(! threadPaused) { bCheckerPauseCompleted = false; oneCycle(); } } catch(Exception ex) { processExceptionOccured(ex, false); }
         
         // 저장 요청 수행
-        if(reserveSaving) { try { saveColonies(); } catch(Exception ex) { ex.printStackTrace(); } reserveSaving = false; }
+        if(reserveSaving) { try { saveColonies(); } catch(Exception ex) { processExceptionOccured(ex, false); } reserveSaving = false; }
         
         // 리프레시 요청 수행
         if(reserveRefresh) {
@@ -530,19 +548,19 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
                         refreshColonyContent();
                     }
                 });
-            } catch(Exception ex) { ex.printStackTrace(); }
+            } catch(Exception ex) { processExceptionOccured(ex, false); }
             reserveRefresh = false;
         }
-        
-        cycleRunningTime = System.currentTimeMillis() - elapsed;
-        lbRunningTime.setText("  " + String.valueOf(cycleRunningTime) + " ms");
         
         // 일시정지 후 쓰레드가 실제 정지 중인지 판단하는 플래그
         if(threadPaused) bCheckerPauseCompleted = true;
         else bCheckerPauseCompleted = false;
         
         // 쓰레드 Sleep
-        try { Thread.sleep(cycleGap); } catch(InterruptedException e) { threadSwitch = false; return false; }
+        try { Thread.sleep(gap); } catch(InterruptedException e) { threadSwitch = false; return false; }
+
+        cycleRunningTime = System.currentTimeMillis() - elapsed - gap;
+        if(isDebugModeEnabled()) lbRunningTime.setText("  " + String.valueOf(cycleRunningTime) + " ms");
         
         threadShutdown = false;
         progThreadStatus.setIndeterminate(! threadPaused);
@@ -754,7 +772,7 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
             
             c.setOriginalFileName(f.getName());
             colonies.add(c); 
-        } catch(Exception ex) { ex.printStackTrace(); if(alert) alert("오류 : " + ex.getMessage()); }
+        } catch(Exception ex) { processExceptionOccured(ex, false); if(alert) alert("오류 : " + ex.getMessage()); }
     }
     
     /** 정착지들을 기본 경로에 저장 */
@@ -810,7 +828,7 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
             if(! ( nameLower.endsWith(".colony") || nameLower.endsWith(".colgz") )) f = new File(f.getAbsolutePath() + ".colony");
             
             c.save(f); 
-        } catch(Exception ex) { ex.printStackTrace(); if(alert) { alert("오류 : " + ex.getMessage()); } else { throw new RuntimeException(ex.getMessage()); } }
+        } catch(Exception ex) { processExceptionOccured(ex, false); if(alert) { alert("오류 : " + ex.getMessage()); } else { throw new RuntimeException(ex.getMessage()); } }
     }
     
     /** 새 정착지 생성 */
@@ -1043,7 +1061,7 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try { Thread.sleep(500L); } catch(InterruptedException ex) { ex.printStackTrace(); }
+                try { Thread.sleep(500L); } catch(InterruptedException ex) { processExceptionOccured(ex, false); }
                 btnThrPlay.setEnabled(true);
                 menuActionThrPlay.setEnabled(true);
             }
@@ -1066,7 +1084,7 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
                 prefInfLoop--;
                 if(prefInfLoop <= 0) break;
             }
-        } catch(InterruptedException ex) { ex.printStackTrace(); }
+        } catch(InterruptedException ex) { processExceptionOccured(ex, false); }
         
         btnThrPlay.setText("시뮬레이션 정지");
         menuActionThrPlay.setText("시뮬레이션 정지");
@@ -1091,7 +1109,7 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
         Colony col = getSelectedColony();
         if(col == null) return;
         
-        try { col.oneCycle(cycle, null, col, 100, getColonyPanel(col)); } catch(Exception ex) { ex.printStackTrace(); }
+        try { col.oneCycle(cycle, null, col, 100, getColonyPanel(col)); } catch(Exception ex) { processExceptionOccured(ex, false); }
         try {
             SwingUtilities.invokeLater(new Runnable() { 
                 @Override
@@ -1099,7 +1117,7 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
                     refreshArenaPanel(cycle);
                 }
             });
-        } catch(Exception ex) { ex.printStackTrace(); }
+        } catch(Exception ex) { processExceptionOccured(ex, false); }
         
         cycle++;
         if(cycle >= Integer.MAX_VALUE - 10) cycle = 0;
@@ -1190,6 +1208,29 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
     public static int generateNaturalNumber() {
         return Math.abs(new Random().nextInt());
     }
+
+    public static boolean isDebugModeEnabled() {
+        return flagDebugMode;
+    }
+
+    /** 오류 처리 (Colony 이내 쪽에서 발생한 예외는 각 패널에서 처리할 것 !) */
+    public static void processExceptionOccured(Throwable tx, boolean isSerious) {
+        if(tx instanceof RuntimeException) {
+            Throwable caused = tx.getCause();
+            if(caused != null) tx = caused;
+        }
+
+        String msg = "오류 - " + tx.getMessage();
+        ByteArrayOutputStream byteCollector = new ByteArrayOutputStream();
+        if(isSerious) {
+            PrintStream ps = new PrintStream(byteCollector);
+            tx.printStackTrace(ps);
+            ps.close();
+
+            msg = msg + "\n" + new String(byteCollector.toByteArray());
+        }
+        System.err.println(msg);
+    }
     
     /** 공격자의 대미지에 추가 연산 (랜덤성 부여, 속성 및 방어력, 상태 적용) */
     public static int naturalizeDamage(AttackableObject attacker, ColonyElements target, int damage) {
@@ -1245,4 +1286,5 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
     public static final short DEFENCETYPE_SMALL    = 1;
     public static final short DEFENCETYPE_BUILDING = 9;
     
+    protected static transient boolean flagDebugMode = false; // 실행 시간 표시 플래그
 }

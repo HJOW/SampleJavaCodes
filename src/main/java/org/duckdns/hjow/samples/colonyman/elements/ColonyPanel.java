@@ -271,6 +271,8 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         
         refreshAccoutingTable();
         setEditable(flagEditable);
+
+        refreshLogs();
     }
     
     public CityPanel getCityPanel(City city) {
@@ -375,6 +377,18 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
                 continue;
             }
             idx++;
+        }
+    }
+
+    /** 쌓인 로그 출력 */
+    public void refreshLogs() {
+        Colony col = getColony();
+        if(col == null) return;
+        
+        List<String> logs = col.getLogList();
+        while(logs.size() > 0) {
+            taLog.log(logs.get(0));
+            logs.remove(0);
         }
     }
     

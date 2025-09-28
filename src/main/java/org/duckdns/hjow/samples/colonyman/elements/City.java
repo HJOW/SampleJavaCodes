@@ -729,7 +729,7 @@ public class City implements ColonyElements {
                         if(fac == null) throw new NullPointerException("Cannot found these facility type " + o);
                         facility.add(fac);
                     } catch(Exception ex) {
-                        ex.printStackTrace();
+                        ColonyManager.processExceptionOccured(ex, false);
                     }
                 }
             }
@@ -745,7 +745,7 @@ public class City implements ColonyElements {
                         Citizen cit = new Citizen((JsonObject) o);
                         citizens.add(cit);
                     } catch(Exception ex) {
-                        ex.printStackTrace();
+                        ColonyManager.processExceptionOccured(ex, false);
                     }
                 }
             }
@@ -762,7 +762,7 @@ public class City implements ColonyElements {
                         h.fromJson((JsonObject) o);
                         holdings.add(h);
                     } catch(Exception ex) {
-                        ex.printStackTrace();
+                        ColonyManager.processExceptionOccured(ex, false);
                     }
                 }
             }
@@ -778,7 +778,7 @@ public class City implements ColonyElements {
                         Enemy en = Enemy.createEnemyFromJson((JsonObject) o);
                         enemies.add(en);
                     } catch(Exception ex) {
-                        ex.printStackTrace();
+                        ColonyManager.processExceptionOccured(ex, false);
                     }
                 }
             }
