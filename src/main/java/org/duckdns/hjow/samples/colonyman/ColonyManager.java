@@ -28,14 +28,14 @@ public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable
     protected transient volatile boolean threadSwitch, threadPaused, threadShutdown, reserveSaving, reserveRefresh;
     protected transient volatile boolean bCheckerPauseCompleted = false;
     
-    protected transient Vector<Colony> colonies = new Vector<Colony>();
-    protected transient volatile int selectedColony = -1;
-    protected transient volatile int cycle = 0;
+    protected transient volatile Vector<Colony> colonies = new Vector<Colony>();
+    protected transient volatile int  selectedColony = -1;
+    protected transient volatile int  cycle = 0;
     protected transient volatile long cycleGap = 99L;
-    protected transient long cycleRunningTime = 0L;
+    protected transient volatile long cycleRunningTime = 0L;
     
-    protected transient boolean flagSaveBeforeClose = true; // 종료 시 저장 플래그
-    protected transient boolean flagAlreadyDisposed = false;
+    protected transient volatile boolean flagSaveBeforeClose = true; // 종료 시 저장 플래그
+    protected transient volatile boolean flagAlreadyDisposed = false;
     
     public ColonyManager(SampleJavaCodes superInstance) {
         super();
@@ -358,6 +358,7 @@ public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable
     
     /** 정착지 목록과 화면 내용 갱신 */
     public void refreshColonyList() {
+    	if(colonies.size() >= 1 && selectedColony < 0) selectedColony = 0;
         refreshColonyContent();
     }
     

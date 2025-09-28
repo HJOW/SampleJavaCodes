@@ -18,9 +18,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
@@ -50,7 +48,6 @@ import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.CityPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
-import org.duckdns.hjow.samples.util.ResourceUtil;
 import org.duckdns.hjow.samples.util.UIUtil;
 
 /** Colonization 프로그램 */
@@ -61,12 +58,6 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram, Colon
     protected transient JPanel pnMain;
     protected transient CardLayout cardMain;
     protected transient JButton btnSaveAs, btnLoadAs, btnThrPlay;
-    
-    protected transient Vector<Colony> colonies = new Vector<Colony>();
-    protected transient volatile int selectedColony = -1;
-    protected transient volatile int cycle = 0;
-    protected transient volatile long cycleGap = 99L;
-    protected transient long cycleRunningTime = 0L;
     
     protected transient JPanel pnCols, pnNoColonies;
     protected transient ColonyPanel cpNow;
@@ -84,9 +75,6 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram, Colon
     protected transient JMenuBar menuBar;
     protected transient JMenu menuFile, menuAction;
     protected transient JMenuItem menuActionThrPlay, menuFileSave, menuFileLoad, menuFileBackup, menuFileRestore, menuFileReset, menuFileNew, menuFileDel;
-    
-    protected transient boolean flagSaveBeforeClose = true; // 종료 시 저장 플래그
-    protected transient boolean flagAlreadyDisposed = false;
     
     public GUIColonyManager(SampleJavaCodes superInstance) {
         super(superInstance);
@@ -244,24 +232,17 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram, Colon
             }
         });
 
-        Vector<String> strSpeeds = new Vector<String>();
-        strSpeeds.add("×1");
-        strSpeeds.add("×2");
-        final int speedsCount = strSpeeds.size();
-        JComboBox<String> cbxSpeed = new JComboBox<String>(strSpeeds);
+        Vector<SimulationSpeed> strSpeeds = getSpeedList();
+        JComboBox<SimulationSpeed> cbxSpeed = new JComboBox<SimulationSpeed>(strSpeeds);
         cbxSpeed.setSelectedIndex(0);
         toolbarNorth.add(cbxSpeed);
 
         cbxSpeed.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                int sel = cbxSpeed.getSelectedIndex();
-                if(sel >= speedsCount) sel = speedsCount -1;
-                if(sel < 0) sel = 0;
-                
-                if(     sel == 0) cycleGap = 99L;
-                else if(sel == 1) cycleGap = 49L;
-                else cycleGap = 99L;
+            	SimulationSpeed spd = (SimulationSpeed) cbxSpeed.getSelectedItem();
+            	if(spd == null) cycleGap = 99L;
+            	else cycleGap = spd.getThreadGap();
             }
         });
         
@@ -460,7 +441,16 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram, Colon
         cardMain.show(pnMain, "C2");
     }
 
-    @Override
+    /** 지원되는 시뮬 속도 목록 반환 */
+    protected Vector<SimulationSpeed> getSpeedList() {
+    	Vector<SimulationSpeed> strSpeeds = new Vector<SimulationSpeed>();
+        strSpeeds.add(new SimulationSpeed(1));
+        strSpeeds.add(new SimulationSpeed(2));
+        strSpeeds.add(new SimulationSpeed(3));
+        return strSpeeds;
+	}
+
+	@Override
     public void onBeforeOpened(SampleJavaCodes superInstance) {
         if(thread != null) { try { threadSwitch = false; thread.interrupt(); Thread.sleep(1000L); } catch(Exception exc) {} }
         if(dialog == null) init(superInstance);
@@ -702,124 +692,6 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram, Colon
         cardMain.show(pnMain, "C1");
     }
     
-    /** 정착지들을 기본 경로에서 불러오기 */
-    public void loadColonies() {
-        File root = getColonySaveRootDirectory();
-        File[] lists = root.listFiles(getColonyFileFilter());
-        
-        colonies.clear();
-        for(File f : lists) {
-            if(filterCol.accept(f)) loadColony(f, false);
-        }
-        
-        if(colonies.isEmpty()) {
-            newColony();
-        } else {
-            refreshColonyList();
-        }
-    }
-    
-    /** 정착지 모두 포기, 초기화 */
-    protected void resetAllColony() {
-        colonies.clear();
-        File root = getColonySaveRootDirectory();
-        File[] lists = root.listFiles(getColonyFileFilter());
-        for(File f : lists) {
-            f.delete();
-        }
-        newColony();
-    }
-    
-    /** 정착지를 별도 파일에서 불러오기 (화면에는 반영하지 않으므로, 사용 후 refreshColonyList 호출 필요) */
-    public void loadColony(File f, boolean alert) {
-        boolean exists = false;
-        try { 
-            Colony c = new Colony(f);
-            exists = false;
-            for(Colony cx : colonies) { if(c.getName().equals(cx.getName())) exists = true; break; }
-            if(exists) return;
-            
-            c.setOriginalFileName(f.getName());
-            colonies.add(c); 
-        } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); if(alert) alert("오류 : " + ex.getMessage()); }
-    }
-    
-    /** 정착지들을 기본 경로에 저장 */
-    public void saveColonies() {
-        File root = ResourceUtil.getHomeDir("samplejavacodes", "colony");
-        
-        // 백업 준비
-        SimpleDateFormat format8 = new SimpleDateFormat("yyyyMMdd");
-        int no = 1;
-        String date8 = format8.format(new Date(System.currentTimeMillis()));
-        String dirName = "backup" + date8 + "_" + no;
-        
-        // 백업 디렉토리 생성
-        File dir = new File(root.getAbsolutePath() + File.separator + dirName);
-        while(dir.exists()) {
-            no++;
-            dirName = "backup" + date8 + "_" + no;
-            dir = new File(root.getAbsolutePath() + File.separator + dirName);
-        }
-        dir.mkdirs();
-        
-        // 백업
-        File[] lists = root.listFiles(getColonyFileFilter());
-        for(File f : lists) {
-            File newPath = new File(dir.getAbsolutePath() + File.separator + f.getName());
-            f.renameTo(newPath); // 파일 이동
-        }
-        
-        // 저장
-        for(Colony c : colonies) {
-            String name = c.getOriginalFileName();
-            if(name == null) name = "col_" + c.getKey() + ".colony";
-            
-            File colFile = new File(root.getAbsolutePath() + File.separator + name);
-            saveColony(c, colFile, false);
-        }
-        
-        // 임시 백업 삭제
-        if(dir.exists()) {
-            lists = dir.listFiles();
-            for(File f : lists) {
-                if(f.isDirectory()) continue;
-                f.delete();
-            }
-            if(dir.listFiles().length <= 0) dir.delete();
-        }
-    }
-    
-    /** 해당 정착지를 별도 파일로 저장 */
-    public void saveColony(Colony c, File f, boolean alert) {
-        try { 
-            String nameLower = f.getName().toLowerCase().trim();
-            if(! ( nameLower.endsWith(".colony") || nameLower.endsWith(".colgz") )) f = new File(f.getAbsolutePath() + ".colony");
-            
-            c.save(f); 
-        } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, true); if(alert) { alert("오류 : " + ex.getMessage()); } else { throw new RuntimeException(ex.getMessage()); } }
-    }
-    
-    /** 새 정착지 생성 */
-    public Colony newColony() {
-        Colony newCol = new Colony();
-        newCol.newCity();
-        
-        colonies.add(newCol);
-        refreshColonyList();
-        
-        return newCol;
-    }
-    
-    /** 정착지 추가 */
-    public void addColony(Colony col) {
-        for(Colony c : colonies) {
-            if(c.getKey() == col.getKey()) return;
-        }
-        colonies.add(col);
-        refreshColonyList();
-    }
-
     @Override
     public String getTitle() {
         return "Colony";
@@ -1097,12 +969,8 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram, Colon
         if(cycle >= Integer.MAX_VALUE - 10) cycle = 0;
     }
     
-    /** 화면 새로고침 예약 */
-    public void reserveRefresh() {
-        reserveRefresh = true;
-    }
-    
     /** 정착지 목록과 화면 내용 갱신 */
+    @Override
     public void refreshColonyList() {
         cbxColony.setModel(new DefaultComboBoxModel<Colony>(colonies));
         selectedColony = cbxColony.getSelectedIndex();
@@ -1110,6 +978,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram, Colon
     }
     
     /** 정착지 화면 내용 갱신 */
+    @Override
     public void refreshColonyContent() {
         selectedColony = cbxColony.getSelectedIndex();
         assureMainThreadRunning();
