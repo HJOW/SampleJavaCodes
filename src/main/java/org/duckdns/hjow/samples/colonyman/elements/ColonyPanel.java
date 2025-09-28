@@ -22,7 +22,6 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.table.DefaultTableModel;
 
-import org.duckdns.hjow.commons.ui.JLogArea;
 import org.duckdns.hjow.samples.colonyman.AccountingData;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.research.Research;
@@ -42,7 +41,6 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
     protected transient JProgressBar progHp;
     protected transient JTextField tfColonyName, tfColonyTime, tfIncomes;
     protected transient JTextArea taStatus;
-    protected transient JLogArea taLog;
     protected transient JToolBar toolbar;
     
     protected transient boolean flagSplitLocated = false;
@@ -164,9 +162,6 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         pnLog.setLayout(new BorderLayout());
         splits.setBottomComponent(pnLog);
         
-        taLog = new JLogArea();
-        pnLog.add(taLog, BorderLayout.CENTER);
-        
         pnHoldings = new JPanel();
         pnLog.add(new JScrollPane(pnHoldings), BorderLayout.EAST);
     }
@@ -179,7 +174,6 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         }
         pnCities.clear();
         
-        if(taLog != null) taLog.dispose();
         removeAll();
         superInstance = null;
     }
@@ -271,8 +265,6 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         
         refreshAccoutingTable();
         setEditable(flagEditable);
-
-        refreshLogs();
     }
     
     public CityPanel getCityPanel(City city) {
@@ -380,18 +372,6 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         }
     }
 
-    /** 쌓인 로그 출력 */
-    public void refreshLogs() {
-        Colony col = getColony();
-        if(col == null) return;
-        
-        List<String> logs = col.getLogList();
-        while(logs.size() > 0) {
-            taLog.log(logs.get(0));
-            logs.remove(0);
-        }
-    }
-    
     /** 컨텐츠 영역과 로그 사이의 분할바 위치 조정 */
     public void setDividerLocation(double loc) {
         splits.setDividerLocation(loc);
@@ -402,15 +382,5 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
     public void setDividerLocationOnlyFirst() {
         if(flagSplitLocated) return;
         setDividerLocation(0.7);
-    }
-    
-    /** 정착지에서 발생하는 로그 */
-    public void log(String msg) {
-        if(taLog != null) taLog.log(msg);
-    }
-    
-    /** 정착지에서 발생하는 로그 리셋 */
-    public void clearLog() {
-        if(taLog != null) taLog.clear();
     }
 }

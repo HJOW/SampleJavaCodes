@@ -2,6 +2,7 @@ package org.duckdns.hjow.samples.colonyman.events;
 
 import java.util.List;
 
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
@@ -65,7 +66,7 @@ public class Riot extends TimeEvent {
         }
         
         if(targetted >= 1) {
-            colPanel.log("폭동이 일어났습니다.");
+            ColonyManager.logGlobals("폭동이 일어났습니다.");
         }
     }
 

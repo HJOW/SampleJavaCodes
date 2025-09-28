@@ -3,6 +3,7 @@ package org.duckdns.hjow.samples.colonyman.events;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
@@ -64,7 +65,7 @@ public class InfluenzaEvent extends TimeEvent {
         }
         
         if(infected >= 1) {
-            colPanel.log("전염병 발생이 감지되었습니다.");
+            ColonyManager.logGlobals("전염병 발생이 감지되었습니다.");
         }
     }
 

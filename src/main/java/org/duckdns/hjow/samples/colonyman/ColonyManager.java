@@ -878,6 +878,7 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
     @Override
     public void log(String msg) {
         System.out.println(msg);
+        if(dialogGlobalLog != null) dialogGlobalLog.log(msg);
     }
 
     @Override
@@ -1248,7 +1249,13 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
 
             msg = msg + "\n" + new String(byteCollector.toByteArray());
         }
+        logGlobals(msg);
+    }
+
+    /** 전역 로그 출력 */
+    public static void logGlobals(String msg) {
         System.err.println(msg);
+        if(dialogGlobalLog != null) dialogGlobalLog.log(msg);
     }
     
     /** 공격자의 대미지에 추가 연산 (랜덤성 부여, 속성 및 방어력, 상태 적용) */

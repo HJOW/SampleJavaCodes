@@ -2,6 +2,7 @@ package org.duckdns.hjow.samples.colonyman.events;
 
 import java.io.Serializable;
 
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
@@ -25,7 +26,7 @@ public abstract class TimeEvent implements Serializable {
     
     /** 이벤트 처리 */
     public void onEventOccured(ColonyElements target, Colony col, City city, ColonyPanel colPanel) {
-        colPanel.log(getTitle() + " 발생 !");
+        ColonyManager.logGlobals(getTitle() + " 발생 !");
     }
     
     /** 이벤트 명칭 반환 */
