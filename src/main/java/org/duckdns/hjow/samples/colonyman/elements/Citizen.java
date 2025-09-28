@@ -444,6 +444,13 @@ public class Citizen implements ColonyElements {
         
         return desc.toString().trim();
     }
+
+    /** 소속 도시 반환 */
+    public City getWorkingCity(Colony col) {
+        if(col == null) return null;
+        if(getWorkingCity() == 0L) return null;
+        return col.getCity(getWorkingCity());
+    }
     
     @Override
     public BigInteger getCheckerValue() {
