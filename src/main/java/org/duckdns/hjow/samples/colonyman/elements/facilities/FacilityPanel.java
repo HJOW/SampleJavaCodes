@@ -21,6 +21,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.GUIColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
@@ -48,12 +49,12 @@ public class FacilityPanel extends JPanel implements ColonyElementPanel {
         super();
     }
     
-    public FacilityPanel(Facility f, City city, Colony colony, ColonyManager superInstance) {
+    public FacilityPanel(Facility f, City city, Colony colony, GUIColonyManager superInstance) {
         this();
         init(f, city, colony, superInstance);   
     }
     
-    public void init(final Facility f, final City city, final Colony colony, final ColonyManager superInstance) {
+    public void init(final Facility f, final City city, final Colony colony, final GUIColonyManager superInstance) {
         dispose();
         setFacilityKey(f.getKey());
         setTargetName(f.getName());

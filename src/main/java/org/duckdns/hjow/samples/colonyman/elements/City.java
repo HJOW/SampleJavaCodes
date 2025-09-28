@@ -14,6 +14,7 @@ import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.ColonyManagerUI;
+import org.duckdns.hjow.samples.colonyman.GlobalLogs;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityManager;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
@@ -353,6 +354,7 @@ public class City implements ColonyElements {
         while(idx < getCitizens().size()) {
             Citizen c = getCitizens().get(idx);
             if(c.getHp() <= 0) {
+            	c.dispose();
                 getCitizens().remove(idx);
                 continue;
             }
@@ -378,6 +380,7 @@ public class City implements ColonyElements {
                 }
                 
                 // 시설 제거
+                f.dispose();
                 getFacility().remove(idx);
                 continue;
             }
@@ -389,6 +392,7 @@ public class City implements ColonyElements {
         while(idx < getEnemies().size()) {
             Enemy en = getEnemies().get(idx);
             if(en.getHp() <= 0) {
+            	en.dispose();
                 getEnemies().remove(idx);
                 continue;
             }
@@ -712,13 +716,14 @@ public class City implements ColonyElements {
     @Override
     public void fromJson(JsonObject json) {
         if(! "City".equals(json.get("type"))) throw new RuntimeException("This object is not City type.");
-        setName(json.get("name").toString());
-        key = Long.parseLong(json.get("key").toString());
-        setHp(Integer.parseInt(json.get("hp").toString()));
-        setTax(Integer.parseInt(json.get("tax").toString()));
-        setSpaces(Integer.parseInt(json.get("spaces").toString()));
+        try { setName(json.get("name").toString());                       } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); setName("");  }
+        try { key = Long.parseLong(json.get("key").toString());           } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); setKey(ColonyManager.generateKey()); }
+        try { setHp(Integer.parseInt(json.get("hp").toString()));         } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); setHp(0);     }
+        try { setTax(Integer.parseInt(json.get("tax").toString()));       } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); setTax(0);    }
+        try { setSpaces(Integer.parseInt(json.get("spaces").toString())); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); setSpaces(0); }
         
-        JsonArray list = (JsonArray) json.get("facilities");
+        JsonArray list = null;
+        try { list = (JsonArray) json.get("facilities"); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); }
         facility.clear();
         if(list != null) {
             for(Object o : list) {
@@ -729,13 +734,14 @@ public class City implements ColonyElements {
                         if(fac == null) throw new NullPointerException("Cannot found these facility type " + o);
                         facility.add(fac);
                     } catch(Exception ex) {
-                        ColonyManager.processExceptionOccured(ex, false);
+                        GlobalLogs.processExceptionOccured(ex, false);
                     }
                 }
             }
         }
         
-        list = (JsonArray) json.get("citizens");
+        list = null;
+        try { list = (JsonArray) json.get("citizens"); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); }
         citizens.clear();
         if(list != null) {
             for(Object o : list) {
@@ -745,13 +751,14 @@ public class City implements ColonyElements {
                         Citizen cit = new Citizen((JsonObject) o);
                         citizens.add(cit);
                     } catch(Exception ex) {
-                        ColonyManager.processExceptionOccured(ex, false);
+                        GlobalLogs.processExceptionOccured(ex, false);
                     }
                 }
             }
         }
         
-        list = (JsonArray) json.get("holdings");
+        list = null;
+        try { list = (JsonArray) json.get("holdings"); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); }
         holdings.clear();
         if(list != null) {
             for(Object o : list) {
@@ -762,13 +769,14 @@ public class City implements ColonyElements {
                         h.fromJson((JsonObject) o);
                         holdings.add(h);
                     } catch(Exception ex) {
-                        ColonyManager.processExceptionOccured(ex, false);
+                        GlobalLogs.processExceptionOccured(ex, false);
                     }
                 }
             }
         }
         
-        list = (JsonArray) json.get("enemies");
+        list = null;
+        try { list = (JsonArray) json.get("enemies"); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); }
         enemies.clear();
         if(list != null) {
             for(Object o : list) {
@@ -778,7 +786,7 @@ public class City implements ColonyElements {
                         Enemy en = Enemy.createEnemyFromJson((JsonObject) o);
                         enemies.add(en);
                     } catch(Exception ex) {
-                        ColonyManager.processExceptionOccured(ex, false);
+                        GlobalLogs.processExceptionOccured(ex, false);
                     }
                 }
             }
@@ -827,4 +835,20 @@ public class City implements ColonyElements {
         
         return res;
     }
+
+	@Override
+	public void dispose() {
+		for(Citizen ct : citizens) {
+			ct.dispose();
+		}
+		citizens.clear();
+		for(Facility f : facility) {
+			f.dispose();
+		}
+		facility.clear();
+		for(Enemy en : enemies) {
+			en.dispose();
+		}
+		enemies.clear();
+	}
 }

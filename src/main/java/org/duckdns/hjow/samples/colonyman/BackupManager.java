@@ -46,11 +46,11 @@ public class BackupManager implements Disposeable {
     protected JFileChooser backupChooser;
     
     protected transient boolean saveMode = true;
-    protected transient ColonyManager superInstance = null;
+    protected transient GUIColonyManager superInstance = null;
     protected transient List<Colony> colonies = new ArrayList<Colony>();
     protected transient String security = "";
     
-    public BackupManager(ColonyManager superInstance) {
+    public BackupManager(GUIColonyManager superInstance) {
         this.superInstance = superInstance;
         
         dialog = new JDialog(superInstance.getDialog());
@@ -152,8 +152,8 @@ public class BackupManager implements Disposeable {
                 new Thread(new Runnable() {   
                     @Override
                     public void run() {
-                        if(saveMode) { try { onSaveRequested();         } catch(Exception ex) { ColonyManager.processExceptionOccured(ex, false); JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage()); } }
-                        else         { try { onLoadCompleteRequested(); } catch(Exception ex) { ColonyManager.processExceptionOccured(ex, false); JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage()); } }
+                        if(saveMode) { try { onSaveRequested();         } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage()); } }
+                        else         { try { onLoadCompleteRequested(); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage()); } }
                         prog.setIndeterminate(false);
                         btnAccept.setEnabled(enBtnAccept);
                         btnConcat.setEnabled(enBtnConcat);
@@ -173,7 +173,7 @@ public class BackupManager implements Disposeable {
                 new Thread(new Runnable() {   
                     @Override
                     public void run() {
-                        try { onLoadConcatRequested(); } catch(Exception ex) { ColonyManager.processExceptionOccured(ex, false); JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage()); }
+                        try { onLoadConcatRequested(); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage()); }
                         prog.setIndeterminate(false);
                         btnAccept.setEnabled(enBtnAccept);
                         btnConcat.setEnabled(enBtnConcat);
@@ -331,7 +331,7 @@ public class BackupManager implements Disposeable {
             dialog.setVisible(false);
             colonies.clear();
         } catch(Exception ex) {
-            ColonyManager.processExceptionOccured(ex, false);
+            GlobalLogs.processExceptionOccured(ex, false);
             JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage());
         }
     }
@@ -354,7 +354,7 @@ public class BackupManager implements Disposeable {
             Exception exc = null;
             
             ColonyBackup bak = new ColonyBackup();
-            try { bak.fromJson(json); } catch(Exception ex) { ColonyManager.processExceptionOccured(ex, false); exc = ex; }
+            try { bak.fromJson(json); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); exc = ex; }
             security = json.get("security").toString().trim();
             json = null;
             
@@ -372,7 +372,7 @@ public class BackupManager implements Disposeable {
             ta.setText(bak.getDescription());
             taDet.setText("저장일시 : " + new Date(bak.getCreated()));
         } catch(Exception ex) {
-            ColonyManager.processExceptionOccured(ex, false);
+            GlobalLogs.processExceptionOccured(ex, false);
             JOptionPane.showMessageDialog(dialog, "오류 : " + ex.getMessage());
             dialog.setVisible(false);
         }

@@ -201,4 +201,7 @@ public abstract class Enemy implements ColonyElements, AttackableObject {
         en.fromJson(json);
         return en;
     }
+    
+    @Override
+    public void dispose() { }
 }

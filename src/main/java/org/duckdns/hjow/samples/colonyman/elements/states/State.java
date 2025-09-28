@@ -105,6 +105,11 @@ public abstract class State implements ColonyElements {
         for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
         return res;
     }
+    
+    @Override
+    public void dispose() {
+    	
+    }
 
     protected static List<Class<?>> stateClasses = new Vector<Class<?>>();
     

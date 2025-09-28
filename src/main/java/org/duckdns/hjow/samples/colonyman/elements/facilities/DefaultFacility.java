@@ -143,6 +143,7 @@ public abstract class DefaultFacility implements Facility {
         while(std < getStates().size()) {
             State st = getStates().get(std);
             if(st.getHp() <= 0 || st.getLefts() <= 0) {
+            	st.dispose();
                 getStates().remove(std);
                 continue;
             }
@@ -246,5 +247,13 @@ public abstract class DefaultFacility implements Facility {
         res = res.add(new BigInteger(String.valueOf(getHp())));
         for(State st : getStates()) { res = res.add(st.getCheckerValue()); }
         return res;
+    }
+    
+    @Override
+    public void dispose() {
+    	for(State st : getStates()) {
+    		st.dispose();
+    	}
+    	states.clear();
     }
 }

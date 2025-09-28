@@ -14,7 +14,6 @@ import java.util.Vector;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -24,38 +23,37 @@ import javax.swing.table.DefaultTableModel;
 
 import org.duckdns.hjow.samples.colonyman.AccountingData;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.GUIColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.research.Research;
 import org.duckdns.hjow.samples.colonyman.elements.research.ResearchPanel;
 
 /** 정착지 정보 출력 및 컨트롤을 담당하는 UI 컴포넌트 */
 public class ColonyPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = 3851432705333464777L;
-    protected ColonyManager superInstance;
+    protected GUIColonyManager superInstance;
     protected Colony colony;
     
     protected transient List<CityPanel> pnCities = new Vector<CityPanel>();
     protected transient JPanel pnColonyBasics, pnAccountingMain, pnHoldings, pnResearches;
     protected transient DefaultTableModel tableAccounting;
-    protected transient JSplitPane splits;
     protected transient JTabbedPane tabMain, tabCities;
     protected transient JProgressBar progHp;
     protected transient JTextField tfColonyName, tfColonyTime, tfIncomes;
     protected transient JTextArea taStatus;
     protected transient JToolBar toolbar;
     
-    protected transient boolean flagSplitLocated = false;
     protected transient boolean flagEditable = true;
     
     public ColonyPanel() {
         super();
     }
     
-    public ColonyPanel(Colony colony, ColonyManager superInstance) {
+    public ColonyPanel(Colony colony, GUIColonyManager superInstance) {
         this();
         init(colony, superInstance);
     }
     
-    public void init(Colony colony, ColonyManager superInstance) {
+    public void init(Colony colony, GUIColonyManager superInstance) {
         if(colony != null) dispose();
         this.colony = colony;
         this.superInstance = superInstance;
@@ -66,12 +64,9 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         pnMain.setLayout(new BorderLayout());
         add(pnMain, BorderLayout.CENTER);
         
-        splits = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        pnMain.add(splits, BorderLayout.CENTER);
-        
         JPanel pnCenter = new JPanel();
         pnCenter.setLayout(new BorderLayout());
-        splits.setTopComponent(pnCenter);
+        pnMain.add(pnCenter, BorderLayout.CENTER);
         
         tabMain = new JTabbedPane();
         pnCenter.add(tabMain, BorderLayout.CENTER);
@@ -160,10 +155,10 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
         
         JPanel pnLog = new JPanel();
         pnLog.setLayout(new BorderLayout());
-        splits.setBottomComponent(pnLog);
+        pnMain.add(pnLog, BorderLayout.SOUTH);
         
         pnHoldings = new JPanel();
-        pnLog.add(new JScrollPane(pnHoldings), BorderLayout.EAST);
+        pnLog.add(new JScrollPane(pnHoldings), BorderLayout.CENTER);
     }
     
     @Override
@@ -212,7 +207,7 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
             pnCities.clear();
             
             for(int idx=0; idx<cities.size(); idx++) {
-                CityPanel c = new CityPanel(cities.get(idx), colony, superInstance);
+                CityPanel c = new CityPanel(cities.get(idx), colony, (GUIColonyManager) superInstance);
                 pnCities.add(c);
                 tabCities.add(cities.get(idx).getName(), c);
             }
@@ -370,17 +365,5 @@ public class ColonyPanel extends JPanel implements ColonyElementPanel {
             }
             idx++;
         }
-    }
-
-    /** 컨텐츠 영역과 로그 사이의 분할바 위치 조정 */
-    public void setDividerLocation(double loc) {
-        splits.setDividerLocation(loc);
-        flagSplitLocated = true;
-    }
-    
-    /** 최초 1회 컨텐츠 영역과 로그 사이의 분할바 위치 적절히 조정 */
-    public void setDividerLocationOnlyFirst() {
-        if(flagSplitLocated) return;
-        setDividerLocation(0.7);
     }
 }

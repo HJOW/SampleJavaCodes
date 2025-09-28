@@ -3,9 +3,10 @@ package org.duckdns.hjow.samples.colonyman.elements;
 import java.io.Serializable;
 import java.math.BigInteger;
 
+import org.duckdns.hjow.commons.core.Disposeable;
 import org.duckdns.hjow.commons.json.JsonObject;
 
-public interface ColonyElements extends Serializable {
+public interface ColonyElements extends Serializable, Disposeable {
     /** 이 객체의 고유 ID 값 반환. 0이 될 수 없음. */
     public long getKey();
     

@@ -187,4 +187,7 @@ public abstract class Research implements ColonyElements {
         if(a >= b) return a;
         return b;
     }
+    
+    @Override
+    public void dispose() { }
 }

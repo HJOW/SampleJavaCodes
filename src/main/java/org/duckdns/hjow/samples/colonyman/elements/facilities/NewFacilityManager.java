@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.GUIColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.HoldingJob;
@@ -37,7 +38,7 @@ public class NewFacilityManager extends JDialog {
     public NewFacilityManager() {
         super();
     }
-    public NewFacilityManager(ColonyManager colonyManager, City city) {
+    public NewFacilityManager(GUIColonyManager colonyManager, City city) {
         super(colonyManager.getDialog());
         init(colonyManager, city);
         refresh();

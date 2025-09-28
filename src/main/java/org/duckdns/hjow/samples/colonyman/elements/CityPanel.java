@@ -29,13 +29,14 @@ import javax.swing.JToolBar;
 import javax.swing.border.EtchedBorder;
 
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.GUIColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityPanel;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.NewFacilityManager;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.SupportGUIFacility;
 
 public class CityPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = 3475480727850203183L;
-    protected transient ColonyManager colonyManager;
+    protected transient GUIColonyManager colonyManager;
     protected transient City city;
     protected transient JProgressBar progHp;
     protected transient JTextArea ta;
@@ -56,12 +57,12 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         
     }
     
-    public CityPanel(City city, Colony colony, ColonyManager superInstance) {
+    public CityPanel(City city, Colony colony, GUIColonyManager superInstance) {
         super();
         init(city, colony, superInstance);
     }
     
-    public void init(City city, Colony colony, ColonyManager superInstance) {
+    public void init(City city, Colony colony, GUIColonyManager superInstance) {
         if(this.city != null) dispose();
         this.colonyManager = superInstance;
         
@@ -203,7 +204,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
     }
     
     /** 새 시설 건설 버튼 클릭 시 호출 */
-    protected void onNewFacilityButtonPressed(ColonyManager superInstance) {
+    protected void onNewFacilityButtonPressed(GUIColonyManager superInstance) {
         if(dialogNewFac != null) dialogNewFac.dispose();
         dialogNewFac = null;
         
@@ -264,7 +265,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             }
         }
         
-        columns = (int) Math.ceil((superInstance.getDialogWidth() - 200.0) / 700.0);
+        columns = (int) Math.ceil((((GUIColonyManager) superInstance).getDialogWidth() - 200.0) / 700.0);
         if(columns <= 0) columns = 1;
         
         idx = 0;
@@ -283,7 +284,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
                     SupportGUIFacility sFac = (SupportGUIFacility) facList.get(idx);
                     pn = sFac.createPanel(city, colony, superInstance);
                 } else {
-                    pn = new FacilityPanel(facList.get(idx), city, colony, superInstance);
+                    pn = new FacilityPanel(facList.get(idx), city, colony, (GUIColonyManager) superInstance);
                 }
                 
                 gridBagConst = new GridBagConstraints();
@@ -396,7 +397,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         ta.setText(city.getStatusString(colony, superInstance));
         
         // 가로 경계선 위치 조절
-        if(superInstance.isVisible()) {
+        if(((GUIColonyManager) superInstance).isVisible()) {
             if(! flagSplitMoved) splits.setDividerLocation(0.3);
             flagSplitMoved = true;
         }

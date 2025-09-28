@@ -9,6 +9,7 @@ import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.ColonyManagerUI;
+import org.duckdns.hjow.samples.colonyman.GlobalLogs;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
 import org.duckdns.hjow.samples.colonyman.elements.states.State;
 
@@ -69,6 +70,7 @@ public class Citizen implements ColonyElements {
 
     @Override
     public void oneCycle(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) {
+    	// HP 처리
         if(hp < 0) hp = 0;
         if(hp <= 0) return;
         
@@ -132,6 +134,7 @@ public class Citizen implements ColonyElements {
         while(std < getStates().size()) {
             State st = getStates().get(std);
             if(st.getHp() <= 0 || st.getLefts() <= 0) {
+            	st.dispose();
                 getStates().remove(std);
                 continue;
             }
@@ -409,7 +412,7 @@ public class Citizen implements ColonyElements {
                         stateOne.fromJson(jsonObj);
                         states.add(stateOne);
                     } catch(Exception ex) {
-                        ColonyManager.processExceptionOccured(ex, false);
+                        GlobalLogs.processExceptionOccured(ex, false);
                     }
                 }
             }
@@ -473,5 +476,13 @@ public class Citizen implements ColonyElements {
         for(int idx=0; idx<getName().length(); idx++) { res = res.add(new BigInteger(String.valueOf((int) getName().charAt(idx)))); }
         for(State st : getStates()) { res = res.add(st.getCheckerValue()); }
         return res;
+    }
+    
+    @Override
+    public void dispose() {
+    	for(State st : getStates()) {
+    		st.dispose();
+    	}
+    	states.clear();
     }
 }

@@ -14,6 +14,7 @@ import org.duckdns.hjow.commons.util.FileUtil;
 import org.duckdns.hjow.samples.colonyman.AccountingData;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.ColonyManagerUI;
+import org.duckdns.hjow.samples.colonyman.GlobalLogs;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Factory;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
@@ -299,6 +300,7 @@ public class Colony implements ColonyElements {
         while(idx < getCities().size()) {
             City cityOne = getCities().get(idx);
             if(cityOne.getHp() <= 0) {
+            	cityOne.dispose();
                 getCities().remove(idx);
                 continue;
             }
@@ -310,6 +312,7 @@ public class Colony implements ColonyElements {
         while(idx < getEnemies().size()) {
             Enemy en = getEnemies().get(idx);
             if(en.getHp() <= 0) {
+            	en.dispose();
                 getEnemies().remove(idx);
                 continue;
             }
@@ -476,7 +479,8 @@ public class Colony implements ColonyElements {
         for(Research d : getResearches()) { list.add(d.toJson()); }
         json.put("researches", list);
         
-        json.put("checker", getCheckerValue().toString());
+        if(checked) json.put("checker", getCheckerValue().toString());
+        else        json.put("checker", "0");
         return json;
     }
     
@@ -485,13 +489,14 @@ public class Colony implements ColonyElements {
         if(! "Colony".equals(json.get("type"))) throw new RuntimeException("This object is not Colony type.");
         setName(json.get("name").toString());
         key = Long.parseLong(json.get("key").toString());
-        try { setHp(Integer.parseInt(json.get("hp").toString()));                     } catch(Exception ex) { ColonyManager.processExceptionOccured(ex, false); hp         = 10;              }
-        try { setDifficulty(Integer.parseInt(json.get("difficulty").toString()));     } catch(Exception ex) { ColonyManager.processExceptionOccured(ex, false); difficulty = 0;               }
-        try { setMoney(Long.parseLong(json.get("money").toString()));                 } catch(Exception ex) { ColonyManager.processExceptionOccured(ex, false); money      = 0;               }
-        try { setTech(Long.parseLong(json.get("tech").toString()));                   } catch(Exception ex) { ColonyManager.processExceptionOccured(ex, false); tech       = 0;               }
-        try { setTime(new BigInteger(json.get("time").toString()));                   } catch(Exception ex) { ColonyManager.processExceptionOccured(ex, false); time       = BigInteger.ZERO; }
+        try { setHp(Integer.parseInt(json.get("hp").toString()));                     } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); hp         = 10;              }
+        try { setDifficulty(Integer.parseInt(json.get("difficulty").toString()));     } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); difficulty = 0;               }
+        try { setMoney(Long.parseLong(json.get("money").toString()));                 } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); money      = 0;               }
+        try { setTech(Long.parseLong(json.get("tech").toString()));                   } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); tech       = 0;               }
+        try { setTime(new BigInteger(json.get("time").toString()));                   } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); time       = BigInteger.ZERO; }
         
-        JsonArray list = (JsonArray) json.get("cities");
+        JsonArray list = null;
+        try { list = (JsonArray) json.get("cities"); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); }
         cities.clear();
         if(list != null) {
             for(Object o : list) {
@@ -501,13 +506,14 @@ public class Colony implements ColonyElements {
                         City city = new City((JsonObject) o);
                         cities.add(city);
                     } catch(Exception ex) {
-                        ColonyManager.processExceptionOccured(ex, false);
+                        GlobalLogs.processExceptionOccured(ex, false);
                     }
                 }
             }
         }
         
-        list = (JsonArray) json.get("holdings");
+        list = null;
+        try { list = (JsonArray) json.get("holdings"); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); }
         holdings.clear();
         if(list != null) {
             for(Object o : list) {
@@ -518,13 +524,14 @@ public class Colony implements ColonyElements {
                         h.fromJson((JsonObject) o);
                         holdings.add(h);
                     } catch(Exception ex) {
-                        ColonyManager.processExceptionOccured(ex, false);
+                        GlobalLogs.processExceptionOccured(ex, false);
                     }
                 }
             }
         }
         
-        list = (JsonArray) json.get("accountinghis");
+        list = null;
+        try { list = (JsonArray) json.get("accountinghis"); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); }
         accountingData.clear();
         if(list != null) {
             for(Object o : list) {
@@ -535,13 +542,14 @@ public class Colony implements ColonyElements {
                         d.fromJson((JsonObject) o);
                         accountingData.add(d);
                     } catch(Exception ex) {
-                        ColonyManager.processExceptionOccured(ex, false);
+                        GlobalLogs.processExceptionOccured(ex, false);
                     }
                 }
             }
         }
         
-        list = (JsonArray) json.get("researches");
+        list = null;
+        try { list = (JsonArray) json.get("researches"); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); }
         resetResearches();
         if(list != null) {
             for(Object o : list) {
@@ -555,15 +563,17 @@ public class Colony implements ColonyElements {
                             }
                         }
                     } catch(Exception ex) {
-                        ColonyManager.processExceptionOccured(ex, false);
+                        GlobalLogs.processExceptionOccured(ex, false);
                     }
                 }
             }
         }
         
         if(json.get("checker") != null) {
-            BigInteger checker = new BigInteger(json.get("checker").toString());
-            checked = (checker.equals(getCheckerValue()));
+        	try {
+                BigInteger checker = new BigInteger(json.get("checker").toString());
+                checked = (checker.equals(getCheckerValue()));
+        	} catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); checked = false; }
         } else {
             checked = false;
         }
@@ -597,5 +607,17 @@ public class Colony implements ColonyElements {
         events.add(new Riot());
         
         return events;
+    }
+    
+    @Override
+    public void dispose() {
+    	for(City c : cities) {
+    		c.dispose();
+    	}
+    	cities.clear();
+    	for(Enemy en : enemies) {
+    		en.dispose();
+    	}
+    	enemies.clear();
     }
 }
