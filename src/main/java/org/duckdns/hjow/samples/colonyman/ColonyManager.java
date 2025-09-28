@@ -343,6 +343,8 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
             }
         });
         pnNoColCenter.add(btnNewCol);
+
+        if(dialogGlobalLog == null) dialogGlobalLog = new GlobalLogDialog(this);
         
         menuBar = new JMenuBar();
         dialog.setJMenuBar(menuBar);
@@ -461,12 +463,22 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
         });
         ((JCheckBoxMenuItem)menuItem).setSelected(isDebugModeEnabled());
 
+        menuItem = new JMenuItem("전역 로그 보기");
+        menuAction.add(menuItem);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialogGlobalLog.open(getSelf());
+            }
+        });
         
         backupManager = new BackupManager(this);
         
         refreshColonyContent();
         cardMain.show(pnMain, "C2");
     }
+
+    public ColonyManager getSelf() { return this; }
 
     @Override
     public void onBeforeOpened(SampleJavaCodes superInstance) {
@@ -496,6 +508,8 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
         for(ColonyPanel pns : pnColonies) {
             pns.setDividerLocationOnlyFirst();
         }
+
+        if(dialogGlobalLog == null) dialogGlobalLog = new GlobalLogDialog(this);
     }
     
     /** 메인 쓰레드 구동 중인지 확인하여, 미구동 중인 경우 구동 시작 */
@@ -924,6 +938,11 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
         
         if(backupManager != null) backupManager.dispose();
         backupManager = null;
+
+        if(dialogGlobalLog != null) {
+            dialogGlobalLog.dispose();
+            dialogGlobalLog = null;
+        }
     }
     
     public void disposeContents() {
@@ -1286,5 +1305,6 @@ public class ColonyManager implements GUIProgram, ColonyManagerUI {
     public static final short DEFENCETYPE_SMALL    = 1;
     public static final short DEFENCETYPE_BUILDING = 9;
     
+    protected static transient GlobalLogDialog dialogGlobalLog;
     protected static transient boolean flagDebugMode = false; // 실행 시간 표시 플래그
 }
