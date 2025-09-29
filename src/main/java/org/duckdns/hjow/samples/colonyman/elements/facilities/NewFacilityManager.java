@@ -9,7 +9,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -89,9 +90,7 @@ public class NewFacilityManager extends JDialog {
         pnMain.add(pnCenter, BorderLayout.CENTER);
         pnMain.add(pnDown  , BorderLayout.SOUTH);
         
-        Vector<FacilityInformation> list = new Vector<FacilityInformation>();
-        list.addAll(FacilityManager.getFacilityInformations());
-        cbxFacInfos = new JComboBox<>(list);
+        cbxFacInfos = new JComboBox<FacilityInformation>();
         pnUp.add(cbxFacInfos, BorderLayout.CENTER);
         
         ta = new JTextArea();
@@ -159,10 +158,35 @@ public class NewFacilityManager extends JDialog {
             }
         });
         
-        refresh();
+        refreshFacilityList();
     }
     
     public JDialog getDialog() { return this; }
+
+    public void refreshFacilityList() {
+        FacilityInformation beforeSelected = (FacilityInformation) cbxFacInfos.getSelectedItem();
+        cbxFacInfos.removeAllItems();
+        
+        Colony col = null; 
+        if(city != null && colonyManager != null) col = city.getColony(colonyManager);
+
+        List<FacilityInformation> lists = new ArrayList<FacilityInformation>();
+        if(col != null) {
+            lists.addAll(FacilityManager.getFacilityInformations());
+            for(FacilityInformation info : lists) {
+            	if(col.supportedFacility(info)) cbxFacInfos.addItem(info);
+            }
+        }
+
+        if(beforeSelected != null) {
+        	if(lists.contains(beforeSelected)) {
+        		cbxFacInfos.setSelectedItem(beforeSelected);
+        	}
+        }
+        
+        
+        refresh();
+    }
     
     public void refresh() {
         FacilityInformation info = (FacilityInformation) cbxFacInfos.getSelectedItem();

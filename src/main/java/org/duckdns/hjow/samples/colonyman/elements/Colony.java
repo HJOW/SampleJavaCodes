@@ -16,6 +16,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.ColonyManagerUI;
 import org.duckdns.hjow.samples.colonyman.GlobalLogs;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityInformation;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Factory;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.ResearchCenter;
@@ -429,10 +430,17 @@ public class Colony implements ColonyElements {
         return 9;
     }
     
+    /** 회계 산출 주기 */
     public int getAccountingPeriod() {
         return 600;
     }
     
+    /** 해당 시설 지원여부 결정 */
+    public boolean supportedFacility(FacilityInformation info) {
+    	return true;
+    }
+    
+    /** 상세 내역 */
     public String getStatusString(ColonyManagerUI superInstance) {
         DecimalFormat formatterInt  = new DecimalFormat("#,###,###,###,###,##0");
         // DecimalFormat formatterRate = new DecimalFormat("##0.00");
