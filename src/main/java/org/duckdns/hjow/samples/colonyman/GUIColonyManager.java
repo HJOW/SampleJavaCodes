@@ -29,6 +29,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -37,6 +38,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -55,9 +58,12 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
     
 	private static final long serialVersionUID = -2483528821790634383L;
 	protected transient JDialog dialog;
-    protected transient JPanel pnMain;
+    protected transient JPanel pnRoot, pnMain, pnFront;
+    protected transient JTabbedPane tabMain;
     protected transient CardLayout cardMain;
-    protected transient JButton btnSaveAs, btnLoadAs, btnThrPlay;
+    protected transient JButton btnSaveAs, btnLoadAs, btnThrPlay, btnGotoGame;
+    
+    protected transient JEditorPane webNotice;
     
     protected transient JPanel pnCols, pnNoColonies;
     protected transient ColonyPanel cpNow;
@@ -160,12 +166,67 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
             fileChooser.addChoosableFileFilter(filterColGz);
         }
         
+        pnRoot = new JPanel();
+        dialog.add(pnRoot, BorderLayout.CENTER);
+        
+        tabMain = new JTabbedPane();
+        pnRoot.setLayout(new BorderLayout());
+        pnRoot.add(tabMain, BorderLayout.CENTER);
+        
         JPanel pnMainCard1, pnMainCard2;
         pnMain      = new JPanel();
+        pnFront     = new JPanel();
         pnMainCard1 = new JPanel();
         pnMainCard2 = new JPanel();
         
-        dialog.add(pnMain, BorderLayout.CENTER);
+        tabMain.add("홈", pnFront);
+        tabMain.add("Colonization", pnMain);
+        
+        pnFront.setLayout(new BorderLayout());
+        
+        JPanel pnFrontCenter, pnFrontDown;
+        pnFrontCenter = new JPanel();
+        pnFrontDown   = new JPanel();
+        pnFront.add(pnFrontCenter, BorderLayout.CENTER);
+        pnFront.add(pnFrontDown  , BorderLayout.SOUTH);
+        
+        webNotice = new JEditorPane();
+        webNotice.setEditable(false);
+        webNotice.setContentType("text/html");
+        webNotice.setText(ColonyClassLoader.htmlNoticeEmpty());
+        
+        pnFrontCenter.setLayout(new BorderLayout());
+        pnFrontCenter.add(new JScrollPane(webNotice), BorderLayout.CENTER);
+        
+        JPanel pnFrontDownCenter, pnFrontDownRight;
+        pnFrontDownCenter = new JPanel();
+        pnFrontDownRight  = new JPanel();
+        pnFrontDown.setLayout(new BorderLayout());
+        pnFrontDown.add(pnFrontDownCenter, BorderLayout.CENTER);
+        pnFrontDown.add(pnFrontDownRight , BorderLayout.EAST);
+        
+        pnFrontDownCenter.setLayout(new FlowLayout(FlowLayout.CENTER));
+        pnFrontDownRight.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        btnGotoGame = new JButton("Colonization");
+        pnFrontDownCenter.add(btnGotoGame);
+        
+        btnGotoGame.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				tabMain.setSelectedIndex(1);
+			}
+		});
+        
+        JButton btnExit = new JButton("종료");
+        pnFrontDownRight.add(btnExit);
+        
+        btnExit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				flagSaveBeforeClose = false;
+                dispose(true);
+			}
+		});
         
         cardMain = new CardLayout();
         pnMain.setLayout(cardMain);
@@ -461,6 +522,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         if(dialog == null) init(superInstance);
         
         loadColonies();
+        loadWebConfigs();
     }
 
     @Override
@@ -478,10 +540,21 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         btnThrPlay.setText("시뮬레이션 시작");
         btnThrPlay.setEnabled(true);
         menuActionThrPlay.setEnabled(true);
+        try { webNotice.setPage(ColonyClassLoader.htmlNoticeUrl()); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); }
         
         setEditable(true);
         
         if(dialogGlobalLog == null) dialogGlobalLog = new GlobalLogDialog(this);
+    }
+    
+    /** 별도 쓰레드에서 웹 서버에서 설정 불러오기 */
+    protected void loadWebConfigs() {
+    	new Thread(new Runnable() {
+			@Override
+			public void run() {
+				ColonyClassLoader.loadWebConfigs(getSelf());
+			}
+		}).start();
     }
     
     /** 메인 쓰레드 실행 */
