@@ -37,22 +37,13 @@ public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable
     protected transient volatile boolean flagSaveBeforeClose = true; // 종료 시 저장 플래그
     protected transient volatile boolean flagAlreadyDisposed = false;
     
-    public ColonyManager(SampleJavaCodes superInstance) {
-        super();
-        this.superInstance = superInstance;
-        
-        threadSwitch = false;
-        threadPaused = true;
-        threadShutdown = true;
-        reserveSaving = false;
-        reserveRefresh = false;
+    public ColonyManager() {
+        threadSwitch        = false;
+        threadPaused        = true;
+        threadShutdown      = true;
+        reserveSaving       = false;
+        reserveRefresh      = false;
         flagAlreadyDisposed = false;
-        
-        init(superInstance);
-    }
-
-    public void init(SampleJavaCodes superInstance) {
-        refreshColonyContent();
     }
 
     public ColonyManager getSelf() { return this; }

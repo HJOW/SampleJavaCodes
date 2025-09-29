@@ -47,6 +47,7 @@ import javax.swing.UIManager;
 
 import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
+import org.duckdns.hjow.samples.colonyman.benchmark.BenchmarkManager;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.CityPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
@@ -55,8 +56,9 @@ import org.duckdns.hjow.samples.util.UIUtil;
 
 /** Colonization 프로그램 */
 public class GUIColonyManager extends ColonyManager implements GUIProgram {
-    
 	private static final long serialVersionUID = -2483528821790634383L;
+	protected transient SampleJavaCodes superInstance;
+	
 	protected transient JDialog dialog;
     protected transient JPanel pnRoot, pnMain, pnFront;
     protected transient JProgressBar progFront;
@@ -78,13 +80,16 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
     protected transient javax.swing.filechooser.FileFilter filterCol, filterColGz;
     
     protected transient BackupManager backupManager;
+    protected transient BenchmarkManager benchManager;
     
     protected transient JMenuBar menuBar;
     protected transient JMenu menuFile, menuAction;
     protected transient JMenuItem menuActionThrPlay, menuFileSave, menuFileLoad, menuFileBackup, menuFileRestore, menuFileReset, menuFileNew, menuFileDel;
     
     public GUIColonyManager(SampleJavaCodes superInstance) {
-        super(superInstance);
+    	super();
+        this.superInstance = superInstance;
+        init(superInstance);
     }
 
     @Override
@@ -510,6 +515,18 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
             }
         });
         
+        menuAction.addSeparator();
+        
+        menuItem = new JMenuItem("Benchmark");
+        menuAction.add(menuItem);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	benchManager.open();
+            }
+        });
+        
+        benchManager  = new BenchmarkManager(dialog);
         backupManager = new BackupManager(this);
         
         refreshColonyContent();
