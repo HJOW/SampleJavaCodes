@@ -3,9 +3,14 @@ package org.duckdns.hjow.samples.colonyman;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 
 import org.duckdns.hjow.commons.ui.JLogArea;
 import org.duckdns.hjow.samples.util.UIUtil;
@@ -28,11 +33,34 @@ public class GlobalLogDialog {
         UIUtil.center(dialog);
 
         dialog.setLayout(new BorderLayout());
+        
+        JPanel pnMain, pnDown;
+        pnMain = new JPanel();
+        pnDown = new JPanel();
+        pnMain.setLayout(new BorderLayout());
+        pnDown.setLayout(new BorderLayout());
+        dialog.add(pnMain, BorderLayout.CENTER);
+        dialog.add(pnDown, BorderLayout.SOUTH);
 
         taLog = new JLogArea();
         taLog.setLineWrap(true);
+        pnMain.add(new JScrollPane(taLog), BorderLayout.CENTER);
         
-        dialog.add(new JScrollPane(taLog), BorderLayout.CENTER);
+        JToolBar toolbar = new JToolBar();
+        pnDown.add(toolbar, BorderLayout.CENTER);
+        
+        JButton btnClear = new JButton("비우기");
+        toolbar.add(btnClear);
+        
+        btnClear.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GlobalLogs.getInstance().clear();
+				taLog.clear();
+			}
+		});
+        
+        threadSwitch = true;
         new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -73,6 +101,7 @@ public class GlobalLogDialog {
     
     public void setLocationBottom(JDialog superDialog) {
     	Point p = superDialog.getLocation();
+    	dialog.setSize(superDialog.getWidth(), dialog.getHeight());
     	dialog.setLocation((int) p.getX(), (int) (p.getY() + superDialog.getHeight()));
     } 
     

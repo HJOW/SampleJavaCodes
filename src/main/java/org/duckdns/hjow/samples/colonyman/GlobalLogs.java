@@ -25,6 +25,9 @@ public class GlobalLogs implements Serializable {
 	public void setLogs(Queue<String> logs) {
 		this.logs = logs;
 	}
+	public void clear() {
+		this.logs.clear();
+	}
 	
 	protected static GlobalLogs instances = new GlobalLogs();
 	public static GlobalLogs getInstance() { return instances; }

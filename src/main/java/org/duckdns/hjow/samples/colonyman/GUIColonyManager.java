@@ -99,10 +99,11 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         
         if(w < 800) w = 800;
         if(h < 600) h = 600;
+        int logHeight = 250;
         
         dialog.setSize(w, h);
         UIUtil.center(dialog);
-        dialog.setSize(w, h - 200); // 로그 대화상자 들어갈 자리 마련
+        dialog.setSize(w, h - logHeight); // 로그 대화상자 들어갈 자리 마련
         dialog.setTitle("Colonization");
         dialog.setIconImage(UIUtil.iconToImage(getIcon()));
         dialog.setLayout(new BorderLayout());
@@ -120,7 +121,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         });
         
         if(dialogGlobalLog == null) dialogGlobalLog = new GlobalLogDialog(this);
-        dialogGlobalLog.setSize(w, 200);
+        dialogGlobalLog.setSize(w, logHeight);
         dialogGlobalLog.setLocationBottom(dialog);
         
         if(fileChooser == null) {
@@ -716,6 +717,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
     public void open(SampleJavaCodes superInstance) {
         onBeforeOpened(superInstance);
         dialog.setVisible(true);
+        if(dialogGlobalLog != null) dialogGlobalLog.open(this);
         onAfterOpened(superInstance);
     }
 
