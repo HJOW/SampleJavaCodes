@@ -18,6 +18,7 @@ public class FacilityManager {
         register(Factory.class);
         register(ResearchCenter.class);
         register(ArchitectOffice.class);
+        register(BusStation.class);
         register(Turret.class);
         register(TownHouse.class);
     }

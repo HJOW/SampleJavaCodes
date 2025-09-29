@@ -19,6 +19,7 @@ import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityManager;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.TransportStation;
 import org.duckdns.hjow.samples.colonyman.events.TimeEvent;
 
 /** 도시 구현 클래스 */
@@ -32,8 +33,11 @@ public class City implements ColonyElements {
     protected List<Enemy>      enemies  = new Vector<Enemy>();
     protected List<HoldingJob> holdings = new Vector<HoldingJob>();
     protected int hp = getMaxHp();
-    protected int spaces = 30 + ((int) ( 30 * Math.random() ));
+    protected int spaces = 300 + ((int) ( 300 * Math.random() ));
     protected int tax = 10;
+    
+    protected transient long calculatedTransPoint     = 0L;
+    protected transient long calculatedTransPointLeft = 0L;
     
     public City() {
         
@@ -163,6 +167,11 @@ public class City implements ColonyElements {
     public void setTax(int tax) {
         this.tax = tax;
     }
+    
+    /** 기본 제공 교통 점수 */
+    protected long getDefaultTransportPoint() {
+    	return 300L;
+    }
 
     @Override
     public void oneCycle(int cycle, City city, Colony colony, int efficiency100, ColonyPanel colPanel) { // city should be a self
@@ -173,8 +182,9 @@ public class City implements ColonyElements {
         processMoveInChance(cycle, colony, efficiency100);
         processMoveOutChance(cycle, colony, efficiency100);
         
-        // 전력 생산량 계산
+        // 전력 생산량 및 교통점수 계산
         long power = getPowerGenerate(colony);
+        long trans = getDefaultTransportPoint(); 
         
         // 시설 파워 및 효율성 계산, 효과 처리
         for(Facility f : getFacility()) {
@@ -213,7 +223,27 @@ public class City implements ColonyElements {
             
             // 시설 효과 처리
             f.oneCycle(cycle, this, colony, efficiency, colPanel);
+            
+            // 교통시설인 경우 교통점수 계산
+            if(f instanceof TransportStation) {
+            	TransportStation t = (TransportStation) f;
+            	
+            	// 두 쌍 이상이 되어야 효력 발생
+            	boolean exists = false;
+            	for(Facility fc : getFacility()) {
+            		if(fc.getKey() == t.getKey()) continue;
+            		if(fc.getType().equalsIgnoreCase(t.getType())) { exists = true; break; }
+            	}
+            	
+            	if(exists) {
+            		// 점수 합산
+                	int adds = t.getCapacity();
+                	adds = (int) Math.floor( adds * (efficiency / 100.0));
+                	trans += adds;
+            	}
+            }
         }
+        calculatedTransPoint = trans;
         
         // 시민 처리
         for(Citizen ct : getCitizens()) {
@@ -228,9 +258,12 @@ public class City implements ColonyElements {
         // 사망 개체 제거
         removeDeads(colony);
         
-        // 거주자 및 일자리 할당
+        // 대중교통 포인트 부족 시설 구직자 만들기
+        trans = applyTransport(trans, colony);
+        
+        // 거주자 및 일자리 할당 (다음 사이클에 적용)
         allocateHome(colony);
-        allocateWorkers(colony);
+        allocateWorkers(trans, colony);
         
         // 예약 작업 처리
         for(HoldingJob h : getHoldings()) {
@@ -450,7 +483,9 @@ public class City implements ColonyElements {
     }
     
     /** 백수에게 새 직장 할당 */
-    protected void allocateWorkers(Colony col) {
+    protected void allocateWorkers(long transportPoint, Colony col) {
+        long trans = transportPoint;
+    	
         List<Facility> list = new ArrayList<Facility>();
         // 시민들 확인해서, 존재하지 않는 직장에 있는지 확인
         for(final Citizen c : citizens) {
@@ -487,7 +522,7 @@ public class City implements ColonyElements {
                 }
             }
             if(building != null) {
-                c.setBuildingFacility(building.getKey());
+                c.setBuildingFacility(building.getKey()); // 건설 시에는 교통 점수 계산 안 함
                 continue;
             }
             
@@ -511,7 +546,9 @@ public class City implements ColonyElements {
                     }
                 });
                 
+                if(trans <= 0) break;
                 c.setWorkingFacility(list.get(0).getKey());
+                trans = trans - 1;
                 continue;
             }
             
@@ -535,9 +572,30 @@ public class City implements ColonyElements {
                     }
                 });
                 
+                if(trans <= 0) break;
                 c.setWorkingFacility(list.get(0).getKey());
+                trans = trans - 1;
             }
         }
+        
+        calculatedTransPointLeft = trans;
+    }
+    
+    /** 대중교통 포인트 계산, 벗어나는 시민들 구직자 만들기, 남은 교통점수 반환 */
+    protected long applyTransport(long transPoint, Colony colony) {
+    	long now = transPoint;
+    	
+    	for(Facility f : getFacility()) {
+    		if(now >= 0) now = now - f.getWorkingCitizensCount(this, colony);
+    		if(now < 0) {
+    			for(Citizen c : f.getWorkingCitizens(this, colony)) {
+    				c.setWorkingFacility(0L);
+    				break; // 1명씩만 구직자 만들기
+    			}
+    		}
+    	}
+    	
+    	return now;
     }
     
     /** 새 시민 생성 */
@@ -814,6 +872,7 @@ public class City implements ColonyElements {
         desc = desc.append("\n").append("거주 한도 : ").append(formatterInt.format(getHomeCapacity()));
         desc = desc.append("\n").append("백수 : ").append(formatterInt.format(getJobSeekers()));
         desc = desc.append("\n").append("직장 한도 : ").append(formatterInt.format(getJobsCount()));
+        if(getCalculatedTransPoint() > 0L) desc = desc.append("\n").append("교통 한도 : ").append(formatterInt.format(getCalculatedTransLeftPoint())).append(" / ").append(formatterInt.format(getCalculatedTransPoint()));
         
         return desc.toString().trim();
     }
@@ -821,6 +880,16 @@ public class City implements ColonyElements {
     /** 소속 정착지 찾기 */
     public Colony getColony(ColonyManagerUI man) {
         return man.getColonyFrom(this);
+    }
+    
+    /** 계산된 교통 점수 반환 */
+    public long getCalculatedTransPoint() {
+    	return calculatedTransPoint;
+    }
+    
+    /** 계산된 잔여 교통 점수 반환 */
+    public long getCalculatedTransLeftPoint() {
+    	return calculatedTransPointLeft;
     }
     
     @Override

@@ -102,6 +102,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         
         dialog.setSize(w, h);
         UIUtil.center(dialog);
+        dialog.setSize(w, h - 200); // 로그 대화상자 들어갈 자리 마련
         dialog.setTitle("Colonization");
         dialog.setIconImage(UIUtil.iconToImage(getIcon()));
         dialog.setLayout(new BorderLayout());
@@ -117,6 +118,10 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
                 refreshArenaPanel(0);
             }
         });
+        
+        if(dialogGlobalLog == null) dialogGlobalLog = new GlobalLogDialog(this);
+        dialogGlobalLog.setSize(w, 200);
+        dialogGlobalLog.setLocationBottom(dialog);
         
         if(fileChooser == null) {
             fileChooser = new JFileChooser();
@@ -306,8 +311,6 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
             }
         });
         pnNoColCenter.add(btnNewCol);
-
-        if(dialogGlobalLog == null) dialogGlobalLog = new GlobalLogDialog(this);
         
         menuBar = new JMenuBar();
         dialog.setJMenuBar(menuBar);
@@ -432,6 +435,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dialogGlobalLog.open(getSelf());
+                dialogGlobalLog.setLocationBottom(getDialog());
             }
         });
         

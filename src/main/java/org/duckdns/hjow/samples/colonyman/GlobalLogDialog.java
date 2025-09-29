@@ -1,6 +1,8 @@
 package org.duckdns.hjow.samples.colonyman;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Point;
 
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
@@ -60,6 +62,19 @@ public class GlobalLogDialog {
     public void close() {
         dialog.setVisible(false);
     }
+    
+    public void setSize(int w, int h) {
+    	dialog.setSize(w, h);
+    }
+    
+    public Dimension getSize() {
+    	return dialog.getSize();
+    }
+    
+    public void setLocationBottom(JDialog superDialog) {
+    	Point p = superDialog.getLocation();
+    	dialog.setLocation((int) p.getX(), (int) (p.getY() + superDialog.getHeight()));
+    } 
     
     public void oneCycle() {
     	GlobalLogs inst = GlobalLogs.getInstance();
