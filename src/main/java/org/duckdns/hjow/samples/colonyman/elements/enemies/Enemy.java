@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.samples.colonyman.ColonyClassLoader;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.AttackableObject;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
@@ -175,8 +176,7 @@ public abstract class Enemy implements ColonyElements, AttackableObject {
     }
     
     
-    protected static List<Class<?>> enemyClasses = new Vector<Class<?>>();
-    static {}
+    protected static List<Class<?>> enemyClasses = ColonyClassLoader.enemyClasses();
     
     /** type 를 읽어, 기본 Enemy 객체 생성 */
     public static Enemy createEnemyObject(String type) {

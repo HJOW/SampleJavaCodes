@@ -5,22 +5,16 @@ import java.util.List;
 import java.util.Vector;
 
 import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.samples.colonyman.ColonyClassLoader;
 import org.duckdns.hjow.samples.colonyman.elements.Facility;
 
 public class FacilityManager {
     protected static List<FacilityInformation> facilities = new Vector<FacilityInformation>();
     
     static {
-        register(ResidenceModule.class);
-        register(PowerStation.class);
-        register(Restaurant.class);
-        register(Arcade.class);
-        register(Factory.class);
-        register(ResearchCenter.class);
-        register(ArchitectOffice.class);
-        register(BusStation.class);
-        register(Turret.class);
-        register(TownHouse.class);
+    	for(Class<?> classOne : ColonyClassLoader.facilityClasses()) {
+    		register(classOne);
+    	}
     }
     
     public static Facility fromJson(JsonObject json) {

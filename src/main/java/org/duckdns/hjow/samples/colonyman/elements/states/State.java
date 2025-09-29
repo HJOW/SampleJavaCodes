@@ -1,9 +1,9 @@
 package org.duckdns.hjow.samples.colonyman.elements.states;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Vector;
 
 import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.samples.colonyman.ColonyClassLoader;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
@@ -111,13 +111,7 @@ public abstract class State implements ColonyElements {
     	
     }
 
-    protected static List<Class<?>> stateClasses = new Vector<Class<?>>();
-    
-    static {
-        stateClasses.add(Influenza.class);
-        stateClasses.add(ImmuneInfluenza.class);
-        stateClasses.add(SuperAngry.class);
-    }
+    protected static List<Class<?>> stateClasses = ColonyClassLoader.stateClasses();
     
     public static State createStateInstance(String type) {
         Class<?> stateClass = null;

@@ -2,22 +2,13 @@ package org.duckdns.hjow.samples.colonyman.elements.research;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.samples.colonyman.ColonyClassLoader;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 
 public class ResearchManager {
-    protected static List<Class<?>> classes = new Vector<Class<?>>();
-    static {
-        classes.add(BasicScience.class);
-        classes.add(BasicHumanities.class);
-        classes.add(MilitaryTech.class);
-        classes.add(BasicBuildingTech.class);
-        classes.add(BasicBiology.class);
-        classes.add(BasicMedicalScience.class);
-        classes.add(BasicEngineering.class);
-    }
+    protected static List<Class<?>> classes = ColonyClassLoader.researchClasses();
     
     public static Research createResearchInstance(String type) {
         for(Class<?> classOne : classes) {
