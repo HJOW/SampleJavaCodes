@@ -59,6 +59,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
 	private static final long serialVersionUID = -2483528821790634383L;
 	protected transient JDialog dialog;
     protected transient JPanel pnRoot, pnMain, pnFront;
+    protected transient JProgressBar progFront;
     protected transient JTabbedPane tabMain;
     protected transient CardLayout cardMain;
     protected transient JButton btnSaveAs, btnLoadAs, btnThrPlay, btnGotoGame;
@@ -198,22 +199,30 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         pnFrontCenter.setLayout(new BorderLayout());
         pnFrontCenter.add(new JScrollPane(webNotice), BorderLayout.CENTER);
         
-        JPanel pnFrontDownCenter, pnFrontDownRight;
+        JPanel pnFrontDownCenter, pnFrontDownRight, pnFrontDownLeft;
+        pnFrontDownLeft   = new JPanel();
         pnFrontDownCenter = new JPanel();
         pnFrontDownRight  = new JPanel();
         pnFrontDown.setLayout(new BorderLayout());
+        pnFrontDown.add(pnFrontDownLeft  , BorderLayout.WEST);
         pnFrontDown.add(pnFrontDownCenter, BorderLayout.CENTER);
         pnFrontDown.add(pnFrontDownRight , BorderLayout.EAST);
         
+        pnFrontDownLeft.setLayout(new FlowLayout(FlowLayout.LEFT));
         pnFrontDownCenter.setLayout(new FlowLayout(FlowLayout.CENTER));
         pnFrontDownRight.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        
+        progFront = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
+        pnFrontDownLeft.add(progFront);
+        
         btnGotoGame = new JButton("Colonization");
-        pnFrontDownCenter.add(btnGotoGame);
+        pnFrontDownRight.add(btnGotoGame);
         
         btnGotoGame.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				tabMain.setSelectedIndex(1);
+				progFront.setVisible(false);
 			}
 		});
         
@@ -552,7 +561,22 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
     	new Thread(new Runnable() {
 			@Override
 			public void run() {
+				progFront.setValue(0);
+				progFront.setIndeterminate(true);
 				ColonyClassLoader.loadWebConfigs(getSelf());
+				
+				progFront.setIndeterminate(false);
+				if(progFront.isVisible()) {
+					int r = 1;
+					
+					while(r < 100) {
+						try { Thread.sleep(12L); } catch(InterruptedException ex) { GlobalLogs.processExceptionOccured(ex, false); break; }
+						progFront.setValue(r); r++;
+					}
+					
+					if(tabMain.getSelectedIndex() == 0) tabMain.setSelectedIndex(1);
+					progFront.setVisible(false);
+				}
 			}
 		}).start();
     }

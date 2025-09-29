@@ -177,7 +177,8 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
         tfSearchFacility.addActionListener(eventEnter);
         
         toolbarCity = new JToolBar();
-        pnDown.add(toolbarCity, BorderLayout.CENTER);
+        // pnDown.add(toolbarCity, BorderLayout.CENTER);
+        pnTop.add(toolbarCity, BorderLayout.SOUTH);
         
         btnNewFac = new JButton("새 시설 건설");
         toolbarCity.add(btnNewFac);

@@ -78,12 +78,9 @@ public class ColonyClassLoader {
 		res = res.append("\n").append("<html>                                                                                                                                                                            ");
 		res = res.append("\n").append("<head>                                                                                                                                                                            ");
 		res = res.append("\n").append("<title>Notice</title>                                                                                                                                                             ");
-		res = res.append("\n").append("<style type=\"text/css\">                                                                                                                                                         ");
-		res = res.append("\n").append("body { margin: 0; padding: 0; background-color: #424242; font-family: NanumGothic, \"나눔고딕\", \"Nanum Gothic\", NanumGothicCoding, \"나눔고딕코딩\", \"Nanum Gothic Coding\" } ");
-		res = res.append("\n").append("</style>                                                                                                                                                                          ");
 		res = res.append("\n").append("</head>                                                                                                                                                                           ");
-		res = res.append("\n").append("<body>                                                                                                                                                                            ");
-		res = res.append("\n").append("        123                                                                                                                                                                       ");
+		res = res.append("\n").append("<body style='margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; background-color: #EEEEEE;'>                                                                       ");
+		res = res.append("\n").append("    <div style='padding-left: 30px; padding-top: 30px; font-size: 30px; font-family: NanumGothic, \"나눔고딕\", \"Nanum Gothic\", NanumGothicCoding, \"나눔고딕코딩\", \"Nanum Gothic Coding\", Arial, Consolas, \"돋움체\";'></div>");
 		res = res.append("\n").append("</body>                                                                                                                                                                           ");
 		res = res.append("\n").append("</html>                                                                                                                                                                           ");
 		
