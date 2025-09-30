@@ -41,7 +41,7 @@ public class ColonyBackup {
                 if(o instanceof String) o = JsonObject.parseJson(o.toString());
                 if(o instanceof JsonObject) {
                     try {
-                        Colony col = ColonyClassLoader.newColonyInstance((JsonObject) o);
+                        Colony col = ColonyClassLoader.loadColony((JsonObject) o);
                         colonies.add(col);
                     } catch(Exception ex) {
                         GlobalLogs.processExceptionOccured(ex, true);
@@ -106,7 +106,7 @@ public class ColonyBackup {
                 if(o instanceof String) o = JsonObject.parseJson(o.toString());
                 if(o instanceof JsonObject) {
                     try {
-                        Colony col = ColonyClassLoader.newColonyInstance((JsonObject) o);
+                        Colony col = ColonyClassLoader.loadColony((JsonObject) o);
                         col.fromJson((JsonObject) o);
                         colonies.add(col);
                     } catch(Exception ex) {

@@ -699,7 +699,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         File[] lists = root.listFiles(getColonyFileFilter());
         for(File f : lists) {
             try {
-                Colony temp = ColonyClassLoader.newColonyInstance(f);
+                Colony temp = ColonyClassLoader.loadColony(f);
                 if(temp.getKey() == col.getKey()) f.delete();
             } catch(Exception ex) {} // 오류 건너뛰기
         }

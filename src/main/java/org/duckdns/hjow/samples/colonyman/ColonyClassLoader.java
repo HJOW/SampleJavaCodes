@@ -71,7 +71,28 @@ public class ColonyClassLoader {
         return classes;
     }
     
-    public static Colony newColonyInstance(File f) throws Exception {
+    public static Colony newColonyInstance(String typeOrClass) {
+        try {
+            for(ColonyInformation info : colonyInfos()) {
+                if(info.getName().equals(typeOrClass)) {
+                    Colony col = (Colony) info.getColonyClass().newInstance();
+                    return col;
+                }
+            }
+            for(ColonyInformation info : colonyInfos()) {
+                if(info.getColonyClass().getName().equals(typeOrClass) || info.getColonyClass().getSimpleName().equals(typeOrClass)) {
+                    Colony col = (Colony) info.getColonyClass().newInstance();
+                    return col;
+                }
+            }
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
+        
+        return null;
+    }
+    
+    public static Colony loadColony(File f) throws Exception {
         String fileName = f.getName().toLowerCase();
         String strJson;
         
@@ -82,10 +103,10 @@ public class ColonyClassLoader {
         }
         
         JsonObject json = (JsonObject) JsonObject.parseJson(strJson);
-        return newColonyInstance(json);
+        return loadColony(json);
     }
     
-    public static Colony newColonyInstance(JsonObject json) throws Exception {
+    public static Colony loadColony(JsonObject json) throws Exception {
         String type = json.get("type").toString();
         
         for(ColonyInformation info : colonyInfos()) {

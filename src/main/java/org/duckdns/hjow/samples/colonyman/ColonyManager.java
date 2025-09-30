@@ -149,7 +149,7 @@ public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable
     public void loadColony(File f, boolean alert) {
         boolean exists = false;
         try { 
-            Colony c = ColonyClassLoader.newColonyInstance(f);
+            Colony c = ColonyClassLoader.loadColony(f);
             exists = false;
             for(Colony cx : colonies) { if(c.getName().equals(cx.getName())) exists = true; break; }
             if(exists) return;
@@ -215,15 +215,27 @@ public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable
         } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, true); if(alert) { alert("오류 : " + ex.getMessage()); } else { throw new RuntimeException(ex.getMessage()); } }
     }
     
-    /** 새 정착지 생성 */
+    /** 새 정착지 생성 (기본형으로 생성) */
     public Colony newColony() {
         Colony newCol = new NormalColony();
-        newCol.newCity();
-        
-        colonies.add(newCol);
-        refreshColonyList();
+        newColonyAfterJobs(newCol);
         
         return newCol;
+    }
+    
+    /** 새 정착지 생성 (타입 지정) */
+    public Colony newColony(String type) {
+        Colony newCol = ColonyClassLoader.newColonyInstance(type);
+        newColonyAfterJobs(newCol);
+        
+        return newCol;
+    }
+    
+    /** 새 정착지 생성 후반부 동작 */
+    protected void newColonyAfterJobs(Colony col) {
+        col.newCity();
+        colonies.add(col);
+        refreshColonyList();
     }
     
     /** 정착지 추가 */
