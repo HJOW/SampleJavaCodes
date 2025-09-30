@@ -23,7 +23,7 @@ import org.duckdns.hjow.samples.colonyman.elements.states.Influenza;
 import org.duckdns.hjow.samples.colonyman.elements.states.SuperAngry;
 
 /** 기본 제공 Pack */
-public class BundledPack extends Pack {
+public class BundledPack extends DefaultPack {
     private static final long serialVersionUID = -1884375631795840563L;
     @Override
     protected void init() {
