@@ -42,6 +42,8 @@ import org.duckdns.hjow.samples.colonyman.pack.Pack;
 
 /** 정착지 시나리오, 시설, 연구, 시설과 시민의 상태 타입 등 클래스들과 타입 리스트를 관리하는 클래스 */
 public class ColonyClassLoader {
+    private static final List<Pack> packs = new Vector<Pack>();
+    
     private static final List<ColonyInformation> colonyInfoList     = new Vector<ColonyInformation>();
     private static       boolean                 colonyInfoListFlag = false; 
     
@@ -81,6 +83,8 @@ public class ColonyClassLoader {
         if(colonyClassListFlag) return colonyClassList;
         
         colonyClassList.clear();
+        for(Pack p : packs) { if(p.isEnabled()) colonyClassList.addAll(p.getColonyClasses()); }
+        
         colonyClassList.add(NormalColony.class);
         
         colonyClassListFlag = true;
@@ -148,6 +152,8 @@ public class ColonyClassLoader {
 	    if(facilityClassListFlag) return facilityClassList;
 	    
 	    facilityClassList.clear();
+	    for(Pack p : packs) { if(p.isEnabled()) facilityClassList.addAll(p.getFacilityClasses()); }
+	    
 		facilityClassList.add(ResidenceModule.class);
         facilityClassList.add(PowerStation.class);
         facilityClassList.add(Restaurant.class);
@@ -171,6 +177,8 @@ public class ColonyClassLoader {
 	    if(researchClassListFlag) return researchClassList;
 	    
 	    researchClassList.clear();
+	    for(Pack p : packs) { if(p.isEnabled()) researchClassList.addAll(p.getResearchClasses()); }
+	    
 		researchClassList.add(BasicScience.class);
         researchClassList.add(BasicHumanities.class);
         researchClassList.add(MilitaryTech.class);
@@ -191,6 +199,8 @@ public class ColonyClassLoader {
 	    if(enemyClassListFlag) return enemyClassList;
 	    
 	    enemyClassList.clear();
+	    for(Pack p : packs) { if(p.isEnabled()) enemyClassList.addAll(p.getEnemyClasses()); }
+	    
 	    // TODO
 	    
 	    enemyClassListFlag = true;
@@ -205,6 +215,8 @@ public class ColonyClassLoader {
 	    if(stateClassListFlag) return stateClassList;
 	    
 	    stateClassList.clear();
+	    for(Pack p : packs) { if(p.isEnabled()) stateClassList.addAll(p.getStateClasses()); }
+	    
 		stateClassList.add(Influenza.class);
         stateClassList.add(ImmuneInfluenza.class);
         stateClassList.add(SuperAngry.class);
@@ -283,6 +295,7 @@ public class ColonyClassLoader {
 	
 	/** 공통 로컬 설정 정보 적용 */
 	public static void applyLocalConfigs(ColonyManagerConfig cfg, ColonyManager man) {
+	    // Pack 목록 불러오기
 	    List<Object> packList = null;
 	    try {
 	        packList = cfg.getList("packs");
@@ -294,8 +307,6 @@ public class ColonyClassLoader {
 	        packList = new ArrayList<Object>();
             cfg.set("packs", packList);
         }
-	    
-	    List<Pack> packs = new ArrayList<Pack>();
 	    
 	    for(Object o : packList) {
 	        try {
@@ -335,7 +346,7 @@ public class ColonyClassLoader {
         }
 	}
 	
-	/** Pack 적용 */
+	/** Pack 차후 적용 */
 	public static void loadPack(Pack pack) throws Exception {
 	    if(pack == null) return;
 	    if(! pack.isEnabled()) return;
@@ -349,6 +360,16 @@ public class ColonyClassLoader {
 	    if(pack.getResearchClasses() != null) researchClassList.addAll(pack.getResearchClasses());
 	    if(pack.getEnemyClasses()    != null) enemyClassList.addAll(pack.getEnemyClasses());
 	    if(pack.getStateClasses()    != null) stateClassList.addAll(pack.getStateClasses());
+	}
+	
+	/** 클래스 정보들과, 불러온 Pack 모두 다시 확인 */
+	public static synchronized void refresh() {
+	    colonyInfoListFlag    = false;
+	    colonyClassListFlag   = false;
+	    facilityClassListFlag = false;
+	    researchClassListFlag = false;
+	    enemyClassListFlag    = false;
+	    stateClassListFlag    = false;
 	}
 	
 	/** 저장된 클래스 정보들 비우기 */

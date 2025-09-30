@@ -378,7 +378,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         pnNoColMain.add(pnNoColCenter, BorderLayout.CENTER);
         pnNoColMain.add(pnNoColSouth , BorderLayout.SOUTH);
         
-        JButton btnNewCol = new JButton("새 정착지");
+        JButton btnNewCol = new JButton("새 정착지 개척");
         btnNewCol.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -397,7 +397,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         menuFile = new JMenu("파일");
         menuBar.add(menuFile);
         
-        menuFileNew = new JMenuItem("새 정착지 생성");
+        menuFileNew = new JMenuItem("새 정착지 개척");
         menuFile.add(menuFileNew);
         menuFileNew.addActionListener(new ActionListener() {
             @Override
