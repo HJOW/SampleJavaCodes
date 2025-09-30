@@ -548,6 +548,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         if(thread != null) { try { threadSwitch = false; thread.interrupt(); Thread.sleep(1000L); } catch(Exception exc) {} }
         if(dialog == null) init(superInstance);
         
+        loadLocalConfigs();
         loadColonies();
         loadWebConfigs();
     }

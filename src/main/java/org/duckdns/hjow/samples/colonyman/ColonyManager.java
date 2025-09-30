@@ -11,6 +11,8 @@ import java.util.Random;
 import java.util.Vector;
 
 import org.duckdns.hjow.commons.core.Disposeable;
+import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.commons.util.FileUtil;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
 import org.duckdns.hjow.samples.colonyman.elements.AttackableObject;
 import org.duckdns.hjow.samples.colonyman.elements.City;
@@ -27,10 +29,12 @@ import org.duckdns.hjow.samples.util.ResourceUtil;
 /** Colonization 프로그램 핵심 클래스 */
 public abstract class ColonyManager implements ColonyManagerUI, Disposeable, Serializable {
     private static final long serialVersionUID = -5740844908011980260L;
+    
     protected transient SampleJavaCodes superInstance;
     protected transient Thread thread;
     protected transient volatile boolean threadSwitch, threadPaused, threadShutdown, reserveSaving, reserveRefresh;
     protected transient volatile boolean bCheckerPauseCompleted = false;
+    protected transient ColonyManagerConfig configs = new ColonyManagerConfig();
     
     protected transient volatile Vector<Colony> colonies = new Vector<Colony>();
     protected transient volatile int  selectedColony = -1;
@@ -122,6 +126,23 @@ public abstract class ColonyManager implements ColonyManagerUI, Disposeable, Ser
         return ResourceUtil.getHomeDir("samplejavacodes", "colony");
     }
     
+    /** Colonization 기본 설정 불러오기 */
+    public void loadLocalConfigs() {
+        File root = getColonySaveRootDirectory();
+        if(! root.exists()) root.mkdirs();
+        
+        try {
+            File conf = new File(root.getAbsolutePath() + File.separator + "config.json");
+            if(conf.exists()) {
+                String strJson = FileUtil.readString(conf, "UTF-8"); // 파일 읽고
+                JsonObject json = (JsonObject) JsonObject.parseJson(strJson); // JSON 파싱
+                configs.fromJson(json); // 설정 넣기
+            }
+        } catch(Exception ex) {
+            GlobalLogs.processExceptionOccured(ex, false);
+        }
+    }
+    
     /** 정착지들을 기본 경로에서 불러오기 */
     public void loadColonies() {
         File root = getColonySaveRootDirectory();
@@ -129,6 +150,7 @@ public abstract class ColonyManager implements ColonyManagerUI, Disposeable, Ser
         
         colonies.clear();
         for(File f : lists) {
+            if(f.getName().equals("config.json")) continue;
             if(getColonyFileFilter().accept(f)) loadColony(f, false);
         }
         
@@ -220,6 +242,24 @@ public abstract class ColonyManager implements ColonyManagerUI, Disposeable, Ser
         } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, true); if(alert) { alert("오류 : " + ex.getMessage()); } else { throw new RuntimeException(ex.getMessage()); } }
     }
     
+    /** Colonization 기본 설정 저장 */
+    public void saveLocalConfigs() {
+        File root = getColonySaveRootDirectory();
+        if(! root.exists()) root.mkdirs();
+        
+        try {
+            File conf = new File(root.getAbsolutePath() + File.separator + "config.jsonn"); // n 일부러 더 붙인 것
+            FileUtil.writeString(conf, "UTF-8", configs.toJson().toJSON()); // 저장
+            
+            File olds = new File(root.getAbsolutePath() + File.separator + "config.json"); // 기존 파일
+            if(olds.exists()) olds.delete();
+            
+            conf.renameTo(olds); // 목표로 하는 이름으로 바꾸기
+        } catch(Exception ex) {
+            GlobalLogs.processExceptionOccured(ex, false);
+        }
+    }
+    
     /** 새 정착지 생성 (기본형으로 생성) */
     public Colony newColony() {
         Colony newCol = new NormalColony();
@@ -286,6 +326,7 @@ public abstract class ColonyManager implements ColonyManagerUI, Disposeable, Ser
     public void disposeContents() {
         threadSwitch = false;
         waitThreadShutdown();
+        if(! flagAlreadyDisposed) saveLocalConfigs();
         if((! flagAlreadyDisposed) && (! colonies.isEmpty())) saveColonies();
     }
     
@@ -444,6 +485,16 @@ public abstract class ColonyManager implements ColonyManagerUI, Disposeable, Ser
             }
         }
         return null;
+    }
+    
+    /** 설정 객체 자체를 반환 */
+    public ColonyManagerConfig getConfig() {
+        return configs;
+    }
+    
+    /** 설정 객체 반환 */
+    public ColonyManagerConfig c() {
+        return getConfig();
     }
     
     /** 각 요소들을 위한 고유키 생성 (절대 0이 나오지 않음) */
