@@ -13,7 +13,6 @@ import java.util.Vector;
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
-import org.duckdns.hjow.samples.colonyman.ColonyManagerUI;
 import org.duckdns.hjow.samples.colonyman.GlobalLogs;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityManager;
@@ -21,6 +20,8 @@ import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.TransportStation;
 import org.duckdns.hjow.samples.colonyman.events.TimeEvent;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyManagerUI;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
 /** 도시 구현 클래스 */
 public class City implements ColonyElements {

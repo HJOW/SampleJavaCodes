@@ -1,4 +1,4 @@
-package org.duckdns.hjow.samples.colonyman;
+package org.duckdns.hjow.samples.colonyman.ui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -29,6 +29,7 @@ import javax.swing.JTextField;
 import org.duckdns.hjow.commons.core.Disposeable;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.commons.util.FileUtil;
+import org.duckdns.hjow.samples.colonyman.GlobalLogs;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyBackup;
 import org.duckdns.hjow.samples.util.UIUtil;

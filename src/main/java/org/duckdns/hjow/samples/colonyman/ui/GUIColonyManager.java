@@ -1,4 +1,4 @@
-package org.duckdns.hjow.samples.colonyman;
+package org.duckdns.hjow.samples.colonyman.ui;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -45,11 +45,13 @@ import javax.swing.UIManager;
 
 import org.duckdns.hjow.samples.base.GUIProgram;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
+import org.duckdns.hjow.samples.colonyman.ColonyClassLoader;
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.GlobalLogs;
+import org.duckdns.hjow.samples.colonyman.SimulationSpeed;
 import org.duckdns.hjow.samples.colonyman.benchmark.BenchmarkManager;
 import org.duckdns.hjow.samples.colonyman.elements.City;
-import org.duckdns.hjow.samples.colonyman.elements.CityPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
-import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.util.UIUtil;
 
 /** Colonization 프로그램 */

@@ -1,4 +1,4 @@
-package org.duckdns.hjow.samples.colonyman.elements.facilities;
+package org.duckdns.hjow.samples.colonyman.ui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -21,10 +21,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
-import org.duckdns.hjow.samples.colonyman.GUIColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.HoldingJob;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityInformation;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityManager;
 import org.duckdns.hjow.samples.util.UIUtil;
 
 public class NewFacilityManager extends JDialog {

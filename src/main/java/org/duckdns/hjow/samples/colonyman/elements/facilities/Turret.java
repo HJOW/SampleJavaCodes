@@ -9,11 +9,11 @@ import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
-import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.research.BasicBuildingTech;
 import org.duckdns.hjow.samples.colonyman.elements.research.MilitaryTech;
 import org.duckdns.hjow.samples.colonyman.elements.research.Research;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
 public class Turret extends DefaultFacility implements AttackableObject {
     private static final long serialVersionUID = -8553101924279880106L;

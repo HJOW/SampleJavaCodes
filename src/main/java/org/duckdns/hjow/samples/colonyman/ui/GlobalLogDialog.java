@@ -1,4 +1,4 @@
-package org.duckdns.hjow.samples.colonyman;
+package org.duckdns.hjow.samples.colonyman.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -13,6 +13,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 
 import org.duckdns.hjow.commons.ui.JLogArea;
+import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.GlobalLogs;
 import org.duckdns.hjow.samples.util.UIUtil;
 
 /** 전역 로그 출력 대화상자 */

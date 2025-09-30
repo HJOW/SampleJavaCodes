@@ -14,11 +14,14 @@ import org.duckdns.hjow.commons.core.Disposeable;
 import org.duckdns.hjow.samples.base.SampleJavaCodes;
 import org.duckdns.hjow.samples.colonyman.elements.AttackableObject;
 import org.duckdns.hjow.samples.colonyman.elements.City;
-import org.duckdns.hjow.samples.colonyman.elements.CityPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
-import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.colonyman.elements.NormalColony;
+import org.duckdns.hjow.samples.colonyman.ui.BackupManager;
+import org.duckdns.hjow.samples.colonyman.ui.CityPanel;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyManagerUI;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
+import org.duckdns.hjow.samples.colonyman.ui.GlobalLogDialog;
 import org.duckdns.hjow.samples.util.ResourceUtil;
 
 /** Colonization 프로그램 */

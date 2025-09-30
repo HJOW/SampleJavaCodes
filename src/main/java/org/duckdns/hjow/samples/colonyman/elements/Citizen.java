@@ -8,10 +8,11 @@ import java.util.Vector;
 import org.duckdns.hjow.commons.json.JsonArray;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
-import org.duckdns.hjow.samples.colonyman.ColonyManagerUI;
 import org.duckdns.hjow.samples.colonyman.GlobalLogs;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
 import org.duckdns.hjow.samples.colonyman.elements.states.State;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyManagerUI;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
 public class Citizen implements ColonyElements {
     private static final long serialVersionUID = -6856576686789163067L;

@@ -6,7 +6,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
-import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
 /** 랜덤 발생 이벤트 공통 부분을 정의하는 상위 클래스 */
 public abstract class TimeEvent implements Serializable {

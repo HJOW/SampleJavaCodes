@@ -5,8 +5,8 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
-import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.colonyman.elements.research.Research;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
 public class ResearchCenter extends DefaultFacility {
     private static final long serialVersionUID = 9084689175126703785L;

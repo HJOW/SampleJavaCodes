@@ -12,7 +12,6 @@ import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.commons.util.FileUtil;
 import org.duckdns.hjow.samples.colonyman.AccountingData;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
-import org.duckdns.hjow.samples.colonyman.ColonyManagerUI;
 import org.duckdns.hjow.samples.colonyman.GlobalLogs;
 import org.duckdns.hjow.samples.colonyman.elements.enemies.Enemy;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityInformation;
@@ -27,6 +26,8 @@ import org.duckdns.hjow.samples.colonyman.elements.research.ResearchManager;
 import org.duckdns.hjow.samples.colonyman.events.InfluenzaEvent;
 import org.duckdns.hjow.samples.colonyman.events.Riot;
 import org.duckdns.hjow.samples.colonyman.events.TimeEvent;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyManagerUI;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
 /** 정착지 구현 클래스 */
 public abstract class Colony implements ColonyElements {

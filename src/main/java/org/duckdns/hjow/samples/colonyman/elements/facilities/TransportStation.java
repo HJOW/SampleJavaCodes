@@ -4,7 +4,7 @@ import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
-import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
 public abstract class TransportStation extends DefaultFacility {
 	private static final long serialVersionUID = 7222508474329385493L;

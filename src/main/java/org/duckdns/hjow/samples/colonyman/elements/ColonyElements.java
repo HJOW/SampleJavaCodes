@@ -5,6 +5,7 @@ import java.math.BigInteger;
 
 import org.duckdns.hjow.commons.core.Disposeable;
 import org.duckdns.hjow.commons.json.JsonObject;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
 public interface ColonyElements extends Serializable, Disposeable {
     /** 이 객체의 고유 ID 값 반환. 0이 될 수 없음. */

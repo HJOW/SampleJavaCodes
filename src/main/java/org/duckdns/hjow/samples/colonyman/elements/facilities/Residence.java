@@ -9,7 +9,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
-import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
 public abstract class Residence extends DefaultFacility implements Home {
     private static final long serialVersionUID = -2930901725309688206L;

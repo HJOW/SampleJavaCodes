@@ -1,4 +1,4 @@
-package org.duckdns.hjow.samples.colonyman.elements;
+package org.duckdns.hjow.samples.colonyman.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -29,9 +29,11 @@ import javax.swing.JToolBar;
 import javax.swing.border.EtchedBorder;
 
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
-import org.duckdns.hjow.samples.colonyman.GUIColonyManager;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.FacilityPanel;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.NewFacilityManager;
+import org.duckdns.hjow.samples.colonyman.elements.Citizen;
+import org.duckdns.hjow.samples.colonyman.elements.City;
+import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.Facility;
+import org.duckdns.hjow.samples.colonyman.elements.HoldingJob;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.SupportGUIFacility;
 
 public class CityPanel extends JPanel implements ColonyElementPanel {

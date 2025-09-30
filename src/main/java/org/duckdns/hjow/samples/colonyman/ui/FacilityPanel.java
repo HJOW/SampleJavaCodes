@@ -1,4 +1,4 @@
-package org.duckdns.hjow.samples.colonyman.elements.facilities;
+package org.duckdns.hjow.samples.colonyman.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -21,12 +21,12 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
-import org.duckdns.hjow.samples.colonyman.GUIColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
-import org.duckdns.hjow.samples.colonyman.elements.ColonyElementPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Facility;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
+import org.duckdns.hjow.samples.colonyman.elements.facilities.ResearchCenter;
 import org.duckdns.hjow.samples.colonyman.elements.research.Research;
 import org.duckdns.hjow.samples.colonyman.elements.states.State;
 

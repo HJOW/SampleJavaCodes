@@ -8,7 +8,7 @@ import org.duckdns.hjow.samples.colonyman.ColonyManager;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
-import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
 /** 시민, 혹은 시설의 상태 하나를 지칭하는 객체를 위한 클래스 */
 public abstract class State implements ColonyElements {

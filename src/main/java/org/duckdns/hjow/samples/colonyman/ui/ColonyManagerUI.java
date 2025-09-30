@@ -1,4 +1,4 @@
-package org.duckdns.hjow.samples.colonyman;
+package org.duckdns.hjow.samples.colonyman.ui;
 
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;

@@ -8,7 +8,7 @@ import java.util.Properties;
 import java.util.Vector;
 
 import org.duckdns.hjow.samples.charsetconv.ui.GUIConverterManager;
-import org.duckdns.hjow.samples.colonyman.GUIColonyManager;
+import org.duckdns.hjow.samples.colonyman.ui.GUIColonyManager;
 import org.duckdns.hjow.samples.console.ConsoleStream;
 import org.duckdns.hjow.samples.console.ConsoleTerminal;
 import org.duckdns.hjow.samples.cryptor.GCypher;

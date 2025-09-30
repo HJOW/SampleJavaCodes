@@ -1,8 +1,10 @@
-package org.duckdns.hjow.samples.colonyman.elements;
+package org.duckdns.hjow.samples.colonyman.ui;
 
 import java.awt.Component;
 
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.elements.City;
+import org.duckdns.hjow.samples.colonyman.elements.Colony;
 
 public interface ColonyElementPanel {
     public void setEditable(boolean editable);

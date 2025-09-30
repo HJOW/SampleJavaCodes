@@ -1,4 +1,4 @@
-package org.duckdns.hjow.samples.colonyman.elements;
+package org.duckdns.hjow.samples.colonyman.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -14,6 +14,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+import org.duckdns.hjow.samples.colonyman.elements.Citizen;
+import org.duckdns.hjow.samples.colonyman.elements.City;
+import org.duckdns.hjow.samples.colonyman.elements.Colony;
 
 public class CitizenPanel extends JPanel implements ColonyElementPanel {
     private static final long serialVersionUID = 8988684923024941632L;

@@ -1,4 +1,4 @@
-package org.duckdns.hjow.samples.colonyman.elements.research;
+package org.duckdns.hjow.samples.colonyman.ui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -10,6 +10,7 @@ import javax.swing.JTextArea;
 
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.research.Research;
 
 /** 연구 하나의 상태를 출력하는 컴포넌트 */
 public class ResearchPanel extends JPanel {

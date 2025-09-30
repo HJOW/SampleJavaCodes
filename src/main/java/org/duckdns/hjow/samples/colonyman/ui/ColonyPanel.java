@@ -1,4 +1,4 @@
-package org.duckdns.hjow.samples.colonyman.elements;
+package org.duckdns.hjow.samples.colonyman.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -23,9 +23,11 @@ import javax.swing.table.DefaultTableModel;
 
 import org.duckdns.hjow.samples.colonyman.AccountingData;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
-import org.duckdns.hjow.samples.colonyman.GUIColonyManager;
+import org.duckdns.hjow.samples.colonyman.elements.Citizen;
+import org.duckdns.hjow.samples.colonyman.elements.City;
+import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.Facility;
 import org.duckdns.hjow.samples.colonyman.elements.research.Research;
-import org.duckdns.hjow.samples.colonyman.elements.research.ResearchPanel;
 
 /** 정착지 정보 출력 및 컨트롤을 담당하는 UI 컴포넌트 */
 public class ColonyPanel extends JPanel implements ColonyElementPanel {

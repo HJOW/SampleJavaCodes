@@ -4,9 +4,9 @@ import org.duckdns.hjow.samples.colonyman.elements.Citizen;
 import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
-import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Facility;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Home;
+import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
 public class Influenza extends State {
     private static final long serialVersionUID = -4399295592737336716L;
