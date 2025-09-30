@@ -127,7 +127,7 @@ public class Arcade extends DefaultFacility implements ServiceFacility {
                 if(c.getMoney() < usingFee()) continue;
                 
                 long fee = usingFee();
-                long tax = getTax(city, colony);
+                long tax = getTax(city, colony); // 사용료에 붙는 세금, 이미 계산 시에 사용료를 반영함.
                 
                 servicingCount++;
                 c.setHappy(c.getHappy() + 5 + (compGrade / 2));

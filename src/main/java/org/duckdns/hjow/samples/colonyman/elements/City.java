@@ -691,6 +691,22 @@ public class City implements ColonyElements {
         if(! happinessAccepts) return 0.0;
         if(rate <= 0.0) return 0.0;
         
+        // 세금 적용
+        int tax = getTax();
+        //    세금이 10% 보다 높으면 효율 감소
+        if(tax >= 16) efficiency100 = (int) Math.round(efficiency100 / 4.0);
+        if(tax == 15) efficiency100 = (int) Math.round(efficiency100 / 2.0);
+        if(tax == 14) efficiency100 = (int) Math.round(efficiency100 / 1.7);
+        if(tax == 13) efficiency100 = (int) Math.round(efficiency100 / 1.5);
+        if(tax == 12) efficiency100 = (int) Math.round(efficiency100 / 1.3);
+        if(tax == 11) efficiency100 = (int) Math.round(efficiency100 / 1.1);
+        //    세금이 9% 보다 높으면 효율 증가 (100까지 남은 수치의 일정 비율만큼 가산)
+        if(tax ==  9) efficiency100 = efficiency100 + (int) Math.round((100.0 - efficiency100) / 10.0);
+        if(tax ==  8) efficiency100 = efficiency100 + (int) Math.round((100.0 - efficiency100) /  9.0);
+        if(tax ==  7) efficiency100 = efficiency100 + (int) Math.round((100.0 - efficiency100) /  8.0);
+        if(tax ==  6) efficiency100 = efficiency100 + (int) Math.round((100.0 - efficiency100) /  7.0);
+        if(tax <=  5) efficiency100 = efficiency100 + (int) Math.round((100.0 - efficiency100) /  6.0);
+        
         // 효율 적용
         rate = rate * (efficiency100 / 100.0);
         
@@ -728,11 +744,47 @@ public class City implements ColonyElements {
                 int idx = 0;
                 List<Citizen> citizens = getCitizens();
                 while(idx < citizens.size()) {
+                    // 세금 적용
+                    int tax = getTax();
+                    double rates    = 0.0;
+                    double multiple = 1.0;
+                    //    세금이 10% 보다 높으면 효율 감소
+                    if(tax >= 16) { multiple = 3.0; rates = 0.30; }
+                    if(tax == 15) { multiple = 1.9; rates = 0.16; }
+                    if(tax == 14) { multiple = 1.6; rates = 0.12; }
+                    if(tax == 13) { multiple = 1.4; rates = 0.07; }
+                    if(tax == 12) { multiple = 1.2; rates = 0.04; }
+                    if(tax == 11) { multiple = 1.1; rates = 0.02; }
+                    //    세금이 9% 보다 높으면 효율 증가 (100까지 남은 수치의 일정 비율만큼 가산)
+                    if(tax ==  9) { multiple = 0.9; }
+                    if(tax ==  8) { multiple = 0.8; }
+                    if(tax ==  7) { multiple = 0.7; }
+                    if(tax ==  6) { multiple = 0.6; }
+                    if(tax <=  5) { multiple = 0.5; }
+                    
+                    //    세금으로 인한 탈출 적용
+                    if(Math.random() <= rates) {
+                        Citizen c = citizens.get(idx);
+                        c.dispose();
+                        citizens.remove(idx); // 탈출
+                        continue;
+                    }
+                    
+                    // 행복도로 인한 탈출 가능성 계산 (20보다 낮은 경우만 적용) - 여기에도 세금이 반영됨
                     int happy = citizens.get(idx).getHappy();
-                    if(happy < 10) {
-                        double rates = (happy / 100.0);
-                        if(Math.random() < rates) {
-                            citizens.remove(idx);
+                    if(happy > 100) happy = 100;
+                    
+                    rates = 0.0;
+                    if(happy < 20) { // 20보다 낮으면 확률 계산
+                        rates = (happy / 100.0);
+                        rates = 0.2 - rates; // 최대값이 0.2 이므로...
+                        if(rates < 0.0) rates = 0.0;
+                        rates = rates * multiple; // 세금 추가 적용
+                        
+                        if(Math.random() <= rates) {
+                            Citizen c = citizens.get(idx);
+                            c.dispose();
+                            citizens.remove(idx); // 탈출
                             continue;
                         }
                     }

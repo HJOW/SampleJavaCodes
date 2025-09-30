@@ -113,7 +113,7 @@ public abstract class DefaultFacility implements Facility {
     /** 사용료 */
     public long usingFee() { return 0; }
     
-    /** 세금 */
+    /** 사용료에 붙는 세금을 반환 */
     protected long getTax(City city, Colony colony) {
         double rate = 0.0;
         if(city.getTax() >= 1) {

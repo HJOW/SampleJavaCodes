@@ -9,6 +9,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -46,6 +49,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
     protected transient JPanel pnGrid, pnCitizens, pnFacilities, pnHoldings;
     protected transient JToolBar toolbarCity;
     protected transient JButton btnNewFac;
+    protected transient JComboBox<String> cbxTax;
     protected transient JSplitPane splits;
     protected transient GridBagLayout layoutFacility, layoutCitizen;
     protected transient NewFacilityManager dialogNewFac;
@@ -103,6 +107,26 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
                     c.setName(tfName.getText());
                     superInstance.refreshColonyContent();
                 }
+            }
+        });
+        
+        Vector<String> listTax = new Vector<String>();
+        for(int idx=5; idx<=15; idx++) {
+            listTax.add(idx + " %");
+        }
+        cbxTax = new JComboBox<String>(listTax);
+        cbxTax.setSelectedIndex(5);
+        pnHp.add(new JLabel("Tax"));
+        pnHp.add(cbxTax);
+        
+        cbxTax.addItemListener(new ItemListener() {    
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if(! cbxTax.isEnabled()) return;
+                String str = (String) cbxTax.getSelectedItem();
+                if(str == null) str = "10 %";
+                str = str.replace("%", "").trim();
+                getCity().setTax(Integer.parseInt(str));
             }
         });
         
@@ -416,6 +440,8 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
                 btnNewFac.setEnabled(city.getFacility().size() < city.getSpaces());
             }
         }
+        
+        cbxTax.setSelectedItem(city.getTax() + " %");
     }
     
     /** 작업중 항목 출력 */
@@ -485,6 +511,7 @@ public class CityPanel extends JPanel implements ColonyElementPanel {
             else p.setEditable(editable); 
         }
         
+        cbxTax.setEnabled(editable);
         tfName.setEditable(editable);
         tfSearchCitizen.setEditable(editable);
         tfSearchFacility.setEditable(editable);
