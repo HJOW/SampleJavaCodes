@@ -18,6 +18,7 @@ import org.duckdns.hjow.samples.colonyman.elements.CityPanel;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyPanel;
+import org.duckdns.hjow.samples.colonyman.elements.NormalColony;
 import org.duckdns.hjow.samples.util.ResourceUtil;
 
 /** Colonization 프로그램 */
@@ -216,7 +217,7 @@ public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable
     
     /** 새 정착지 생성 */
     public Colony newColony() {
-        Colony newCol = new Colony();
+        Colony newCol = new NormalColony();
         newCol.newCity();
         
         colonies.add(newCol);

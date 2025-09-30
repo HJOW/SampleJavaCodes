@@ -15,6 +15,7 @@ import org.duckdns.hjow.commons.util.ClassUtil;
 import org.duckdns.hjow.commons.util.FileUtil;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyInformation;
+import org.duckdns.hjow.samples.colonyman.elements.NormalColony;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Arcade;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.ArchitectOffice;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.BusStation;
@@ -66,7 +67,7 @@ public class ColonyClassLoader {
     
     public static List<Class<?>> colonyClasses() {
         List<Class<?>> classes = new Vector<Class<?>>();
-        classes.add(Colony.class);
+        classes.add(NormalColony.class);
         return classes;
     }
     
@@ -81,6 +82,10 @@ public class ColonyClassLoader {
         }
         
         JsonObject json = (JsonObject) JsonObject.parseJson(strJson);
+        return newColonyInstance(json);
+    }
+    
+    public static Colony newColonyInstance(JsonObject json) throws Exception {
         String type = json.get("type").toString();
         
         for(ColonyInformation info : colonyInfos()) {

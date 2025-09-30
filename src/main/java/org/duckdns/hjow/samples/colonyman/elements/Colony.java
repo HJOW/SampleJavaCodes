@@ -29,7 +29,7 @@ import org.duckdns.hjow.samples.colonyman.events.Riot;
 import org.duckdns.hjow.samples.colonyman.events.TimeEvent;
 
 /** 정착지 구현 클래스 */
-public class Colony implements ColonyElements {
+public abstract class Colony implements ColonyElements {
     private static final long serialVersionUID = -3144963237818493111L;
     protected volatile long key = ColonyManager.generateKey();
     
@@ -616,14 +616,14 @@ public class Colony implements ColonyElements {
     }
     
     public static String getColonyClassName() {
-        return "NormalColony";
+        return "Colony";
     }
     
     public static String getColonyClassTitle() {
-        return "일반 정착지 시나리오";
+        return "정착지";
     }
     
     public static String getColonyClassDescription() {
-        return "일반 정착지 시나리오";
+        return "";
     }
 }
