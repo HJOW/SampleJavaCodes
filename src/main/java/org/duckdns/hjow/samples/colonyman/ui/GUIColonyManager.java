@@ -90,7 +90,6 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
     public GUIColonyManager(SampleJavaCodes superInstance) {
     	super();
         this.superInstance = superInstance;
-        init(superInstance);
     }
 
     @Override
@@ -546,9 +545,10 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
 	@Override
     public void onBeforeOpened(SampleJavaCodes superInstance) {
         if(thread != null) { try { threadSwitch = false; thread.interrupt(); Thread.sleep(1000L); } catch(Exception exc) {} }
-        if(dialog == null) init(superInstance);
         
         loadLocalConfigs();
+        if(dialog == null) init(superInstance);
+        
         loadColonies();
         loadWebConfigs();
     }

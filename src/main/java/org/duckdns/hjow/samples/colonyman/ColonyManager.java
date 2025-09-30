@@ -140,6 +140,7 @@ public abstract class ColonyManager implements ColonyManagerUI, Disposeable, Ser
             }
             
             // 설정들 중 클래스 관련 설정 적용
+            ColonyClassLoader.clearAll();
             ColonyClassLoader.applyLocalConfigs(configs, this);
         } catch(Exception ex) {
             GlobalLogs.processExceptionOccured(ex, false);

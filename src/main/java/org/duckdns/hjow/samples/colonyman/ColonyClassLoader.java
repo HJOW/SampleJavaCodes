@@ -17,27 +17,7 @@ import org.duckdns.hjow.commons.util.ClassUtil;
 import org.duckdns.hjow.commons.util.FileUtil;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.colonyman.elements.ColonyInformation;
-import org.duckdns.hjow.samples.colonyman.elements.NormalColony;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.Arcade;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.ArchitectOffice;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.BusStation;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.Factory;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.PowerStation;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.ResearchCenter;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.ResidenceModule;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.Restaurant;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.TownHouse;
-import org.duckdns.hjow.samples.colonyman.elements.facilities.Turret;
-import org.duckdns.hjow.samples.colonyman.elements.research.BasicBiology;
-import org.duckdns.hjow.samples.colonyman.elements.research.BasicBuildingTech;
-import org.duckdns.hjow.samples.colonyman.elements.research.BasicEngineering;
-import org.duckdns.hjow.samples.colonyman.elements.research.BasicHumanities;
-import org.duckdns.hjow.samples.colonyman.elements.research.BasicMedicalScience;
-import org.duckdns.hjow.samples.colonyman.elements.research.BasicScience;
-import org.duckdns.hjow.samples.colonyman.elements.research.MilitaryTech;
-import org.duckdns.hjow.samples.colonyman.elements.states.ImmuneInfluenza;
-import org.duckdns.hjow.samples.colonyman.elements.states.Influenza;
-import org.duckdns.hjow.samples.colonyman.elements.states.SuperAngry;
+import org.duckdns.hjow.samples.colonyman.pack.BundledPack;
 import org.duckdns.hjow.samples.colonyman.pack.Pack;
 
 /** 정착지 시나리오, 시설, 연구, 시설과 시민의 상태 타입 등 클래스들과 타입 리스트를 관리하는 클래스 */
@@ -84,8 +64,6 @@ public class ColonyClassLoader {
         
         colonyClassList.clear();
         for(Pack p : packs) { if(p.isEnabled()) colonyClassList.addAll(p.getColonyClasses()); }
-        
-        colonyClassList.add(NormalColony.class);
         
         colonyClassListFlag = true;
         return colonyClassList;
@@ -154,17 +132,6 @@ public class ColonyClassLoader {
 	    facilityClassList.clear();
 	    for(Pack p : packs) { if(p.isEnabled()) facilityClassList.addAll(p.getFacilityClasses()); }
 	    
-		facilityClassList.add(ResidenceModule.class);
-        facilityClassList.add(PowerStation.class);
-        facilityClassList.add(Restaurant.class);
-        facilityClassList.add(Arcade.class);
-        facilityClassList.add(Factory.class);
-        facilityClassList.add(ResearchCenter.class);
-        facilityClassList.add(ArchitectOffice.class);
-        facilityClassList.add(BusStation.class);
-        facilityClassList.add(Turret.class);
-        facilityClassList.add(TownHouse.class);
-        
         facilityClassListFlag = true;
 		return facilityClassList;
 	}
@@ -179,14 +146,6 @@ public class ColonyClassLoader {
 	    researchClassList.clear();
 	    for(Pack p : packs) { if(p.isEnabled()) researchClassList.addAll(p.getResearchClasses()); }
 	    
-		researchClassList.add(BasicScience.class);
-        researchClassList.add(BasicHumanities.class);
-        researchClassList.add(MilitaryTech.class);
-        researchClassList.add(BasicBuildingTech.class);
-        researchClassList.add(BasicBiology.class);
-        researchClassList.add(BasicMedicalScience.class);
-        researchClassList.add(BasicEngineering.class);
-        
         researchClassListFlag = true;
         return researchClassList;
 	}
@@ -217,10 +176,6 @@ public class ColonyClassLoader {
 	    stateClassList.clear();
 	    for(Pack p : packs) { if(p.isEnabled()) stateClassList.addAll(p.getStateClasses()); }
 	    
-		stateClassList.add(Influenza.class);
-        stateClassList.add(ImmuneInfluenza.class);
-        stateClassList.add(SuperAngry.class);
-        
         stateClassListFlag = true;
 		return stateClassList;
 	}
@@ -322,7 +277,7 @@ public class ColonyClassLoader {
 	    
 	    for(Pack p : packs) {
 	        try {
-	            loadPack(p);
+	            if(! packs.contains(p)) loadPack(p);
 	        } catch(Exception ex) {
 	            GlobalLogs.processExceptionOccured(ex, false);
 	        }
@@ -379,6 +334,8 @@ public class ColonyClassLoader {
 	    facilityClassListFlag = false; facilityClassList.clear();
 	    researchClassListFlag = false; researchClassList.clear();
 	    enemyClassListFlag    = false; enemyClassList.clear();   
-	    stateClassListFlag    = false; stateClassList.clear();   
+	    stateClassListFlag    = false; stateClassList.clear();
+	    packs.clear();
+	    packs.add(new BundledPack());
 	}
 }
