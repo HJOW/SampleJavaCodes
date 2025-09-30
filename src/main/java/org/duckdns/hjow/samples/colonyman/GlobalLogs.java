@@ -41,7 +41,9 @@ public class GlobalLogs implements Serializable {
             Throwable caused = tx.getCause();
             if(caused != null) tx = caused;
         }
-
+        
+        tx.printStackTrace();
+        
         String msg = "오류 - " + tx.getMessage();
         ByteArrayOutputStream byteCollector = new ByteArrayOutputStream();
         if(isSerious) {

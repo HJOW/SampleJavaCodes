@@ -10,8 +10,6 @@ import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -125,12 +123,12 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
                 onWindowClosing();
             }
         });
-        dialog.addComponentListener(new ComponentAdapter() {
+        /*dialog.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 refreshArenaPanel(0);
             }
-        });
+        });*/
         
         if(dialogGlobalLog == null) dialogGlobalLog = new GlobalLogDialog(this);
         dialogGlobalLog.setSize(w, logHeight);
@@ -701,7 +699,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         File[] lists = root.listFiles(getColonyFileFilter());
         for(File f : lists) {
             try {
-                Colony temp = new Colony(f);
+                Colony temp = ColonyClassLoader.newColonyInstance(f);
                 if(temp.getKey() == col.getKey()) f.delete();
             } catch(Exception ex) {} // 오류 건너뛰기
         }

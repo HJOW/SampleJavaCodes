@@ -2,13 +2,16 @@ package org.duckdns.hjow.samples.colonyman.elements.facilities;
 
 import java.io.Serializable;
 
+/** 시설 정보 */
 public class FacilityInformation implements Serializable {
     private static final long serialVersionUID = -5378970571423008845L;
     protected String name, description, title;
+    protected String imageHex;
     protected Long price = new Long(0L);
-    protected Long tech = new Long(0L);
+    protected Long tech  = new Long(0L);
     protected int buildingCycle = 1200;
     protected Class<?> facilityClass;
+    public FacilityInformation() {}
     public String getName() {
         return name;
     }
@@ -50,6 +53,12 @@ public class FacilityInformation implements Serializable {
     }
     public void setTech(Long tech) {
         this.tech = tech;
+    }
+    public String getImageHex() {
+        return imageHex;
+    }
+    public void setImageHex(String imageHex) {
+        this.imageHex = imageHex;
     }
     @Override
     public String toString() {

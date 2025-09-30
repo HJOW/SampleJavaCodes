@@ -1,14 +1,20 @@
 package org.duckdns.hjow.samples.colonyman;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
 import java.util.Vector;
+import java.util.zip.GZIPInputStream;
 
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.commons.util.ClassUtil;
+import org.duckdns.hjow.commons.util.FileUtil;
+import org.duckdns.hjow.samples.colonyman.elements.Colony;
+import org.duckdns.hjow.samples.colonyman.elements.ColonyInformation;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.Arcade;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.ArchitectOffice;
 import org.duckdns.hjow.samples.colonyman.elements.facilities.BusStation;
@@ -31,7 +37,64 @@ import org.duckdns.hjow.samples.colonyman.elements.states.Influenza;
 import org.duckdns.hjow.samples.colonyman.elements.states.SuperAngry;
 
 public class ColonyClassLoader {
-	
+    public static List<ColonyInformation> colonyInfos() {
+        List<ColonyInformation> infos = new Vector<ColonyInformation>();
+        
+        for(Class<?> classOne : colonyClasses()) {
+            ColonyInformation info = new ColonyInformation();
+            
+            try {
+                Method method = classOne.getMethod("getColonyClassName");
+                info.setName((String) method.invoke(null));
+                
+                method = classOne.getMethod("getColonyClassTitle");
+                info.setTitle((String) method.invoke(null));
+                
+                method = classOne.getMethod("getColonyClassDescription");
+                info.setDescription((String) method.invoke(null));
+                
+                info.setColonyClass(classOne);
+                if(! infos.contains(info)) infos.add(info);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
+        }
+        
+        return infos;
+    }
+    
+    public static List<Class<?>> colonyClasses() {
+        List<Class<?>> classes = new Vector<Class<?>>();
+        classes.add(Colony.class);
+        return classes;
+    }
+    
+    public static Colony newColonyInstance(File f) throws Exception {
+        String fileName = f.getName().toLowerCase();
+        String strJson;
+        
+        if(fileName.endsWith(".colgz")) {
+            strJson = FileUtil.readString(f, "UTF-8", GZIPInputStream.class);
+        } else {
+            strJson = FileUtil.readString(f, "UTF-8");
+        }
+        
+        JsonObject json = (JsonObject) JsonObject.parseJson(strJson);
+        String type = json.get("type").toString();
+        
+        for(ColonyInformation info : colonyInfos()) {
+            if(info.getName().equals(type)) {
+                Colony col = (Colony) info.getColonyClass().newInstance();
+                if(col == null) continue;
+                
+                col.fromJson(json);
+                return col;
+            }
+        }
+        return null;
+    }
+    
 	public static List<Class<?>> facilityClasses() {
 		List<Class<?>> classes = new Vector<Class<?>>();
 		classes.add(ResidenceModule.class);

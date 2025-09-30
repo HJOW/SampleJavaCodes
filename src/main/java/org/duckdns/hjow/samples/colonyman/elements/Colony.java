@@ -5,7 +5,6 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Vector;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.duckdns.hjow.commons.json.JsonArray;
@@ -57,26 +56,13 @@ public class Colony implements ColonyElements {
         resetResearches();
     }
     
-    public Colony(File f) throws Exception {
-        this();
-        checked = true;
-        
-        String fileName = f.getName().toLowerCase();
-        String strJson;
-        
-        if(fileName.endsWith(".colgz")) {
-            strJson = FileUtil.readString(f, "UTF-8", GZIPInputStream.class);
-        } else {
-            strJson = FileUtil.readString(f, "UTF-8");
-        }
-        
-        JsonObject objJson = (JsonObject) JsonObject.parseJson(strJson);
-        fromJson(objJson);
-    }
-    
     /** 기본 이름 앞부분 */
     protected String getDefaultNamePrefix() {
         return "정착지";
+    }
+    
+    public String getType() {
+        return getColonyClassName();
     }
 
     @Override
@@ -462,7 +448,7 @@ public class Colony implements ColonyElements {
     @Override
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
-        json.put("type", "Colony");
+        json.put("type", getType());
         json.put("name", getName());
         json.put("key", new Long(getKey()));
         json.put("hp", new Long(getHp()));
@@ -494,7 +480,7 @@ public class Colony implements ColonyElements {
     
     @Override
     public void fromJson(JsonObject json) {
-        if(! "Colony".equals(json.get("type"))) throw new RuntimeException("This object is not Colony type.");
+        if(! ("Colony".equals(json.get("type")) || getType().equals(json.get("type")))) throw new RuntimeException("This object is not Colony type.");
         setName(json.get("name").toString());
         key = Long.parseLong(json.get("key").toString());
         try { setHp(Integer.parseInt(json.get("hp").toString()));                     } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); hp         = 10;              }
@@ -627,5 +613,17 @@ public class Colony implements ColonyElements {
     		en.dispose();
     	}
     	enemies.clear();
+    }
+    
+    public static String getColonyClassName() {
+        return "NormalColony";
+    }
+    
+    public static String getColonyClassTitle() {
+        return "일반 정착지 시나리오";
+    }
+    
+    public static String getColonyClassDescription() {
+        return "일반 정착지 시나리오";
     }
 }

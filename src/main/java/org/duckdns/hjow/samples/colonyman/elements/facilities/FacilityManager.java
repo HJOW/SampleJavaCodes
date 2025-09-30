@@ -59,6 +59,10 @@ public class FacilityManager {
             method = facilityClass.getMethod("getFacilityBuildingCycle");
             info.setBuildingCycle((Integer) method.invoke(null));
             
+            method = facilityClass.getMethod("getImageHex");
+            Object obj = method.invoke(null);
+            if(obj != null) info.setImageHex(obj.toString());
+            
             if(! facilities.contains(info)) facilities.add(info);
         } catch (Exception e) {
             e.printStackTrace();

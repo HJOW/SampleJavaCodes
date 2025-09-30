@@ -148,7 +148,7 @@ public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable
     public void loadColony(File f, boolean alert) {
         boolean exists = false;
         try { 
-            Colony c = new Colony(f);
+            Colony c = ColonyClassLoader.newColonyInstance(f);
             exists = false;
             for(Colony cx : colonies) { if(c.getName().equals(cx.getName())) exists = true; break; }
             if(exists) return;
