@@ -14,6 +14,7 @@ import org.duckdns.hjow.samples.colonyman.elements.states.State;
 import org.duckdns.hjow.samples.colonyman.ui.ColonyManagerUI;
 import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
+/** 시민 구현 클래스 */
 public class Citizen implements ColonyElements {
     private static final long serialVersionUID = -6856576686789163067L;
     protected volatile long key = ColonyManager.generateKey();

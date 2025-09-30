@@ -7,6 +7,7 @@ import org.duckdns.hjow.commons.core.Disposeable;
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
+/** Colonization 내 소속 클래스임을 나타내는 인터페이스 */
 public interface ColonyElements extends Serializable, Disposeable {
     /** 이 객체의 고유 ID 값 반환. 0이 될 수 없음. */
     public long getKey();

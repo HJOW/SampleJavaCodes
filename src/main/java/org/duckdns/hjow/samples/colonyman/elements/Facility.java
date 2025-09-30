@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.duckdns.hjow.samples.colonyman.elements.states.State;
 
+/** 시설 클래스임을 나타내는 인터페이스 */
 public interface Facility extends ColonyElements {
     public void setName(String name);
     public String getType();

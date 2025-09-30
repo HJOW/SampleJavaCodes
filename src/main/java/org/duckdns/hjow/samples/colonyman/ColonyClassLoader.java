@@ -37,7 +37,9 @@ import org.duckdns.hjow.samples.colonyman.elements.states.ImmuneInfluenza;
 import org.duckdns.hjow.samples.colonyman.elements.states.Influenza;
 import org.duckdns.hjow.samples.colonyman.elements.states.SuperAngry;
 
+/** 정착지 시나리오, 시설, 연구, 시설과 시민의 상태 타입 등 클래스들과 타입 리스트를 관리하는 클래스 */
 public class ColonyClassLoader {
+    /** 정착지 시나리오 정보들을 반환, 타입명과 제목, 설명, 클래스가 포함 */
     public static List<ColonyInformation> colonyInfos() {
         List<ColonyInformation> infos = new Vector<ColonyInformation>();
         
@@ -65,12 +67,14 @@ public class ColonyClassLoader {
         return infos;
     }
     
+    /** 정착지 시나리오 클래스들을 반환 */
     public static List<Class<?>> colonyClasses() {
         List<Class<?>> classes = new Vector<Class<?>>();
         classes.add(NormalColony.class);
         return classes;
     }
     
+    /** 타입을 받아 그에 맞는 새 정착지 객체 생성, 해당 클래스 정보가 없으면 null 반환 */
     public static Colony newColonyInstance(String typeOrClass) {
         try {
             for(ColonyInformation info : colonyInfos()) {
@@ -92,6 +96,7 @@ public class ColonyClassLoader {
         return null;
     }
     
+    /** 파일로부터 정착지 객체 읽어 반환 */
     public static Colony loadColony(File f) throws Exception {
         String fileName = f.getName().toLowerCase();
         String strJson;
@@ -106,6 +111,7 @@ public class ColonyClassLoader {
         return loadColony(json);
     }
     
+    /**  JSON 으로부터 정착지 객체 읽어 반환 */
     public static Colony loadColony(JsonObject json) throws Exception {
         String type = json.get("type").toString();
         
@@ -121,6 +127,7 @@ public class ColonyClassLoader {
         return null;
     }
     
+    /** 시설 클래스 목록 반환 */
 	public static List<Class<?>> facilityClasses() {
 		List<Class<?>> classes = new Vector<Class<?>>();
 		classes.add(ResidenceModule.class);
@@ -136,6 +143,7 @@ public class ColonyClassLoader {
 		return classes;
 	}
 	
+    /** 연구 클래스 목록 반환 */
 	public static List<Class<?>> researchClasses() {
 		List<Class<?>> classes = new Vector<Class<?>>();
 		classes.add(BasicScience.class);
@@ -148,11 +156,13 @@ public class ColonyClassLoader {
         return classes;
 	}
 	
+    /** 적 클래스 목록 반환 */
 	public static List<Class<?>> enemyClasses() {
         List<Class<?>> classes = new Vector<Class<?>>();
 		return classes;
 	}
 	
+    /** 상태 클래스 목록 반환 */
 	public static List<Class<?>> stateClasses() {
 		List<Class<?>> classes = new Vector<Class<?>>();
 		classes.add(Influenza.class);
@@ -161,6 +171,7 @@ public class ColonyClassLoader {
 		return classes;
 	}
 	
+    /** 기본 공지사항 컨텐츠 html 반환 (웹 접근 못했을 시 이 내용 출력) */
 	public static String htmlNoticeEmpty() {
 		StringBuilder res = new StringBuilder("");
 		
@@ -176,14 +187,17 @@ public class ColonyClassLoader {
 		return res.toString().trim();
 	}
 	
+    /** 공지사항 웹 URL 반환 */
 	public static String htmlNoticeUrl() {
 		return "http://hjow.duckdns.org/colonization/notice_ko.html";
 	}
 	
+    /** 공통 설정 URL 반환 (이 안에서 최신 버전 코드와 추가 컨텐츠 정보 등을 얻게 됨) */
 	public static String htmlConfigJsonUrl() {
 		return "http://hjow.duckdns.org/colonization/content.json";
 	}
 	
+    /** 공통 설정 정보 조회 */
 	public static void loadWebConfigs(ColonyManager man) {
 		InputStream       inp1 = null;
 		InputStreamReader inp2 = null;
@@ -220,6 +234,7 @@ public class ColonyClassLoader {
 		}
 	}
 	
+    /** 공통 설정 정보 적용 */
 	protected static void applyWebConfigs(JsonObject json, ColonyManager man) throws Exception {
 		// TODO
 	}

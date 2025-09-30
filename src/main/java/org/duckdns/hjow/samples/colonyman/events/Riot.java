@@ -10,6 +10,7 @@ import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
 import org.duckdns.hjow.samples.colonyman.elements.states.SuperAngry;
 import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
+/** 폭동 이벤트 */
 public class Riot extends TimeEvent {
     private static final long serialVersionUID = 3877755419740712733L;
 

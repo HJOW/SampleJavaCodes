@@ -11,6 +11,7 @@ import org.duckdns.hjow.samples.colonyman.elements.ColonyElements;
 import org.duckdns.hjow.samples.colonyman.elements.states.Influenza;
 import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
+/** 전염병 이벤트 */
 public class InfluenzaEvent extends TimeEvent {
     private static final long serialVersionUID = -5377286479366944281L;
 

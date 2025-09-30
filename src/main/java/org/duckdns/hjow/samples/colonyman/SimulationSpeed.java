@@ -17,9 +17,13 @@ public class SimulationSpeed implements Serializable {
     public String toString() {
     	return "×" + speed;
     }
+
+	/** 속도 번호 반환 */
 	public int getSpeed() {
 		return speed;
 	}
+
+	/** 속도 번호 지정 */
 	public void setSpeed(int speed) {
 		this.speed = speed;
 		if(this.speed < 0) this.speed = 0;

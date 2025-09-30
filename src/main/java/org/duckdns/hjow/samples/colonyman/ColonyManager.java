@@ -24,8 +24,8 @@ import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 import org.duckdns.hjow.samples.colonyman.ui.GlobalLogDialog;
 import org.duckdns.hjow.samples.util.ResourceUtil;
 
-/** Colonization 프로그램 */
-public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable {
+/** Colonization 프로그램 핵심 클래스 */
+public abstract class ColonyManager implements ColonyManagerUI, Disposeable, Serializable {
     private static final long serialVersionUID = -5740844908011980260L;
     protected transient SampleJavaCodes superInstance;
     protected transient Thread thread;
@@ -41,6 +41,7 @@ public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable
     protected transient volatile boolean flagSaveBeforeClose = true; // 종료 시 저장 플래그
     protected transient volatile boolean flagAlreadyDisposed = false;
     
+    /** 기본 생성자 */
     public ColonyManager() {
         threadSwitch        = false;
         threadPaused        = true;
@@ -50,6 +51,7 @@ public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable
         flagAlreadyDisposed = false;
     }
 
+    /** 자기자신 객체 반환 (익명클래스 내부에서 활용 용도) */
     public ColonyManager getSelf() { return this; }
 
     /** 메인 쓰레드 구동 중인지 확인하여, 미구동 중인 경우 구동 시작 */
@@ -78,7 +80,7 @@ public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable
         thread.start();
     }
     
-    /** 메인 쓰레드 동작 */
+    /** 메인 쓰레드 내에서 단독으로 실행되는 메소드 */
     protected boolean onMainThread() {
         threadShutdown = false;
         long elapsed = System.currentTimeMillis();
@@ -250,11 +252,12 @@ public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable
         refreshColonyList();
     }
 
+    /** 로그 출력 */
     public void log(String msg) {
         System.out.println(msg);
-        GlobalLogs.log(msg);
     }
     
+    /** 메인 쓰레드 종료까지 대기 */
     protected void waitThreadShutdown() {
         threadSwitch = false;
         int prevInfinites = 0;
@@ -273,25 +276,22 @@ public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable
         flagAlreadyDisposed = true;
     }
     
+    /** 이 객체 사용 중단 - 관련 리소스 모두 해제 */
     public void dispose(boolean closeDialog) {
         disposeContents();
-        
         colonies.clear();
-        
-        if(dialogGlobalLog != null) {
-            dialogGlobalLog.dispose();
-            dialogGlobalLog = null;
-        }
     }
     
+    /** 이 객체 사용 중단 - 내부 컨텐츠들만 리소스 해제 */
     public void disposeContents() {
         threadSwitch = false;
         waitThreadShutdown();
         if((! flagAlreadyDisposed) && (! colonies.isEmpty())) saveColonies();
     }
     
+    /** 메시지 출력 */
     public void alert(String msg) {
-        GlobalLogs.log(msg);
+        System.out.println(msg);
     }
     
     /** 현재 선택된 정착지 반환 */
@@ -325,10 +325,12 @@ public class ColonyManager implements ColonyManagerUI, Disposeable, Serializable
         }
     }
     
+    /** 시뮬레이션 일시 정지 */
     public void pauseSimulation() {
         threadPaused = true;
     }
     
+    /** 시뮬레이션 재개 */
     public void resumeSimulation() {
         threadPaused = false;
         reserveSaving = true;

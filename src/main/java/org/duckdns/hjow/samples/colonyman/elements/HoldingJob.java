@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.duckdns.hjow.commons.json.JsonObject;
 import org.duckdns.hjow.samples.colonyman.ColonyManager;
+
+/** 진행중인 작업 하나를 나타내는 객체를 위한 클래스 */
 public class HoldingJob implements Serializable {
     private static final long serialVersionUID = -8030473577462698183L;
     protected long   key       = ColonyManager.generateKey();

@@ -54,7 +54,7 @@ import org.duckdns.hjow.samples.colonyman.elements.City;
 import org.duckdns.hjow.samples.colonyman.elements.Colony;
 import org.duckdns.hjow.samples.util.UIUtil;
 
-/** Colonization 프로그램 */
+/** Colonization 프로그램 핵심 클래스 Swing 버전 */
 public class GUIColonyManager extends ColonyManager implements GUIProgram {
 	private static final long serialVersionUID = -2483528821790634383L;
 	protected transient SampleJavaCodes superInstance;
@@ -86,6 +86,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
     protected transient JMenu menuFile, menuAction;
     protected transient JMenuItem menuActionThrPlay, menuFileSave, menuFileLoad, menuFileBackup, menuFileRestore, menuFileReset, menuFileNew, menuFileDel;
     
+    /** 생성자, 상위 프로그램에서 호출됨 */
     public GUIColonyManager(SampleJavaCodes superInstance) {
     	super();
         this.superInstance = superInstance;
@@ -869,6 +870,8 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         flagAlreadyDisposed = true;
     }
     
+    /** 이 객체 사용 중단 - 관련 리소스 모두 해제, 대화상자 닫기 여부도 지정 */
+    @Override
     public void dispose(boolean closeDialog) {
         setEditable(false);
         disposeContents();
@@ -900,12 +903,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         }
     }
     
-    public void disposeContents() {
-        threadSwitch = false;
-        waitThreadShutdown();
-        if((! flagAlreadyDisposed) && (! colonies.isEmpty())) saveColonies();
-    }
-    
+    /** 메인 대화상자다 닫힐 때 호출 */
     public void onWindowClosing() {
         setEditable(false);
         if(! flagSaveBeforeClose) return;
@@ -928,6 +926,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         }
     }
     
+    /** 메인 대화상자 내 모든 입력/버튼 등의 컴포넌트 활성화 여부 일괄 지정 */
     public void setEditable(boolean editable) {
         if(editable) {
             if(cardMain != null) cardMain.show(pnMain, "C1");
@@ -961,14 +960,17 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         return newIcon;
     }
 
+    /** 대화상자 객체 반환 */
     public JDialog getDialog() {
         return dialog;
     }
     
+    /** 대화상자 가로 길이 반환 */
     public int getDialogWidth() {
         return getDialog().getWidth();
     }
     
+    /** 대화상자 세로 길이 반환 */
     public int getDialogHeight() {
         return getDialog().getHeight();
     }
@@ -1004,6 +1006,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         }
     }
     
+    @Override
     public void pauseSimulation() {
         threadPaused = true;
         
@@ -1040,6 +1043,7 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
         }).start();
     }
     
+    @Override
     public void resumeSimulation() {
         threadPaused = false;
         reserveSaving = true;

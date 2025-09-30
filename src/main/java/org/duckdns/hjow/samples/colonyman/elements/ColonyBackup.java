@@ -1,5 +1,6 @@
 package org.duckdns.hjow.samples.colonyman.elements;
 
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.util.Date;
 import java.util.List;
@@ -15,7 +16,9 @@ import org.duckdns.hjow.commons.util.HexUtil;
 import org.duckdns.hjow.samples.colonyman.ColonyClassLoader;
 import org.duckdns.hjow.samples.colonyman.GlobalLogs;
 
-public class ColonyBackup {
+/** 정착지 백업 객체를 위한 클래스, 정착지 목록과 이름, 설명, 생성일자를 포함 */
+public class ColonyBackup implements Serializable {
+    private static final long serialVersionUID = -1648482045060274157L;
     protected List<Colony> colonies = new Vector<Colony>();
     protected String name, description;
     protected long created = 0L;

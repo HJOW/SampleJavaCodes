@@ -29,7 +29,7 @@ import org.duckdns.hjow.samples.colonyman.events.TimeEvent;
 import org.duckdns.hjow.samples.colonyman.ui.ColonyManagerUI;
 import org.duckdns.hjow.samples.colonyman.ui.ColonyPanel;
 
-/** 정착지 구현 클래스 */
+/** 정착지 구현 공통 클래스 */
 public abstract class Colony implements ColonyElements {
     private static final long serialVersionUID = -3144963237818493111L;
     protected volatile long key = ColonyManager.generateKey();
@@ -43,7 +43,6 @@ public abstract class Colony implements ColonyElements {
     protected int  hp         = getMaxHp();
     protected long money      = 1000000L;
     protected long tech       = 0L;
-    
     
     protected volatile BigInteger time = new BigInteger("0");
     
@@ -62,6 +61,7 @@ public abstract class Colony implements ColonyElements {
         return "정착지";
     }
     
+    /** 객체 타입 반환, JSON 변환 시 type 으로 들어갈 내용 */
     public String getType() {
         return getColonyClassName();
     }
