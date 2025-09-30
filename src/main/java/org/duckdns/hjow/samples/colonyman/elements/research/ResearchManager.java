@@ -21,8 +21,12 @@ public class ResearchManager {
     
     public static Research fromJson(String json) {
         JsonObject jsonObj = (JsonObject) JsonObject.parseJson(json);
-        Research   instances = createResearchInstance(jsonObj.get("type").toString());
-        instances.fromJson(jsonObj);
+        return fromJson(jsonObj);
+    }
+    
+    public static Research fromJson(JsonObject json) {
+        Research   instances = createResearchInstance(json.get("type").toString());
+        instances.fromJson(json);
         return instances;
     }
     

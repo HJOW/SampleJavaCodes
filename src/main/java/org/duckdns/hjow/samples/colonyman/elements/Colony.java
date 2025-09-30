@@ -544,18 +544,14 @@ public abstract class Colony implements ColonyElements {
         
         list = null;
         try { list = (JsonArray) json.get("researches"); } catch(Exception ex) { GlobalLogs.processExceptionOccured(ex, false); }
-        resetResearches();
+        researches.clear();
         if(list != null) {
             for(Object o : list) {
                 if(o instanceof String) o = JsonObject.parseJson(o.toString());
                 if(o instanceof JsonObject) {
                     try {
-                        long key = Long.parseLong(String.valueOf(((JsonObject) o).get("key")));
-                        for(Research r : getResearches()) {
-                            if(key == r.getKey()) {
-                                r.fromJson((JsonObject) o);
-                            }
-                        }
+                        Research res = ResearchManager.fromJson((JsonObject) o);
+                        researches.add(res);
                     } catch(Exception ex) {
                         GlobalLogs.processExceptionOccured(ex, false);
                     }
