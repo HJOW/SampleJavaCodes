@@ -22,6 +22,64 @@ public class ColonyManagerConfig implements Serializable {
         return roots.get(key);
     }
     
+    /** 설정 변경 */
+    public void set(String key, Object obj) {
+        roots.put(key, obj);
+    }
+    
+    /** 설정 값 반환, 값이 Map 이어야 예외가 발생하지 않음. 해당 키가 없으면 null 이 리턴 */
+    public ColonyManagerConfig getMap(String key) {
+        Object obj = get(key);
+        if(obj == null) return null;
+        
+        if(obj instanceof JsonObject) obj = toMap((JsonObject) obj);
+        if(obj instanceof Map<?, ?>) {
+            ColonyManagerConfig child = new ColonyManagerConfig();
+            
+            Map<?, ?> map = (Map<?, ?>) obj;
+            Set<?> keys = map.keySet();
+            for(Object k : keys) {
+                Object val = map.get(k);
+                
+                child.getRoots().put(k.toString(), val);
+            }
+            return child;
+        } else {
+            throw new RuntimeException("This child " + key + " is not a map !");
+        }
+    }
+    
+    /** 설정 값 반환, 값이 List 이어야 예외가 발생하지 않음. 해당 키가 없으면 null 이 리턴 */
+    public List<Object> getList(String key) {
+        Object obj = get(key);
+        if(obj == null) return null;
+        
+        if(obj instanceof JsonArray) obj = toList((JsonArray) obj);
+        if(obj instanceof List<?>) {
+            List<?> list = (List<?>) obj;
+            List<Object> newList = new ArrayList<Object>();
+            for(Object o : list) {
+                
+                // 객체가 Map 인 경우 ColonyManagerConfig 으로 변환해 탑재
+                if(o instanceof Map<?, ?>) {
+                    Map<?, ?> map = (Map<?, ?>) o;
+                    Set<?> keys = map.keySet();
+                    
+                    ColonyManagerConfig child = new ColonyManagerConfig();
+                    for(Object k : keys) {
+                        child.set(k.toString(), map.get(k));
+                    }
+                    o = child;
+                }
+                
+                newList.add(o);
+            }
+            return newList;
+        } else {
+            throw new RuntimeException("This child " + key + " is not a list !");
+        }
+    }
+    
     /** 설정 값을 문자열로 취급하여 문자열 반환, 강제 형변환될 수 있음. null 일 경우 공란 반환 */
     public String getString(String key) {
         Object obj = roots.get(key);
@@ -120,5 +178,12 @@ public class ColonyManagerConfig implements Serializable {
             list.add(val);
         }
         return list;
+    }
+    
+    /** 이 객체를 복제 */
+    public ColonyManagerConfig cloneSelf() {
+        ColonyManagerConfig newInst = new ColonyManagerConfig();
+        newInst.getRoots().putAll(getRoots());
+        return newInst;
     }
 }

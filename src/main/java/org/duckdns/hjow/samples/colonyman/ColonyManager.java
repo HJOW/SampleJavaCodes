@@ -138,6 +138,9 @@ public abstract class ColonyManager implements ColonyManagerUI, Disposeable, Ser
                 JsonObject json = (JsonObject) JsonObject.parseJson(strJson); // JSON 파싱
                 configs.fromJson(json); // 설정 넣기
             }
+            
+            // 설정들 중 클래스 관련 설정 적용
+            ColonyClassLoader.applyLocalConfigs(configs, this);
         } catch(Exception ex) {
             GlobalLogs.processExceptionOccured(ex, false);
         }

@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.zip.GZIPInputStream;
@@ -36,6 +38,7 @@ import org.duckdns.hjow.samples.colonyman.elements.research.MilitaryTech;
 import org.duckdns.hjow.samples.colonyman.elements.states.ImmuneInfluenza;
 import org.duckdns.hjow.samples.colonyman.elements.states.Influenza;
 import org.duckdns.hjow.samples.colonyman.elements.states.SuperAngry;
+import org.duckdns.hjow.samples.colonyman.pack.Pack;
 
 /** 정착지 시나리오, 시설, 연구, 시설과 시민의 상태 타입 등 클래스들과 타입 리스트를 관리하는 클래스 */
 public class ColonyClassLoader {
@@ -273,9 +276,79 @@ public class ColonyClassLoader {
 		}
 	}
 	
-    /** 공통 설정 정보 적용 */
+    /** 공통 웹 설정 정보 적용 */
 	protected static void applyWebConfigs(JsonObject json, ColonyManager man) throws Exception {
 		// TODO
+	}
+	
+	/** 공통 로컬 설정 정보 적용 */
+	public static void applyLocalConfigs(ColonyManagerConfig cfg, ColonyManager man) {
+	    List<Object> packList = null;
+	    try {
+	        packList = cfg.getList("packs");
+        } catch(Exception ex) {
+            GlobalLogs.processExceptionOccured(ex, false);
+        }
+	    
+	    if(packList == null) {
+	        packList = new ArrayList<Object>();
+            cfg.set("packs", packList);
+        }
+	    
+	    List<Pack> packs = new ArrayList<Pack>();
+	    
+	    for(Object o : packList) {
+	        try {
+	            ColonyManagerConfig child = (ColonyManagerConfig) o;
+	            Class<?> classObj = loadClassFrom(child);
+	            Pack packOne = (Pack) classObj.newInstance();
+	            
+	            if(! packs.contains(packOne)) packs.add(packOne);
+	        } catch(Exception ex) {
+	            GlobalLogs.processExceptionOccured(ex, false);
+	        }
+	    }
+	    
+	    for(Pack p : packs) {
+	        try {
+	            loadPack(p);
+	        } catch(Exception ex) {
+	            GlobalLogs.processExceptionOccured(ex, false);
+	        }
+	    }
+	}
+	
+	/** 설정 Map 으로부터 클래스 정보 추출 */
+	protected static Class<?> loadClassFrom(ColonyManagerConfig info) throws Exception {
+	    String className = info.getString("name");
+        String classUrl  = info.getString("url");
+        URL[] urls = new URL[1];
+        urls[0] = new URL(classUrl);
+        
+        URLClassLoader loader = null;
+        try {
+            loader = new URLClassLoader(urls, ColonyClassLoader.class.getClassLoader());
+            Class<?> classObj = loader.loadClass(className);
+            return classObj;
+        } finally {
+            ClassUtil.closeAll(loader);
+        }
+	}
+	
+	/** Pack 적용 */
+	public static void loadPack(Pack pack) throws Exception {
+	    if(pack == null) return;
+	    if(! pack.isEnabled()) return;
+	    
+	    if(pack.getColonyClasses() != null) {
+	        colonyClassList.addAll(pack.getColonyClasses());
+	        colonyInfoListFlag = false;
+	    }
+	    
+	    if(pack.getFacilityClasses() != null) facilityClassList.addAll(pack.getFacilityClasses());
+	    if(pack.getResearchClasses() != null) researchClassList.addAll(pack.getResearchClasses());
+	    if(pack.getEnemyClasses()    != null) enemyClassList.addAll(pack.getEnemyClasses());
+	    if(pack.getStateClasses()    != null) stateClassList.addAll(pack.getStateClasses());
 	}
 	
 	/** 저장된 클래스 정보들 비우기 */
