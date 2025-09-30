@@ -665,7 +665,14 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
     
     /** 정착지 생성 요청 시 호출됨 */
     protected void onNewRequested() {
-        Colony newCol = newColony();
+        NewColonyManager dialogNewCol = new NewColonyManager(this);
+        dialogNewCol.open();
+    }
+    
+    /** 새 정착지 대화상자 응답 시 호출 */
+    public void onNewColonyTypeDecided(String type, NewColonyManager dicider) {
+        if(dicider == null) return;
+        Colony newCol = newColony(type);
         cbxColony.setSelectedItem(newCol);
         
         cardMain.show(pnMain, "C2");
@@ -676,7 +683,6 @@ public class GUIColonyManager extends ColonyManager implements GUIProgram {
                 cardMain.show(pnMain, "C1");
             }
         });
-        
     }
     
     /** 현재의 정착지 삭제 요청 시 호출됨 */

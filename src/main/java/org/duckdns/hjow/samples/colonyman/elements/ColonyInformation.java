@@ -41,4 +41,9 @@ public class ColonyInformation implements Serializable {
     public void setColonyClass(Class<?> colonyClass) {
         this.colonyClass = colonyClass;
     }
+    
+    @Override
+    public String toString() {
+        return getTitle();
+    }
 }
