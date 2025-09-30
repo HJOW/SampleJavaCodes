@@ -328,6 +328,7 @@ public abstract class ColonyManager implements ColonyManagerUI, Disposeable, Ser
         waitThreadShutdown();
         if(! flagAlreadyDisposed) saveLocalConfigs();
         if((! flagAlreadyDisposed) && (! colonies.isEmpty())) saveColonies();
+        ColonyClassLoader.clearAll();
     }
     
     /** 메시지 출력 */

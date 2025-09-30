@@ -39,10 +39,14 @@ import org.duckdns.hjow.samples.colonyman.elements.states.SuperAngry;
 
 /** 정착지 시나리오, 시설, 연구, 시설과 시민의 상태 타입 등 클래스들과 타입 리스트를 관리하는 클래스 */
 public class ColonyClassLoader {
+    private static final List<ColonyInformation> colonyInfoList     = new Vector<ColonyInformation>();
+    private static       boolean                 colonyInfoListFlag = false; 
+    
     /** 정착지 시나리오 정보들을 반환, 타입명과 제목, 설명, 클래스가 포함 */
-    public static List<ColonyInformation> colonyInfos() {
-        List<ColonyInformation> infos = new Vector<ColonyInformation>();
+    public static synchronized List<ColonyInformation> colonyInfos() {
+        if(colonyInfoListFlag) return colonyInfoList;
         
+        colonyInfoList.clear();
         for(Class<?> classOne : colonyClasses()) {
             ColonyInformation info = new ColonyInformation();
             
@@ -57,21 +61,27 @@ public class ColonyClassLoader {
                 info.setDescription((String) method.invoke(null));
                 
                 info.setColonyClass(classOne);
-                if(! infos.contains(info)) infos.add(info);
+                if(! colonyInfoList.contains(info)) colonyInfoList.add(info);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            
         }
-        
-        return infos;
+        colonyInfoListFlag = true;
+        return colonyInfoList;
     }
     
+    private static final List<Class<?>> colonyClassList     = new Vector<Class<?>>();
+    private static       boolean        colonyClassListFlag = false;
+    
     /** 정착지 시나리오 클래스들을 반환 */
-    public static List<Class<?>> colonyClasses() {
-        List<Class<?>> classes = new Vector<Class<?>>();
-        classes.add(NormalColony.class);
-        return classes;
+    public static synchronized List<Class<?>> colonyClasses() {
+        if(colonyClassListFlag) return colonyClassList;
+        
+        colonyClassList.clear();
+        colonyClassList.add(NormalColony.class);
+        
+        colonyClassListFlag = true;
+        return colonyClassList;
     }
     
     /** 타입을 받아 그에 맞는 새 정착지 객체 생성, 해당 클래스 정보가 없으면 null 반환 */
@@ -127,48 +137,77 @@ public class ColonyClassLoader {
         return null;
     }
     
+    private static final List<Class<?>> facilityClassList     = new Vector<Class<?>>();
+    private static       boolean        facilityClassListFlag = false;
+    
     /** 시설 클래스 목록 반환 */
-	public static List<Class<?>> facilityClasses() {
-		List<Class<?>> classes = new Vector<Class<?>>();
-		classes.add(ResidenceModule.class);
-        classes.add(PowerStation.class);
-        classes.add(Restaurant.class);
-        classes.add(Arcade.class);
-        classes.add(Factory.class);
-        classes.add(ResearchCenter.class);
-        classes.add(ArchitectOffice.class);
-        classes.add(BusStation.class);
-        classes.add(Turret.class);
-        classes.add(TownHouse.class);
-		return classes;
+	public static synchronized List<Class<?>> facilityClasses() {
+	    if(facilityClassListFlag) return facilityClassList;
+	    
+	    facilityClassList.clear();
+		facilityClassList.add(ResidenceModule.class);
+        facilityClassList.add(PowerStation.class);
+        facilityClassList.add(Restaurant.class);
+        facilityClassList.add(Arcade.class);
+        facilityClassList.add(Factory.class);
+        facilityClassList.add(ResearchCenter.class);
+        facilityClassList.add(ArchitectOffice.class);
+        facilityClassList.add(BusStation.class);
+        facilityClassList.add(Turret.class);
+        facilityClassList.add(TownHouse.class);
+        
+        facilityClassListFlag = true;
+		return facilityClassList;
 	}
+	
+	private static final List<Class<?>> researchClassList     = new Vector<Class<?>>();
+    private static       boolean        researchClassListFlag = false;
 	
     /** 연구 클래스 목록 반환 */
-	public static List<Class<?>> researchClasses() {
-		List<Class<?>> classes = new Vector<Class<?>>();
-		classes.add(BasicScience.class);
-        classes.add(BasicHumanities.class);
-        classes.add(MilitaryTech.class);
-        classes.add(BasicBuildingTech.class);
-        classes.add(BasicBiology.class);
-        classes.add(BasicMedicalScience.class);
-        classes.add(BasicEngineering.class);
-        return classes;
+	public static synchronized List<Class<?>> researchClasses() {
+	    if(researchClassListFlag) return researchClassList;
+	    
+	    researchClassList.clear();
+		researchClassList.add(BasicScience.class);
+        researchClassList.add(BasicHumanities.class);
+        researchClassList.add(MilitaryTech.class);
+        researchClassList.add(BasicBuildingTech.class);
+        researchClassList.add(BasicBiology.class);
+        researchClassList.add(BasicMedicalScience.class);
+        researchClassList.add(BasicEngineering.class);
+        
+        researchClassListFlag = true;
+        return researchClassList;
 	}
+	
+	private static final List<Class<?>> enemyClassList     = new Vector<Class<?>>();
+    private static       boolean        enemyClassListFlag = false;
 	
     /** 적 클래스 목록 반환 */
-	public static List<Class<?>> enemyClasses() {
-        List<Class<?>> classes = new Vector<Class<?>>();
-		return classes;
+	public static synchronized List<Class<?>> enemyClasses() {
+	    if(enemyClassListFlag) return enemyClassList;
+	    
+	    enemyClassList.clear();
+	    // TODO
+	    
+	    enemyClassListFlag = true;
+		return enemyClassList;
 	}
 	
+	private static final List<Class<?>> stateClassList     = new Vector<Class<?>>();
+    private static       boolean        stateClassListFlag = false;
+	
     /** 상태 클래스 목록 반환 */
-	public static List<Class<?>> stateClasses() {
-		List<Class<?>> classes = new Vector<Class<?>>();
-		classes.add(Influenza.class);
-        classes.add(ImmuneInfluenza.class);
-        classes.add(SuperAngry.class);
-		return classes;
+	public static synchronized List<Class<?>> stateClasses() {
+	    if(stateClassListFlag) return stateClassList;
+	    
+	    stateClassList.clear();
+		stateClassList.add(Influenza.class);
+        stateClassList.add(ImmuneInfluenza.class);
+        stateClassList.add(SuperAngry.class);
+        
+        stateClassListFlag = true;
+		return stateClassList;
 	}
 	
     /** 기본 공지사항 컨텐츠 html 반환 (웹 접근 못했을 시 이 내용 출력) */
@@ -198,7 +237,7 @@ public class ColonyClassLoader {
 	}
 	
     /** 공통 설정 정보 조회 */
-	public static void loadWebConfigs(ColonyManager man) {
+	public static synchronized void loadWebConfigs(ColonyManager man) {
 		InputStream       inp1 = null;
 		InputStreamReader inp2 = null;
 		BufferedReader    inp3 = null;
@@ -237,5 +276,15 @@ public class ColonyClassLoader {
     /** 공통 설정 정보 적용 */
 	protected static void applyWebConfigs(JsonObject json, ColonyManager man) throws Exception {
 		// TODO
+	}
+	
+	/** 저장된 클래스 정보들 비우기 */
+	public static synchronized void clearAll() {
+	    colonyInfoListFlag    = false; colonyInfoList.clear();
+	    colonyClassListFlag   = false; colonyClassList.clear();
+	    facilityClassListFlag = false; facilityClassList.clear();
+	    researchClassListFlag = false; researchClassList.clear();
+	    enemyClassListFlag    = false; enemyClassList.clear();   
+	    stateClassListFlag    = false; stateClassList.clear();   
 	}
 }
