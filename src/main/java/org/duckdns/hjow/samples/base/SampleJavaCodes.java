@@ -8,7 +8,6 @@ import java.util.Properties;
 import java.util.Vector;
 
 import org.duckdns.hjow.samples.charsetconv.ui.GUIConverterManager;
-import org.duckdns.hjow.samples.colonyman.ui.GUIColonyManager;
 import org.duckdns.hjow.samples.console.ConsoleStream;
 import org.duckdns.hjow.samples.console.ConsoleTerminal;
 import org.duckdns.hjow.samples.cryptor.GCypher;
@@ -73,7 +72,6 @@ public class SampleJavaCodes {
         addProgram(superInstance, new GCypher(superInstance));
         addProgram(superInstance, new GUITextConverter(superInstance));
         addProgram(superInstance, new SVNDirDelete(superInstance));
-        addProgram(superInstance, new GUIColonyManager(superInstance));
         addProgram(superInstance, new GUIConverterManager(superInstance));
         
         ResourceUtil.loadResource("/program.txt", '#', new LineListener() {   
