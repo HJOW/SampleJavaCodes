@@ -12,6 +12,7 @@ import org.duckdns.hjow.samples.console.ConsoleStream;
 import org.duckdns.hjow.samples.console.ConsoleTerminal;
 import org.duckdns.hjow.samples.cryptor.GCypher;
 import org.duckdns.hjow.samples.img2base64.GUIImage2Base64Converter;
+import org.duckdns.hjow.samples.img2base64.GUIImage2HexConverter;
 import org.duckdns.hjow.samples.interfaces.LineListener;
 import org.duckdns.hjow.samples.scripts.ScriptBase;
 import org.duckdns.hjow.samples.svndirdel.SVNDirDelete;
@@ -69,6 +70,7 @@ public class SampleJavaCodes {
         disposeAllPrograms();
         
         addProgram(superInstance, new GUIImage2Base64Converter(superInstance));
+        addProgram(superInstance, new GUIImage2HexConverter(superInstance));
         addProgram(superInstance, new GCypher(superInstance));
         addProgram(superInstance, new GUITextConverter(superInstance));
         addProgram(superInstance, new SVNDirDelete(superInstance));
