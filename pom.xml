@@ -82,7 +82,7 @@
         <dependency>
             <groupId>org.duckdns.hjow</groupId>
             <artifactId>hjow-commons</artifactId>
-            <version>0.0.6</version>
+            <version>0.0.19</version>
         </dependency>
       <dependency>
           <groupId>org.egovframe.rte</groupId>
@@ -115,6 +115,29 @@
           <version>${org.egovframe.rte.version}</version>
       </dependency>
       <!-- simplecryptor 패키지 의존성 END -->
+      
+      <!-- DBConsole 의존성 START -->
+      <!--<dependency>
+          <groupId>org.duckdns.hjow</groupId>
+          <artifactId>hjow-commons</artifactId>
+          <version>0.0.19</version>
+      </dependency>-->
+      <dependency>
+          <groupId>org.mariadb.jdbc</groupId>
+          <artifactId>mariadb-java-client</artifactId>
+          <version>1.8.0</version>
+      </dependency>
+      <dependency>
+          <groupId>com.github.jinahya</groupId>
+          <artifactId>cubrid-jdbc-driver-10.1.1.7691</artifactId>
+          <version>10.1.1.7691-1.0.0</version>
+      </dependency>
+      <dependency>
+          <groupId>org.hsqldb</groupId>
+          <artifactId>hsqldb</artifactId>
+          <version>2.3.6</version>
+      </dependency>
+      <!-- DBConsole 의존성 END -->
   </dependencies>
   <build>
     <defaultGoal>package</defaultGoal>
@@ -159,6 +182,30 @@
                       <includeScope>runtime</includeScope>
                       <outputDirectory>${project.build.directory}/lib/</outputDirectory>
                   </configuration>
+              </execution>
+          </executions>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>3.6.0</version>
+          <configuration>
+              <descriptorRefs>
+                  <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+              <archive>
+                  <manifest>
+                      <addClasspath>true</addClasspath>
+                      <mainClass>org.duckdns.hjow.samples.base.SampleJavaCodes</mainClass>
+                  </manifest>
+              </archive>
+          </configuration>
+          <executions>
+              <execution>
+                  <phase>package</phase>
+                  <goals>
+                      <goal>single</goal>
+                  </goals>
               </execution>
           </executions>
       </plugin>
