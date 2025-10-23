@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Vector;
 
 import org.duckdns.hjow.commons.util.DataUtil;
@@ -45,24 +46,26 @@ public class SampleJavaCodes {
         // 실행
         SampleJavaCodes obj;
         
-        Properties prop = new Properties();
-        prop.putAll(argMap);
-        
-        if(prop.getProperty("dbconsole") != null) {
-            if(DataUtil.parseBoolean(prop.getProperty("dbconsole"))) {
+        if(argMap.get("dbconsole") != null) {
+            if(DataUtil.parseBoolean(argMap.get("dbconsole"))) {
                 DBConsole.main(args);
                 return;
             }
         }
         
         boolean gui = true;
-        if(prop.getProperty("GUI") != null) gui = Boolean.parseBoolean(prop.getProperty("GUI"));
+        if(argMap.get("GUI") != null) gui = Boolean.parseBoolean(argMap.get("GUI"));
         
         if(gui) obj = new GUISampleJavaCodes();
         else    obj = new SampleJavaCodes();
         obj.init(obj);
         obj.loadSamples(obj);
         obj.applySampleList(obj);
+        
+        Properties prop = new Properties();
+        Set<String> keys = argMap.keySet();
+        for(String k : keys) { String val = argMap.get(k); if(val != null) prop.setProperty(k, val); }
+        
         obj.run(prop);
     }
     
