@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -310,5 +311,26 @@ public class DBConsole {
                 ClassUtil.closeAll(rs, pstmt);
             }
         }
+    }
+    
+    public static void main(String[] args) {
+        // 매개변수 수집
+        StringBuilder params = new StringBuilder("");
+        if(args != null) {
+            for(String a : args) {
+                params = params.append(" ").append(a);
+            }
+        }
+        
+        String paramStr = params.toString().trim();
+        params = null;
+        
+        // Map 으로 변환
+        Map<String, String> argMap = new HashMap<String, String>();
+        if(DataUtil.isNotEmpty(paramStr)) argMap.putAll(DataUtil.parseParameter(paramStr));
+        params = null;
+        
+        // 실행
+        new org.duckdns.hjow.subprogram.DBConsole().run(argMap);
     }
 }
