@@ -3,10 +3,13 @@ package org.duckdns.hjow.samples.base;
 import java.awt.Window;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
+import org.duckdns.hjow.commons.util.DataUtil;
 import org.duckdns.hjow.samples.FileUniqueNumberChecker;
 import org.duckdns.hjow.samples.charsetconv.ui.GUIConverterManager;
 import org.duckdns.hjow.samples.console.ConsoleStream;
@@ -19,31 +22,36 @@ import org.duckdns.hjow.samples.scripts.ScriptBase;
 import org.duckdns.hjow.samples.svndirdel.SVNDirDelete;
 import org.duckdns.hjow.samples.textconvert.GUITextConverter;
 import org.duckdns.hjow.samples.util.ResourceUtil;
+import org.duckdns.hjow.subprogram.DBConsole;
 
 public class SampleJavaCodes {
     public static void main(String[] args) {
+        // 매개변수 수집
+        StringBuilder params = new StringBuilder("");
+        if(args != null) {
+            for(String a : args) {
+                params = params.append(" ").append(a);
+            }
+        }
+        
+        String paramStr = params.toString().trim();
+        params = null;
+        
+        // Map 으로 변환
+        Map<String, String> argMap = new HashMap<String, String>();
+        if(DataUtil.isNotEmpty(paramStr)) argMap.putAll(DataUtil.parseParameter(paramStr));
+        params = null;
+        
+        // 실행
         SampleJavaCodes obj;
         
         Properties prop = new Properties();
-        String opt = null;
-        String values = "";
-        if(args != null) {
-            for(String a : args) {
-                if(a.startsWith("--")) {
-                    if(opt != null) {
-                        if(values.equals("")) values = "true";
-                        prop.setProperty(opt, values.trim());
-                        values = "";
-                    }
-                    opt = a.substring(2).trim().toUpperCase();
-                } else {
-                    values += " " + a;
-                }
-            }
-            if(opt != null) {
-                if(values.equals("")) values = "true";
-                prop.setProperty(opt, values.trim());
-                values = "";
+        prop.putAll(argMap);
+        
+        if(prop.getProperty("dbconsole") != null) {
+            if(DataUtil.parseBoolean(prop.getProperty("dbconsole"))) {
+                DBConsole.main(args);
+                return;
             }
         }
         
