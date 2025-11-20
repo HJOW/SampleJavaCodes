@@ -20,6 +20,7 @@ import org.duckdns.hjow.samples.img2base64.GUIImage2Base64Converter;
 import org.duckdns.hjow.samples.img2base64.GUIImage2HexConverter;
 import org.duckdns.hjow.samples.interfaces.LineListener;
 import org.duckdns.hjow.samples.scripts.ScriptBase;
+import org.duckdns.hjow.samples.space3D.Space3D;
 import org.duckdns.hjow.samples.svndirdel.SVNDirDelete;
 import org.duckdns.hjow.samples.textconvert.GUITextConverter;
 import org.duckdns.hjow.samples.util.ResourceUtil;
@@ -88,6 +89,7 @@ public class SampleJavaCodes {
         addProgram(superInstance, new SVNDirDelete(superInstance));
         addProgram(superInstance, new GUIConverterManager(superInstance));
         addProgram(superInstance, new FileUniqueNumberChecker(superInstance));
+        addProgram(superInstance, new Space3D(superInstance));
         
         ResourceUtil.loadResource("/program.txt", '#', new LineListener() {   
             @SuppressWarnings("unchecked")
