@@ -41,7 +41,7 @@ public class Space3D implements GUIProgram {
         if(dialog != null) dispose();
         
         dialog = new JDialog();
-        dialog.setSize(600, 400);
+        dialog.setSize(800, 600);
         dialog.setTitle("Space 3D");
         dialog.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         dialog.addWindowListener(new WindowAdapter() {
@@ -62,7 +62,7 @@ public class Space3D implements GUIProgram {
         JToolBar toolbar = new JToolBar();
         pnRoot.add(toolbar, BorderLayout.NORTH);
         
-        JLabel lb = new JLabel("카메라 수평이동 : W, A, S, D / 카메라 상하이동 : R, F / 객체 추가 : G / 초기화 : T / 종료 : Y");
+        JLabel lb = new JLabel("카메라 수평이동 : W, A, S, D / 카메라 상하이동 : R, F / 좌우 회전 : Q, E / 객체 추가 : G / 초기화 : T / 종료 : Y");
         toolbar.add(lb);
         
         arena = new Arena();
@@ -221,6 +221,8 @@ class Arena extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         Coordinate2D p;
         
+        double scale = 100.0;
+        
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, w, h);
         for(Ovals ov : ovals) {
@@ -228,7 +230,7 @@ class Arena extends JPanel {
             if(p == null) continue;
             
             g2d.setColor(Color.BLUE);
-            g2d.fillOval((int) p.getX(), (int) p.getY(), (int) ov.getR(), (int) ov.getR());
+            g2d.fillOval((int) p.getX(), (int) p.getY(), (int) Math.ceil(ov.getR() / ((ov.getDistance(cameraX, cameraY, cameraZ) + 0.1) / scale)), (int) Math.ceil(ov.getR() / ((ov.getDistance(cameraX, cameraY, cameraZ) + 0.1) / scale)));
         }
         
         g2d.setColor(Color.DARK_GRAY);
@@ -303,10 +305,10 @@ class Coordinate2D {
 class Ovals {
     double x, y, z, r;
     public Ovals() {
-        x = Math.abs(Math.random()) * 10000.0;
-        y = Math.abs(Math.random()) * 10000.0;
-        z = Math.abs(Math.random()) * 10000.0;
-        r = Math.abs(Math.random()) * 100.0;
+        x = Math.abs(Math.random() * 10000.0);
+        y = Math.abs(Math.random() * 10000.0);
+        z = Math.abs(Math.random() * 10000.0);
+        r = Math.abs(Math.random() * 100.0  ) + 1;
     }
     public Ovals(double x, double y, double z, double r) {
         this.x = x;
@@ -345,6 +347,14 @@ class Ovals {
 
     public void setR(double r) {
         this.r = r;
+    }
+    
+    /** 해당 좌표와의 거리 */
+    public double getDistance(double x, double y, double z) {
+        double dx = Math.pow(Math.abs(getX() - x), 2);
+        double dy = Math.pow(Math.abs(getY() - y), 2);
+        double dz = Math.pow(Math.abs(getZ() - z), 2);
+        return Math.sqrt(dx + dy + dz);
     }
     
     /** 2D 영역에 투영 (중앙 점만 투영) */
